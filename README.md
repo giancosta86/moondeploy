@@ -2,6 +2,8 @@
 
 *Lightweight software deployment*
 
+![Logo](moondeploy.png)
+
 
 ## For software users
 
@@ -109,7 +111,11 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 ### Technologies
 
-MoonDeploy employs the following open source libraries:
+MoonDeploy employs the following technologies:
+
+* [Go](https://golang.org/), which was definitely brilliant for this task! ^\_\_^!
+
+* [GitHub API](https://developer.github.com/) - simple and elegant RESTful access to GitHub's information.
 
 * [Caravel](https://github.com/giancosta86/caravel)
 
