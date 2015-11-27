@@ -1,0 +1,143 @@
+/*§
+  ===========================================================================
+  MoonDeploy
+  ===========================================================================
+  Copyright (C) 2015 Gianluca Costa
+  ===========================================================================
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ===========================================================================
+*/
+
+buildscript {
+    repositories {
+        maven {
+            url "https://dl.bintray.com/giancosta86/Hephaestus"
+        }
+    }
+
+    dependencies {
+        classpath "info.gianlucacosta.moonlicense:moonlicense-gradle:4.0"
+    }
+}
+
+apply plugin: 'base'
+apply plugin: 'info.gianlucacosta.moonlicense'
+
+version = '1.0'
+
+description = 'Lightweight software deployment'
+
+
+moonLicense {
+    license = apache2
+
+    productInfo {
+        productName = "MoonDeploy"
+        inceptionYear = 2015
+        copyrightHolder = "Gianluca Costa"
+    }
+
+    includes += [
+      /.*\.(go)$/: javaFormat
+    ]
+}
+
+
+def goLibs = [
+  "github.com/mattn/go-gtk/gtk",
+  "github.com/giancosta86/caravel",
+  "github.com/giancosta86/LockAPI/lockapi",
+  "github.com/op/go-logging",
+  "github.com/kardianos/osext"
+]
+
+String currentOS = System.properties['os.name'].toLowerCase()
+String osSuffix = currentOS.split(" ")[0]
+
+boolean onWindows = currentOS.contains("windows")
+
+String compileOutputDir = "${buildDir}/${osSuffix}"
+
+String programExtension = ""
+if (onWindows) {
+  programExtension = ".exe"
+}
+
+
+task installGoLibs << {
+  goLibs.each{ goLib ->
+    println "Installing ${goLib}..."
+
+    exec {
+      commandLine "go", "get", "-u", goLib
+    }
+
+    exec {
+      commandLine "go", "install", goLib
+    }
+  }
+}
+
+
+task copyResources(type: Copy) {
+    from projectDir
+    into compileOutputDir
+    include "moondeploy.ico"
+    include "moondeploy.png"
+}
+
+
+task('compileGo', dependsOn: ['copyResources', 'installGoLibs', 'setNotices']) << {
+  exec {
+    commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", "github.com/giancosta86/moondeploy/client"
+  }
+
+  if (onWindows) {
+    exec {
+      commandLine "go", "build", "-o", "${compileOutputDir}/moondeployw${programExtension}", "-ldflags", "-H windowsgui", "github.com/giancosta86/moondeploy/client"
+    }
+  }
+}
+
+
+tasks['assemble'].dependsOn(['compileGo'])
+
+
+task('testGo', type: Exec, dependsOn: ['assemble']) {
+  commandLine "go", "test", "github.com/giancosta86/moondeploy/test"
+}
+
+
+tasks['check'].dependsOn(['testGo'])
+
+
+task('createProgramZip', type: Zip, dependsOn: ['check'])  {
+  from compileOutputDir
+
+  archiveName "moondeploy-${version}-${osSuffix}.zip"
+  destinationDir buildDir
+}
+
+
+task('createAdditionalPackages', dependsOn: ['check']) << {
+  exec {
+    commandLine "iscc", "/Q", "/O\"${buildDir}\"", "${projectDir}/WinSetup/MoonDeploy.iss"
+  }
+}
+tasks['createAdditionalPackages'].onlyIf { onWindows }
+
+
+task('packageProgram').dependsOn(['createProgramZip', 'createAdditionalPackages'])
+
+
+tasks['build'].dependsOn(['packageProgram'])
