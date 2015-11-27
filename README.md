@@ -66,7 +66,7 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 * **Technology independence**: MoonDeploy is written in Go, so it is deployed as a *native executable* on every supported operating system - it reads an application descriptor, applies its update algorithm and runs the application - which can be written in any language!
 
-* **GitHub-friendly**: [GitHub](https://github.com/) is a brilliant platform for software development; applications deployed on it can easily download their latest versions, just by following a very easy naming convention for the BaseURL in their [app descriptor](wiki/App-descriptors).
+* **GitHub-friendly**: [GitHub](https://github.com/) is a brilliant platform for software development; applications deployed on it can easily download their latest versions, just by following a very easy naming convention for the BaseURL in their [app descriptor](https://github.com/giancosta86/moondeploy/wiki/App-descriptors).
 
 * **Simplicity**: installed apps reside in the *App gallery* in the user directory, organized by *host* and *base URL path*. Running an application is as easy as making MoonDeploy open a *.moondeploy* file - which can be simplified by the desktop environment. The user can see the files of an app by opening its directory in the app gallery. Likewise, uninstalling an app is achieved by deleting its directory.
 
@@ -82,7 +82,7 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 ### Packaging
 
-* To deploy an application, you don't even need MoonDeploy - just open a text editor to create an [app descriptor](wiki/App-descriptors) in JSON format
+* To deploy an application, you don't even need MoonDeploy - just open a text editor to create an [app descriptor](https://github.com/giancosta86/moondeploy/wiki/App-descriptors) in JSON format
 
 * To install the Go library for *very* customized installers, run:
  ```
@@ -94,14 +94,14 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 ### Documentation
 
 
-* The most important documents are in the [user-friendly wiki](wiki)
+* The most important documents are in the [user-friendly wiki](https://github.com/giancosta86/moondeploy/wiki)
 
 * MoonDeploy's Go API has a [dedicated GoDoc page](https://godoc.org/github.com/giancosta86/moondeploy), if you wish to employ its engine for a custom installer
 
 
 ### See also
 
-* [Chronos IDE](https://github.com/giancosta86/Chronos-IDE), the development environment for my very first programming language! ^\_\_^! It's also the very first application using MoonDeploy.
+* [Chronos IDE](https://github.com/giancosta86/Chronos-IDE), the development environment for my very first programming language!  :ghost: It's also the very first application using MoonDeploy.
 
 * [Facebook page](https://www.facebook.com/MoonDeploy/)
 
