@@ -11,8 +11,8 @@
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="border_width">15</property>
-        <property name="spacing">20</property>
+        <property name="border_width">35</property>
+        <property name="spacing">25</property>
         <child>
           <object class="GtkSpinner" id="spinner">
             <property name="name">spinner</property>
@@ -34,8 +34,7 @@
             <property name="can_focus">False</property>
             <property name="margin_left">15</property>
             <property name="margin_right">15</property>
-            <property name="margin_top">15</property>
-            <property name="margin_bottom">45</property>
+            <property name="margin_bottom">15</property>
             <property name="orientation">vertical</property>
             <property name="spacing">15</property>
             <child>
@@ -91,6 +90,7 @@
                 <property name="name">progressBar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_right">62</property>
               </object>
               <packing>
                 <property name="expand">True</property>
