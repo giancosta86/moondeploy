@@ -21,51 +21,7 @@
 package moondeploy
 
 import (
-	"net/url"
-	"path/filepath"
-	"runtime"
-
-	"github.com/kardianos/osext"
+  "github.com/giancosta86/moondeploy/versioning"
 )
 
-const Name = "MoonDeploy"
-
-var Title = Name + " " + Version.String()
-
-var WebsiteURL *url.URL
-
-var Executable string
-var Dir string
-
-var IconPathAsIco string
-var IconPathAsPng string
-
-func GetIconPath() string {
-	if runtime.GOOS == "windows" {
-		return IconPathAsIco
-	}
-
-	return IconPathAsPng
-}
-
-func init() {
-	var err error
-
-	WebsiteURL, err = url.Parse("https://github.com/giancosta86/moondeploy")
-	if err != nil {
-		panic(err)
-	}
-
-	Executable, err = osext.Executable()
-	if err != nil {
-		panic(err)
-	}
-
-	Dir, err = osext.ExecutableFolder()
-	if err != nil {
-		panic(err)
-	}
-
-	IconPathAsIco = filepath.Join(Dir, "moondeploy.ico")
-	IconPathAsPng = filepath.Join(Dir, "moondeploy.png")
-}
+var Version = versioning.MustParseVersion("2.0")

@@ -120,6 +120,22 @@ task copyResources(type: Copy) {
 }
 
 
+task createVersionSourceFile << {
+  def versionFile = project.file('engineVersion.go')
+
+  versionFile.text = """package moondeploy
+
+import (
+  "github.com/giancosta86/moondeploy/versioning"
+)
+
+var Version = versioning.MustParseVersion("${project.version}")
+"""
+}
+
+
+tasks["setNotices"].dependsOn(createVersionSourceFile)
+
 task compileGo {
   dependsOn(copyResources, installGoLibs, setNotices)
 } << {
