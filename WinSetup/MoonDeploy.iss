@@ -7,8 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{2EF654FA-68EC-4AEE-AA11-5BBF2395098D}
 AppName=MoonDeploy
-AppVersion=1.0
-;AppVerName=MoonDeploy 1.0
+AppVersion=2.0
 AppPublisher=Gianluca Costa
 AppPublisherURL=https://github.com/giancosta86/moondeploy
 AppSupportURL=https://github.com/giancosta86/moondeploy
@@ -16,14 +15,14 @@ AppUpdatesURL=https://github.com/giancosta86/moondeploy
 DefaultDirName=C:\MoonDeploy
 DefaultGroupName=MoonDeploy
 DisableProgramGroupPage=yes
-LicenseFile=C:\GoPath\src\github.com\giancosta86\moondeploy\LICENSE
+LicenseFile=..\LICENSE
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
 ChangesAssociations=True
 WizardImageFile=SideImage.bmp
 WizardSmallImageFile=SmallImage.bmp
-AppCopyright=Copyright © 2015 Gianluca Costa
+AppCopyright=Copyright © 2015-2016 Gianluca Costa
 UninstallDisplayIcon={app}\moondeploy.ico
 ArchitecturesInstallIn64BitMode=x64 ia64
 
@@ -35,6 +34,7 @@ Source: "..\build\windows\moondeployw.exe"; DestDir: "{app}"; Flags: 64bit
 Source: "..\build\windows\moondeploy.exe"; DestDir: "{app}"; Flags: 64bit
 Source: "..\build\windows\moondeploy.ico"; DestDir: "{app}"
 Source: "..\build\windows\moondeploy.png"; DestDir: "{app}"
+Source: "..\moondeploy.glade"; DestDir: "{app}"
 
 [Registry]
 Root: HKCR; SubKey: ".moondeploy"; ValueType: string; ValueData: "MoonDeploy Application"; Flags: uninsdeletekey
