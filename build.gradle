@@ -48,7 +48,8 @@ moonLicense {
     }
 
     includes += [
-      /.*\.(go)$/: javaFormat
+      /.*\.(go)$/: javaFormat,
+      /.*\.(glade)$/: xmlFormat
     ]
 }
 
@@ -109,8 +110,8 @@ task installGoLibs {
 
 
 task copyResources(type: Copy) {
-    dependsOn(checkGoPath)
-    
+    dependsOn(checkGoPath, setNotices)
+
     from projectDir
     into compileOutputDir
     include "moondeploy.ico"
