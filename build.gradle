@@ -135,7 +135,7 @@ task createVersionSourceFile << {
 
   versionFile.withWriter('utf-8') { writer ->
     lines.each {line ->
-      writer.write(line + "\r\n")
+      writer.write(line + "\n")
     }
   }
 }
