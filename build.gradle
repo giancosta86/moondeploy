@@ -33,7 +33,7 @@ buildscript {
 apply plugin: 'base'
 apply plugin: 'info.gianlucacosta.moonlicense'
 
-version = '1.5'
+version = '2.0'
 
 description = 'Lightweight software deployment'
 
