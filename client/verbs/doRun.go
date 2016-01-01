@@ -2,7 +2,7 @@
   ===========================================================================
   MoonDeploy
   ===========================================================================
-  Copyright (C) 2015 Gianluca Costa
+  Copyright (C) 2015-2016 Gianluca Costa
   ===========================================================================
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package verbs
 import (
 	"os"
 
-	"github.com/mattn/go-gtk/gtk"
+	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/giancosta86/moondeploy"
 	"github.com/giancosta86/moondeploy/apps"

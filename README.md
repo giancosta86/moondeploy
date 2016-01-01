@@ -121,13 +121,22 @@ MoonDeploy employs the following technologies:
 
 * [LockAPI](https://github.com/giancosta86/LockAPI)
 
-* [go-gtk](https://github.com/mattn/go-gtk/)
+* [gotk3](https://github.com/gotk3/gotk3)
 
   ```
-  The library is available under the same terms and conditions as the Go,
-  the BSD style license, and the LGPL (Lesser GNU Public License).
-  The idea is that if you can use Go (and Gtk) in a project, you should
-  also be able to use go-gtk.
+  Copyright (c) 2013-2014 Conformal Systems LLC.
+
+  Permission to use, copy, modify, and distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ```
 
 * [Golang logging library](https://github.com/op/go-logging)

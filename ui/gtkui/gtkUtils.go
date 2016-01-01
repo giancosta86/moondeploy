@@ -2,7 +2,7 @@
   ===========================================================================
   MoonDeploy
   ===========================================================================
-  Copyright (C) 2015 Gianluca Costa
+  Copyright (C) 2015-2016 Gianluca Costa
   ===========================================================================
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package gtkui
 
-import "github.com/mattn/go-gtk/glib"
+import "github.com/gotk3/gotk3/glib"
 
 type uiTask func() (result interface{})
 

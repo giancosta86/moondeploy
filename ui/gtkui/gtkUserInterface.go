@@ -2,7 +2,7 @@
   ===========================================================================
   MoonDeploy
   ===========================================================================
-  Copyright (C) 2015 Gianluca Costa
+  Copyright (C) 2015-2016 Gianluca Costa
   ===========================================================================
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,10 +22,9 @@ package gtkui
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/mattn/go-gtk/gdk"
-	"github.com/mattn/go-gtk/glib"
-	"github.com/mattn/go-gtk/gtk"
+	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/giancosta86/moondeploy"
 	"github.com/giancosta86/moondeploy/apps"
@@ -56,60 +55,60 @@ func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
 	userInterface = &GtkUserInterface{}
 
 	runOnUIThreadAndWait(func() interface{} {
-		window := gtk.NewWindow(gtk.WINDOW_TOPLEVEL)
+		builder, err := gtk.BuilderNew()
+		if err != nil {
+			panic(err)
+		}
+
+		gladeDescriptorPath := filepath.Join(
+			filepath.Dir(moondeploy.Executable),
+			"moondeploy.glade")
+
+		err = builder.AddFromFile(gladeDescriptorPath)
+		if err != nil {
+			panic(err)
+		}
+
+		windowObject, err := builder.GetObject("mainWindow")
+		if err != nil {
+			panic(err)
+		}
+		window := windowObject.(*gtk.Window)
 		userInterface.window = window
 
 		window.SetTitle(moondeploy.Title)
-		window.SetPosition(gtk.WIN_POS_CENTER_ALWAYS)
-		window.SetTypeHint(gdk.WINDOW_TYPE_HINT_DIALOG)
 		window.SetIconFromFile(moondeploy.IconPathAsPng)
-		window.SetSizeRequest(800, 350)
 
-		window.Connect("destroy", func(ctx *glib.CallbackContext) {
+		window.Connect("destroy", func() {
 			window.Destroy()
 			userInterface.window = nil
 			gtk.MainQuit()
 			userInterface.closedByUser = true
 		})
 
-		mainBox := gtk.NewVBox(false, 10)
-		mainAlignment := gtk.NewAlignment(0, 0, 1, 1)
-		mainAlignment.SetPadding(40, 40, 40, 40)
-		mainAlignment.Add(mainBox)
-		window.Add(mainAlignment)
+		appLabelObject, err := builder.GetObject("appLabel")
+		if err != nil {
+			panic(err)
+		}
+		userInterface.appLabel = appLabelObject.(*gtk.Label)
 
-		appLabel := gtk.NewLabel("")
-		userInterface.appLabel = appLabel
-		appLabel.ModifyFontEasy("bold 24")
-		mainBox.PackStart(appLabel, false, false, 15)
+		headerLabelObject, err := builder.GetObject("headerLabel")
+		if err != nil {
+			panic(err)
+		}
+		userInterface.headerLabel = headerLabelObject.(*gtk.Label)
 
-		appBox := gtk.NewHBox(false, 40)
-		mainBox.PackStart(appBox, true, true, 20)
+		statusLabelObject, err := builder.GetObject("statusLabel")
+		if err != nil {
+			panic(err)
+		}
+		userInterface.statusLabel = statusLabelObject.(*gtk.Label)
 
-		spinner := gtk.NewSpinner()
-		spinner.SetSizeRequest(32, 32)
-		spinner.Start()
-		appBox.PackStart(spinner, false, false, 0)
-
-		infoBox := gtk.NewVBox(false, 20)
-		appBox.PackStart(infoBox, true, true, 0)
-
-		headerLabel := gtk.NewLabel("")
-		userInterface.headerLabel = headerLabel
-		headerLabel.SetAlignment(0, 0.5)
-		headerLabel.ModifyFontEasy("bold")
-		infoBox.PackStart(headerLabel, true, true, 0)
-
-		statusLabel := gtk.NewLabel("")
-		userInterface.statusLabel = statusLabel
-		statusLabel.SetAlignment(0, 0.5)
-		statusLabel.SetLineWrap(true)
-		infoBox.PackStart(statusLabel, true, true, 0)
-
-		progressBar := gtk.NewProgressBar()
-		userInterface.progressBar = progressBar
-		progressBar.SetSizeRequest(-1, 20)
-		infoBox.PackStart(progressBar, true, false, 0)
+		progressBarObject, err := builder.GetObject("progressBar")
+		if err != nil {
+			panic(err)
+		}
+		userInterface.progressBar = progressBarObject.(*gtk.ProgressBar)
 
 		return nil
 	})
@@ -123,7 +122,7 @@ func (userInterface *GtkUserInterface) IsClosedByUser() bool {
 
 func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.MessageType, message string) {
 	runOnUIThreadAndWait(func() interface{} {
-		dialog := gtk.NewMessageDialog(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
+		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
 		defer dialog.Destroy()
 
 		dialog.SetTitle(moondeploy.Title)
@@ -135,11 +134,11 @@ func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.Me
 
 func (userInterface *GtkUserInterface) showYesNoDialog(messageType gtk.MessageType, message string) bool {
 	result := runOnUIThreadAndWait(func() interface{} {
-		dialog := gtk.NewMessageDialog(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
+		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
 		defer dialog.Destroy()
 
 		dialog.SetTitle(moondeploy.Title)
-		return (dialog.Run() == gtk.RESPONSE_YES)
+		return (dialog.Run() == int(gtk.RESPONSE_YES))
 	})
 
 	return result.(bool)

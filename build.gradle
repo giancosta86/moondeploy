@@ -2,7 +2,7 @@
   ===========================================================================
   MoonDeploy
   ===========================================================================
-  Copyright (C) 2015 Gianluca Costa
+  Copyright (C) 2015-2016 Gianluca Costa
   ===========================================================================
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ buildscript {
 apply plugin: 'base'
 apply plugin: 'info.gianlucacosta.moonlicense'
 
-version = '1.0'
+version = '1.5'
 
 description = 'Lightweight software deployment'
 
@@ -54,7 +54,7 @@ moonLicense {
 
 
 def goLibs = [
-  "github.com/mattn/go-gtk/gtk",
+  "github.com/gotk3/gotk3/gtk",
   "github.com/giancosta86/caravel",
   "github.com/giancosta86/LockAPI/lockapi",
   "github.com/op/go-logging",
@@ -94,6 +94,7 @@ task copyResources(type: Copy) {
     into compileOutputDir
     include "moondeploy.ico"
     include "moondeploy.png"
+    include "moondeploy.glade"
 }
 
 
