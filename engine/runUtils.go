@@ -50,6 +50,13 @@ func resolveAppDir(bootDescriptor *apps.AppDescriptor, appGalleryDir string) (ap
 
 	appDirComponents = append(appDirComponents, baseComponents...)
 
+	if hostComponent == "github.com" &&
+		len(appDirComponents) > 2 &&
+		appDirComponents[len(appDirComponents)-2] == "releases" &&
+		appDirComponents[len(appDirComponents)-1] == "latest" {
+		appDirComponents = appDirComponents[0 : len(appDirComponents)-2]
+	}
+
 	appDir = filepath.Join(appDirComponents...)
 
 	return appDir, nil
