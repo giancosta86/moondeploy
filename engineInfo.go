@@ -32,7 +32,7 @@ import (
 
 const Name = "MoonDeploy"
 
-var Version = versioning.MustParseVersion("1.0")
+var Version = versioning.MustParseVersion("1.5")
 
 var Title = Name + " " + Version.String()
 
