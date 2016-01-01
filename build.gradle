@@ -74,7 +74,26 @@ if (onWindows) {
 }
 
 
-task installGoLibs << {
+task checkGoPath << {
+  def goPath = System.getenv('GOPATH')
+  if (goPath == null) {
+    throw new GradleException("The GOPATH environment variable must be set! See https://golang.org/doc/code.html for further information")
+  }
+
+  def absoluteProjectDir = project.projectDir.getAbsolutePath()
+
+  def expectedAbsoluteProjectDir = new File(
+    goPath + "/src/github.com/giancosta86/moondeploy"
+  ).getAbsolutePath()
+
+  if (absoluteProjectDir != expectedAbsoluteProjectDir) {
+    throw new GradleException("The project dir should be: '${expectedAbsoluteProjectDir}' but it is '${absoluteProjectDir}'. Please, move the content of the current project dir to the expected directory")
+  }
+}
+
+task installGoLibs {
+    dependsOn(checkGoPath)
+} << {
   goLibs.each{ goLib ->
     println "Installing ${goLib}..."
 
@@ -90,6 +109,8 @@ task installGoLibs << {
 
 
 task copyResources(type: Copy) {
+    dependsOn(checkGoPath)
+    
     from projectDir
     into compileOutputDir
     include "moondeploy.ico"
@@ -98,7 +119,9 @@ task copyResources(type: Copy) {
 }
 
 
-task('compileGo', dependsOn: ['copyResources', 'installGoLibs', 'setNotices']) << {
+task compileGo {
+  dependsOn(copyResources, installGoLibs, setNotices)
+} << {
   exec {
     commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", "github.com/giancosta86/moondeploy/client"
   }
