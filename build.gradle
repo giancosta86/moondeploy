@@ -123,14 +123,21 @@ task copyResources(type: Copy) {
 task createVersionSourceFile << {
   def versionFile = project.file('engineVersion.go')
 
-  versionFile.text = """package moondeploy
+  def lines = [
+    "package moondeploy",
+    "",
+    "import (",
+    "  \"github.com/giancosta86/moondeploy/versioning\"",
+    ")",
+    "",
+    "var Version = versioning.MustParseVersion(\"${project.version}\")"
+  ]
 
-import (
-  "github.com/giancosta86/moondeploy/versioning"
-)
-
-var Version = versioning.MustParseVersion("${project.version}")
-"""
+  versionFile.withWriter('utf-8') { writer ->
+    lines.each {line ->
+      writer.write(line + "\r\n")
+    }
+  }
 }
 
 
