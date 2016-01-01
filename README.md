@@ -25,6 +25,11 @@ MoonDeploy is a cross-platform utility, written in Go, that:
 There are already similar solutions (for example Java Web Start, Getdown or Zero Install), but MoonDeploy is designed to make both deployment and installation definitely minimalist and simple, as well as GitHub-aware.
 
 
+## Requirements
+
+MoonDeploy requires a **64-bit** system. In particular, to correctly start applications from your web browser, it is recommended that you use the **64-bit version of your favorite browser**, which should be free to download from the browser's website.
+
+
 ### Installation
 
 MoonDeploy can be easily installed:
@@ -33,7 +38,7 @@ MoonDeploy can be easily installed:
 
 * on Linux, download the zip file from the [download area](https://github.com/giancosta86/moondeploy/releases/latest), then tell your desktop environment that you wish to employ MoonDeploy's executable to open **.moondeploy** files
 
-* Mac OS is not officially supported, but you might want to build MoonDeploy from the Go source code - and it will probably work. You should download and uncompress MoonDeploy's source files, then run **gradle build** from within its root directory, installing dependencies as required by the build process.
+* Mac OS is not officially supported, but you might want to build MoonDeploy from the Go source code - please, refer to the [related wiki page](https://github.com/giancosta86/moondeploy/wiki/Building-MoonDeploy).
 
 
 ### Usage
