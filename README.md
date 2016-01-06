@@ -110,6 +110,10 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 * [Chronos IDE](https://github.com/giancosta86/Chronos-IDE), the development environment for my very first programming language!  :ghost: It's also the very first application using MoonDeploy.
 
+* [KnapScal](https://github.com/giancosta86/KnapScal), a ScalaFX didactic application for the Knapsack problem
+
+* [GraphsJ](https://github.com/giancosta86/GraphsJ), a didactic application for running graph algorithms
+
 * [Facebook page](https://www.facebook.com/MoonDeploy/)
 
 
