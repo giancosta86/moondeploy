@@ -195,6 +195,7 @@ func (descriptor *AppDescriptorV1V2) setCommandLine() {
 	osSpecificCommandLine := descriptor.CommandLine[runtime.GOOS]
 	if osSpecificCommandLine != nil {
 		descriptor.commandLine = osSpecificCommandLine
+		return
 	}
 
 	genericCommandLine := descriptor.CommandLine[AnyOS]
