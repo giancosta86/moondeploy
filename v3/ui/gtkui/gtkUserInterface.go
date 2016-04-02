@@ -26,7 +26,7 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
@@ -151,7 +151,7 @@ func (userInterface *GtkUserInterface) askWarningYesNo(message string) bool {
 	return userInterface.showYesNoDialog(gtk.MESSAGE_WARNING, message)
 }
 
-func formatBasicFirstRunPrompt(bootDescriptor apps.AppDescriptor) (basicFirstRunPrompt string) {
+func formatBasicFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) (basicFirstRunPrompt string) {
 	const basicFirstRunTemplate = "You are running an application for the first time." +
 		"\n\n\nTitle:   %v" +
 		"\n\nPublisher:   %v" +
@@ -164,16 +164,16 @@ func formatBasicFirstRunPrompt(bootDescriptor apps.AppDescriptor) (basicFirstRun
 		bootDescriptor.GetDeclaredBaseURL())
 }
 
-func (userInterface *GtkUserInterface) AskForSecureFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool) {
+func (userInterface *GtkUserInterface) AskForSecureFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
 	return userInterface.askYesNo(formatBasicFirstRunPrompt(bootDescriptor))
 }
 
-func (userInterface *GtkUserInterface) AskForUntrustedFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool) {
+func (userInterface *GtkUserInterface) AskForUntrustedFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
 	return userInterface.askWarningYesNo(
 		formatBasicFirstRunPrompt(bootDescriptor) + untrustedWarning)
 }
 
-func (userInterface *GtkUserInterface) AskForDesktopShortcut(referenceDescriptor apps.AppDescriptor) (canCreate bool) {
+func (userInterface *GtkUserInterface) AskForDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (canCreate bool) {
 	return userInterface.askYesNo("Would you like to create a desktop shortcut for the application?")
 }
 

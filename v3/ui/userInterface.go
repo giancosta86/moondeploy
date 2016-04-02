@@ -20,7 +20,7 @@
 
 package ui
 
-import "github.com/giancosta86/moondeploy/v3/apps"
+import "github.com/giancosta86/moondeploy/v3/descriptors"
 
 /*
 UserInterface is the interface that must be implemented to plug a user interface,
@@ -29,15 +29,15 @@ base on any technology, into MoonDeploy's algorithm
 type UserInterface interface {
 	ShowError(message string)
 
-	AskForSecureFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool)
-	AskForUntrustedFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool)
+	AskForSecureFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool)
+	AskForUntrustedFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool)
 
 	SetApp(app string)
 	SetHeader(header string)
 	SetStatus(status string)
 	SetProgress(progress float64)
 
-	AskForDesktopShortcut(referenceDescriptor apps.AppDescriptor) (canCreate bool)
+	AskForDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (canCreate bool)
 
 	HideLoader()
 }

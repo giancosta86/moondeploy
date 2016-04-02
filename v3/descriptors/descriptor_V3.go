@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package apps
+package descriptors
 
 import (
 	"encoding/json"
@@ -156,7 +156,7 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 	}
 
 	if osSettingsFound && descriptor.descriptorFileName == "" {
-		descriptor.descriptorFileName = DefaultDescriptorFileName
+		descriptor.descriptorFileName = defaultDescriptorFileName
 	}
 
 	if osSettingsFound && osSettings.Name != "" {

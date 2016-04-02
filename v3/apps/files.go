@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package engine
+package apps
 
 import (
 	"fmt"
@@ -26,30 +26,28 @@ import (
 	"os"
 
 	"github.com/giancosta86/caravel"
-	"github.com/giancosta86/moondeploy/v3/apps"
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/logging"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
-func checkAppFiles(
-	remoteDescriptor apps.AppDescriptor,
-	localDescriptorPath string,
-	localDescriptor apps.AppDescriptor,
-	appFilesDir string,
+func (app *App) CheckFiles(
 	settings *custom.Settings,
 	userInterface ui.UserInterface) (err error) {
 
-	packagesToUpdate := getPackagesToUpdate(remoteDescriptor, localDescriptor)
+	remoteDescriptor := app.GetRemoteDescriptor()
+	localDescriptor := app.GetLocalDescriptor()
+
+	packagesToUpdate := app.getPackagesToUpdate()
 
 	if len(packagesToUpdate) == 0 {
 		logging.Notice("All the packages are up-to-date")
 		return nil
 	}
 
-	if caravel.FileExists(localDescriptorPath) {
+	if localDescriptor != nil && caravel.FileExists(app.localDescriptorPath) {
 		logging.Info("Deleting the local descriptor before starting the update process...")
-		err = os.Remove(localDescriptorPath)
+		err = os.Remove(app.localDescriptorPath)
 		if err != nil {
 			return err
 		}
@@ -61,7 +59,7 @@ func checkAppFiles(
 
 	if retrieveAllPackages {
 		logging.Info("Removing app files dir...")
-		err = os.RemoveAll(appFilesDir)
+		err = os.RemoveAll(app.filesDirectory)
 		if err != nil {
 			return err
 		}
@@ -75,10 +73,8 @@ func checkAppFiles(
 				len(packagesToUpdate),
 				packageName))
 
-		err = installPackage(
-			remoteDescriptor,
+		err = app.installPackage(
 			packageName,
-			appFilesDir,
 			settings,
 			func(retrievedSize int64, totalSize int64) {
 				userInterface.SetProgress(float64(retrievedSize) / float64(totalSize))
@@ -92,7 +88,10 @@ func checkAppFiles(
 	return nil
 }
 
-func getPackagesToUpdate(remoteDescriptor apps.AppDescriptor, localDescriptor apps.AppDescriptor) []string {
+func (app *App) getPackagesToUpdate() []string {
+	localDescriptor := app.GetLocalDescriptor()
+	remoteDescriptor := app.GetRemoteDescriptor()
+
 	if localDescriptor == nil {
 		packagesToUpdate := []string{}
 
@@ -122,12 +121,12 @@ func getPackagesToUpdate(remoteDescriptor apps.AppDescriptor, localDescriptor ap
 	return packagesToUpdate
 }
 
-func installPackage(
-	remoteDescriptor apps.AppDescriptor,
+func (app *App) installPackage(
 	packageName string,
-	appFilesDir string,
 	settings *custom.Settings,
 	progressCallback caravel.RetrievalProgressCallback) (err error) {
+
+	remoteDescriptor := app.GetRemoteDescriptor()
 
 	packageURL, err := remoteDescriptor.GetFileURL(packageName)
 	if err != nil {
@@ -168,13 +167,13 @@ func installPackage(
 	}
 	logging.Notice("Package temp file closed")
 
-	err = os.MkdirAll(appFilesDir, 0700)
+	err = os.MkdirAll(app.filesDirectory, 0700)
 	if err != nil {
 		return err
 	}
 
 	logging.Info("Extracting the package. Skipping levels: %v...", remoteDescriptor.GetSkipPackageLevels())
-	err = caravel.ExtractZipSkipLevels(packageTempFilePath, appFilesDir, remoteDescriptor.GetSkipPackageLevels())
+	err = caravel.ExtractZipSkipLevels(packageTempFilePath, app.filesDirectory, remoteDescriptor.GetSkipPackageLevels())
 	if err != nil {
 		return err
 	}

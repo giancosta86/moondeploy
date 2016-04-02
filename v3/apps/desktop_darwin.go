@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package engine
+package apps
 
 import (
 	"fmt"
@@ -27,24 +27,16 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy/v3/apps"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
-const linuxShortcutContent = `
-[Desktop Entry]
-Encoding=UTF-8
-Name=%v
-Comment=%v
-Exec="%v" "%v"
-Icon=%v
-Version=1.0
-Type=Application
-Terminal=0
+const macScriptContentFormat = `#!/bin/bash
+"%v" "%v"
 `
 
-func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor apps.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -54,39 +46,34 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	shortcutFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".desktop"
-	logging.Info("Shortcut name: '%v'", shortcutFileName)
+	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName())
+	logging.Info("BASH shortcut name: '%v'", scriptFileName)
 
-	shortcutFilePath := filepath.Join(desktopDir, shortcutFileName)
+	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
+	logging.Info("Creating BASH shortcut: '%v'...", scriptFilePath)
 
-	logging.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
-
-	shortcutFile, err := os.OpenFile(shortcutFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
+	scriptFile, err := os.OpenFile(scriptFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		shortcutFile.Close()
+		scriptFile.Close()
+
 		if err != nil {
-			os.Remove(shortcutFilePath)
+			os.Remove(scriptFilePath)
 		}
 	}()
 
-	actualIconPath := getActualIconPath(referenceDescriptor, appFilesDir)
-
-	shortcutContent := fmt.Sprintf(linuxShortcutContent,
-		referenceDescriptor.GetName(),
-		referenceDescriptor.GetDescription(),
+	scriptContent := fmt.Sprintf(macScriptContentFormat,
 		moonclient.Executable,
-		localDescriptorPath,
-		actualIconPath)
+		app.localDescriptorPath)
 
-	_, err = shortcutFile.Write([]byte(shortcutContent))
+	_, err = scriptFile.Write([]byte(scriptContent))
 	if err != nil {
 		return err
 	}
 
-	logging.Notice("Desktop shortcut created")
+	logging.Notice("BASH shortcut script created")
 
 	return nil
 }

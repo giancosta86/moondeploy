@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package engine
+package apps
 
 import (
 	"fmt"
@@ -27,75 +27,75 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/giancosta86/caravel"
-
-	"github.com/giancosta86/moondeploy/v3/apps"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
-func resolveAppDir(bootDescriptor apps.AppDescriptor, appGalleryDir string) (appDir string, err error) {
-	baseURL := bootDescriptor.GetDeclaredBaseURL()
+const filesDirName = "files"
+const lockFileName = "App.lock"
 
-	hostComponent := strings.Replace(baseURL.Host, ":", "_", -1)
+type App struct {
+	Directory string
 
-	appDirComponents := []string{
-		appGalleryDir,
-		hostComponent}
+	bootDescriptor descriptors.AppDescriptor
 
-	trimmedBasePath := strings.Trim(baseURL.Path, "/")
-	baseComponents := strings.Split(trimmedBasePath, "/")
+	filesDirectory string
 
-	appDirComponents = append(appDirComponents, baseComponents...)
+	lockFile *os.File
 
-	if hostComponent == "github.com" &&
-		len(appDirComponents) > 2 &&
-		appDirComponents[len(appDirComponents)-2] == "releases" &&
-		appDirComponents[len(appDirComponents)-1] == "latest" {
-		appDirComponents = appDirComponents[0 : len(appDirComponents)-2]
-	}
+	localDescriptor       descriptors.AppDescriptor
+	localDescriptorCached bool
+	localDescriptorPath   string
 
-	appDir = filepath.Join(appDirComponents...)
+	remoteDescriptor       descriptors.AppDescriptor
+	remoteDescriptorCached bool
 
-	return appDir, nil
+	referenceDescriptor       descriptors.AppDescriptor
+	referenceDescriptorCached bool
 }
 
-func ensureFirstRun(bootDescriptor apps.AppDescriptor, appDir string, userInterface ui.UserInterface) (err error) {
-	var canRun bool
-	if caravel.IsSecureURL(bootDescriptor.GetDeclaredBaseURL()) {
-		canRun = userInterface.AskForSecureFirstRun(bootDescriptor)
+func (app *App) DirectoryExists() bool {
+	return caravel.DirectoryExists(app.Directory)
+}
+
+func (app *App) CanPerformFirstRun(userInterface ui.UserInterface) bool {
+	if caravel.IsSecureURL(app.bootDescriptor.GetDeclaredBaseURL()) {
+		return userInterface.AskForSecureFirstRun(app.bootDescriptor)
 	} else {
-		canRun = userInterface.AskForUntrustedFirstRun(bootDescriptor)
+		return userInterface.AskForUntrustedFirstRun(app.bootDescriptor)
 	}
+}
 
-	if !canRun {
-		return &ExecutionCanceled{}
-	}
-
-	logging.Notice("The user agreed to proceed")
-
-	logging.Info("Ensuring the app dir is available...")
-	err = os.MkdirAll(appDir, 0700)
+func (app *App) EnsureDirectory() (err error) {
+	err = os.MkdirAll(app.Directory, 0700)
 	if err != nil {
 		return err
 	}
-	logging.Notice("App dir available")
 
 	return nil
 }
 
-func getLocalDescriptor(localDescriptorPath string) (localDescriptor apps.AppDescriptor) {
-	if !caravel.FileExists(localDescriptorPath) {
+func (app *App) GetLocalDescriptor() (localDescriptor descriptors.AppDescriptor) {
+	if app.localDescriptorCached {
+		return app.localDescriptor
+	}
+
+	app.localDescriptorCached = true
+
+	app.localDescriptorPath = filepath.Join(app.Directory, app.bootDescriptor.GetDescriptorFileName())
+
+	if !caravel.FileExists(app.localDescriptorPath) {
 		logging.Notice("The local descriptor is missing")
 		return nil
 	}
 
 	logging.Notice("The local descriptor has been found! Deserializing...")
-	localDescriptor, err := apps.NewAppDescriptorFromPath(localDescriptorPath)
+	localDescriptor, err := descriptors.NewAppDescriptorFromPath(app.localDescriptorPath)
 	if err != nil {
 		logging.Warning(err.Error())
 		return nil
@@ -104,15 +104,32 @@ func getLocalDescriptor(localDescriptorPath string) (localDescriptor apps.AppDes
 
 	logging.Info("The local descriptor is: %#v", localDescriptor)
 
+	app.localDescriptor = localDescriptor
+	app.localDescriptorPath = app.localDescriptorPath
+
 	return localDescriptor
 }
 
-func getRemoteDescriptor(bootDescriptor apps.AppDescriptor, localDescriptor apps.AppDescriptor, userInterface ui.UserInterface) (remoteDescriptor apps.AppDescriptor) {
+func (app *App) GetRemoteDescriptor() (remoteDescriptor descriptors.AppDescriptor) {
+	if app.remoteDescriptorCached {
+		return app.remoteDescriptor
+	}
+
+	app.remoteDescriptorCached = true
+
+	bootDescriptor := app.bootDescriptor
+	localDescriptor := app.GetLocalDescriptor()
+
 	var remoteDescriptorURL *url.URL
 	var err error
 
 	if localDescriptor != nil {
-		remoteDescriptorURL, err = localDescriptor.GetFileURL(localDescriptor.GetDescriptorFileName())
+		if localDescriptor.IsSkipUpdateCheck() {
+			logging.Notice("Skipping update check, as requested by the local descriptor")
+			return nil
+		} else {
+			remoteDescriptorURL, err = localDescriptor.GetFileURL(localDescriptor.GetDescriptorFileName())
+		}
 	} else {
 		remoteDescriptorURL, err = bootDescriptor.GetFileURL(bootDescriptor.GetDescriptorFileName())
 	}
@@ -133,7 +150,7 @@ func getRemoteDescriptor(bootDescriptor apps.AppDescriptor, localDescriptor apps
 	logging.Notice("Remote descriptor retrieved")
 
 	logging.Info("Deserializing the remote descriptor...")
-	remoteDescriptor, err = apps.NewAppDescriptorFromBytes(remoteDescriptorBytes)
+	remoteDescriptor, err = descriptors.NewAppDescriptorFromBytes(remoteDescriptorBytes)
 	if err != nil {
 		logging.Warning(err.Error())
 		return nil
@@ -142,10 +159,21 @@ func getRemoteDescriptor(bootDescriptor apps.AppDescriptor, localDescriptor apps
 
 	logging.Notice("The remote descriptor is: %#v", remoteDescriptor)
 
+	app.remoteDescriptor = remoteDescriptor
+
 	return remoteDescriptor
 }
 
-func chooseReferenceDescriptor(remoteDescriptor apps.AppDescriptor, localDescriptor apps.AppDescriptor) (referenceDescriptor apps.AppDescriptor, err error) {
+func (app *App) GetReferenceDescriptor() (referenceDescriptor descriptors.AppDescriptor, err error) {
+	if app.referenceDescriptorCached {
+		return app.referenceDescriptor, nil
+	}
+
+	app.referenceDescriptorCached = true
+
+	localDescriptor := app.GetLocalDescriptor()
+	remoteDescriptor := app.GetRemoteDescriptor()
+
 	if remoteDescriptor == nil && localDescriptor == nil {
 		return nil, fmt.Errorf("Cannot run the application: it is not installed and cannot be downloaded")
 	}
@@ -156,29 +184,27 @@ func chooseReferenceDescriptor(remoteDescriptor apps.AppDescriptor, localDescrip
 		} else {
 			logging.Warning("The remote descriptor is missing, so the local descriptor will be used")
 		}
-		return localDescriptor, nil
-	}
-
-	if localDescriptor == nil {
+		app.referenceDescriptor = localDescriptor
+	} else if localDescriptor == nil {
 		logging.Notice("The local descriptor is missing, so the remote descriptor will be used")
-		return remoteDescriptor, nil
-	}
-
-	if remoteDescriptor.GetAppVersion().NewerThan(localDescriptor.GetAppVersion()) {
+		app.referenceDescriptor = remoteDescriptor
+	} else if remoteDescriptor.GetAppVersion().NewerThan(localDescriptor.GetAppVersion()) {
 		logging.Notice("Switching to the remote descriptor, as it is more recent")
-		return remoteDescriptor, nil
+		app.referenceDescriptor = remoteDescriptor
+	} else {
+		logging.Notice("Keeping the local descriptor, as the remote descriptor is NOT more recent")
+		app.referenceDescriptor = localDescriptor
 	}
 
-	logging.Notice("Keeping the local descriptor, as the remote descriptor is NOT more recent")
-	return localDescriptor, nil
+	return app.referenceDescriptor, nil
 }
 
-func prepareCommand(appDir string, appFilesDir string, commandLine []string) (command *exec.Cmd) {
-	if caravel.DirectoryExists(appFilesDir) {
-		os.Chdir(appFilesDir)
+func (app *App) PrepareCommand(commandLine []string) (command *exec.Cmd) {
+	if caravel.DirectoryExists(app.filesDirectory) {
+		os.Chdir(app.filesDirectory)
 		logging.Notice("Files directory set as the current directory")
 	} else {
-		os.Chdir(appDir)
+		os.Chdir(app.Directory)
 		logging.Notice("App directory set as the current directory")
 	}
 
@@ -191,7 +217,13 @@ func prepareCommand(appDir string, appFilesDir string, commandLine []string) (co
 	return exec.Command(commandLine[0], commandLine[1:]...)
 }
 
-func tryToSaveReferenceDescriptor(referenceDescriptor apps.AppDescriptor, localDescriptorPath string) (referenceDescriptorSaved bool) {
+func (app *App) SaveReferenceDescriptor() (referenceDescriptorSaved bool) {
+	referenceDescriptor, err := app.GetReferenceDescriptor()
+	if err != nil {
+		logging.Warning("Cannot save the reference descriptor:" + err.Error())
+		return false
+	}
+
 	logging.Info("Saving the reference descriptor as the local descriptor...")
 	referenceDescriptorBytes, err := referenceDescriptor.GetBytes()
 	if err != nil {
@@ -199,7 +231,7 @@ func tryToSaveReferenceDescriptor(referenceDescriptor apps.AppDescriptor, localD
 		return false
 	}
 
-	err = ioutil.WriteFile(localDescriptorPath, referenceDescriptorBytes, 0600)
+	err = ioutil.WriteFile(app.localDescriptorPath, referenceDescriptorBytes, 0600)
 	if err != nil {
 		logging.Error("Could not save the reference descriptor: %v", err)
 		return false
@@ -209,7 +241,7 @@ func tryToSaveReferenceDescriptor(referenceDescriptor apps.AppDescriptor, localD
 	return true
 }
 
-func launchApp(command *exec.Cmd, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
+func (app *App) Launch(command *exec.Cmd, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
 	logging.Info("Starting the app...")
 
 	logging.Info("Hiding the user interface...")
@@ -231,11 +263,17 @@ func launchApp(command *exec.Cmd, settings *custom.Settings, userInterface ui.Us
 	return err
 }
 
-func getActualIconPath(referenceDescriptor apps.AppDescriptor, appFilesDir string) string {
+func (app *App) GetActualIconPath() string {
+	referenceDescriptor, err := app.GetReferenceDescriptor()
+	if err != nil {
+		logging.Warning("Error while retrieving the reference descriptor: " + err.Error())
+		return moonclient.GetIconPath()
+	}
+
 	providedIconPath := referenceDescriptor.GetIconPath()
 
 	if providedIconPath != "" {
-		return filepath.Join(appFilesDir, providedIconPath)
+		return filepath.Join(app.filesDirectory, providedIconPath)
 	}
 
 	return moonclient.GetIconPath()

@@ -18,9 +18,40 @@
   ===========================================================================
 */
 
-package apps
+package descriptors
 
-const LockFileName = "App.lock"
-const DefaultDescriptorFileName = "App.moondeploy"
+import (
+	"net/url"
 
-const FilesDirName = "files"
+	"github.com/giancosta86/moondeploy/v3/versioning"
+)
+
+const defaultDescriptorFileName = "App.moondeploy"
+
+type AppDescriptor interface {
+	GetDescriptorVersion() *versioning.Version
+	GetDeclaredBaseURL() *url.URL
+	GetActualBaseURL() *url.URL
+	GetDescriptorFileName() string
+
+	GetName() string
+	GetAppVersion() *versioning.Version
+	GetPublisher() string
+	GetDescription() string
+
+	GetPackageVersions() map[string]*versioning.Version
+	GetCommandLine() []string
+	GetSkipPackageLevels() int
+	IsSkipUpdateCheck() bool
+
+	GetIconPath() string
+
+	GetTitle() string
+
+	Init() (err error)
+	CheckRequirements() (err error)
+
+	GetFileURL(relativePath string) (fileURL *url.URL, err error)
+
+	GetBytes() (bytes []byte, err error)
+}

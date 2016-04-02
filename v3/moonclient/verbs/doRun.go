@@ -25,8 +25,8 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/giancosta86/moondeploy/v3/apps"
 	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/logging"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
@@ -118,7 +118,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 	//----------------------------------------------------------------------------
 	logging.Info("Opening boot descriptor: %v", bootDescriptorPath)
 
-	bootDescriptor, err := apps.NewAppDescriptorFromPath(bootDescriptorPath)
+	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
 	if err != nil {
 		return asyncResult{
 			userInterface: userInterface,

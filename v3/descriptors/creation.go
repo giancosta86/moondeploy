@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package apps
+package descriptors
 
 import (
 	"encoding/json"

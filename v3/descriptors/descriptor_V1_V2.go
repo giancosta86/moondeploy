@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package apps
+package descriptors
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ import (
 	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
-const AnyOS = "*"
+const anyOS = "*"
 
 type AppDescriptorV1V2 struct {
 	DescriptorVersion string
@@ -75,7 +75,7 @@ func (descriptor *AppDescriptorV1V2) GetDeclaredBaseURL() *url.URL {
 }
 
 func (descriptor *AppDescriptorV1V2) GetDescriptorFileName() string {
-	return DefaultDescriptorFileName
+	return defaultDescriptorFileName
 }
 
 func (descriptor *AppDescriptorV1V2) GetName() string {
@@ -164,7 +164,7 @@ func (descriptor *AppDescriptorV1V2) setIconPath() {
 		return
 	}
 
-	genericIconPath := descriptor.IconPath[AnyOS]
+	genericIconPath := descriptor.IconPath[anyOS]
 	if genericIconPath != "" {
 		descriptor.iconPath = genericIconPath
 	}
@@ -181,7 +181,7 @@ func (descriptor *AppDescriptorV1V2) setCommandLine() {
 		return
 	}
 
-	genericCommandLine := descriptor.CommandLine[AnyOS]
+	genericCommandLine := descriptor.CommandLine[anyOS]
 	if genericCommandLine != nil {
 		descriptor.commandLine = genericCommandLine
 	}
