@@ -56,7 +56,12 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 			descriptorVersion)
 	}
 
-	err = descriptor.Validate()
+	err = descriptor.Init()
+	if err != nil {
+		return nil, err
+	}
+
+	err = validate(descriptor)
 	if err != nil {
 		return nil, err
 	}

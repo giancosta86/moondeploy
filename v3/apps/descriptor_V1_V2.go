@@ -50,7 +50,7 @@ type AppDescriptorV1V2 struct {
 	PackageVersions map[string]string
 
 	//Cache fields
-	version         *versioning.Version
+	appVersion      *versioning.Version
 	declaredBaseURL *url.URL
 	actualBaseURL   *url.URL
 	iconPath        string
@@ -80,7 +80,7 @@ func (descriptor *AppDescriptorV1V2) GetName() string {
 }
 
 func (descriptor *AppDescriptorV1V2) GetAppVersion() *versioning.Version {
-	return descriptor.version
+	return descriptor.appVersion
 }
 
 func (descriptor *AppDescriptorV1V2) GetPublisher() string {
@@ -115,24 +115,8 @@ func (descriptor *AppDescriptorV1V2) GetTitle() string {
 	return fmt.Sprintf("%v %v", descriptor.Name, descriptor.Version)
 }
 
-func (descriptor *AppDescriptorV1V2) Validate() (err error) {
-	if descriptor.BaseURL == "" {
-		return fmt.Errorf("Base URL field is missing")
-	}
-
-	if descriptor.Name == "" {
-		return fmt.Errorf("Name field is missing")
-	}
-
-	if descriptor.Version == "" {
-		return fmt.Errorf("Version field is missing")
-	}
-
-	if descriptor.Publisher == "" {
-		return fmt.Errorf("Publisher field is missing")
-	}
-
-	descriptor.version, err = versioning.ParseVersion(descriptor.Version)
+func (descriptor *AppDescriptorV1V2) Init() (err error) {
+	descriptor.appVersion, err = versioning.ParseVersion(descriptor.Version)
 	if err != nil {
 		return err
 	}
@@ -144,19 +128,7 @@ func (descriptor *AppDescriptorV1V2) Validate() (err error) {
 
 	descriptor.actualBaseURL = getActualBaseURL(descriptor)
 
-	if descriptor.IconPath == nil {
-		descriptor.IconPath = make(map[string]string)
-	}
-
 	descriptor.setIconPath()
-
-	if descriptor.SkipPackageLevels < 0 {
-		return fmt.Errorf("SkipPackageLevels field must be >= 0")
-	}
-
-	if descriptor.CommandLine == nil {
-		descriptor.CommandLine = make(map[string][]string)
-	}
 
 	descriptor.setCommandLine()
 
@@ -179,6 +151,10 @@ func (descriptor *AppDescriptorV1V2) setDeclaredBaseURL() (err error) {
 }
 
 func (descriptor *AppDescriptorV1V2) setIconPath() {
+	if descriptor.IconPath == nil {
+		return
+	}
+
 	osSpecificIconPath := descriptor.IconPath[runtime.GOOS]
 	if osSpecificIconPath != "" {
 		descriptor.iconPath = osSpecificIconPath
@@ -192,6 +168,10 @@ func (descriptor *AppDescriptorV1V2) setIconPath() {
 }
 
 func (descriptor *AppDescriptorV1V2) setCommandLine() {
+	if descriptor.CommandLine == nil {
+		return
+	}
+
 	osSpecificCommandLine := descriptor.CommandLine[runtime.GOOS]
 	if osSpecificCommandLine != nil {
 		descriptor.commandLine = osSpecificCommandLine

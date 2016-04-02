@@ -46,7 +46,7 @@ type AppDescriptor interface {
 
 	GetTitle() string
 
-	Validate() (err error)
+	Init() (err error)
 	CheckMatch(otherDescriptor AppDescriptor) (err error)
 	CheckRequirements() (err error)
 
