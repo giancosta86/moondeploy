@@ -164,14 +164,9 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 
 	//----------------------------------------------------------------------------
 
-	if remoteDescriptor != nil {
-		userInterface.SetHeader("Checking the app files")
-
-		err = app.CheckFiles(settings, userInterface)
-		if err != nil {
-			return err
-		}
-		logging.Notice("App files checked")
+	err = app.CheckFiles(settings, userInterface)
+	if err != nil {
+		return err
 	}
 
 	//----------------------------------------------------------------------------

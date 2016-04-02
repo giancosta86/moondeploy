@@ -35,8 +35,15 @@ func (app *App) CheckFiles(
 	settings *custom.Settings,
 	userInterface ui.UserInterface) (err error) {
 
-	remoteDescriptor := app.GetRemoteDescriptor()
 	localDescriptor := app.GetLocalDescriptor()
+	remoteDescriptor := app.GetRemoteDescriptor()
+
+	if remoteDescriptor == nil {
+		logging.Notice("Skipping file check, as the remote descriptor is missing")
+		return nil
+	}
+
+	userInterface.SetHeader("Checking the app files")
 
 	packagesToUpdate := app.getPackagesToUpdate()
 
@@ -85,6 +92,7 @@ func (app *App) CheckFiles(
 		}
 	}
 
+	logging.Notice("App files checked")
 	return nil
 }
 
