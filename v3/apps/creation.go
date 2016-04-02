@@ -24,7 +24,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/giancosta86/moondeploy"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/versioning"
 )
+
+type BasicDescriptor struct {
+	DescriptorVersion string
+}
 
 func NewAppDescriptorFromPath(descriptorPath string) (descriptor AppDescriptor, err error) {
 	descriptorBytes, err := ioutil.ReadFile(descriptorPath)
@@ -36,24 +44,30 @@ func NewAppDescriptorFromPath(descriptorPath string) (descriptor AppDescriptor, 
 }
 
 func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor, err error) {
-	descriptor, err = createV3Descriptor(descriptorBytes)
+	basicDescriptor, err := createBasicDescriptor(descriptorBytes)
+	if err != nil {
+		return nil, err
+	}
 
-	descriptorVersion, err := descriptor.GetDescriptorVersion()
+	descriptorVersion, err := versioning.ParseVersion(basicDescriptor.DescriptorVersion)
 	if err != nil {
 		return nil, err
 	}
 
 	switch descriptorVersion.Major {
 	case 3:
-		break
+		logging.Notice("V3 descriptor found! Deserializing it")
+		descriptor, err = createV3Descriptor(descriptorBytes)
 
 	case 2:
 	case 1:
+		logging.Notice("V1/V2 descriptor found! Deserializing it")
 		descriptor, err = createV1V2Descriptor(descriptorBytes)
 
 	default:
-		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy.",
-			descriptorVersion)
+		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy, now at version (%v).",
+			descriptorVersion,
+			moondeploy.Version)
 	}
 
 	err = descriptor.Init()
@@ -69,8 +83,19 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 	return descriptor, nil
 }
 
+func createBasicDescriptor(descriptorBytes []byte) (descriptor *BasicDescriptor, err error) {
+	descriptor = &BasicDescriptor{}
+
+	err = json.Unmarshal(descriptorBytes, descriptor)
+	if err != nil {
+		return nil, err
+	}
+
+	return descriptor, nil
+}
+
 func createV3Descriptor(descriptorBytes []byte) (descriptor AppDescriptor, err error) {
-	descriptor = &AppDescriptorV1V2{} //TODO: Instantiate a V3 descriptor!!!
+	descriptor = &AppDescriptorV3{}
 
 	err = json.Unmarshal(descriptorBytes, descriptor)
 	if err != nil {

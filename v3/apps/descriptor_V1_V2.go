@@ -49,18 +49,21 @@ type AppDescriptorV1V2 struct {
 
 	PackageVersions map[string]string
 
-	//Cache fields
-	appVersion      *versioning.Version
-	declaredBaseURL *url.URL
-	actualBaseURL   *url.URL
-	iconPath        string
-	commandLine     []string
+	//
+	//Computed fields
+	//
+	descriptorVersion *versioning.Version
+	appVersion        *versioning.Version
+	declaredBaseURL   *url.URL
+	actualBaseURL     *url.URL
+	iconPath          string
+	commandLine       []string
 
 	packageVersions map[string]*versioning.Version
 }
 
-func (descriptor *AppDescriptorV1V2) GetDescriptorVersion() (*versioning.Version, error) {
-	return versioning.ParseVersion(descriptor.DescriptorVersion)
+func (descriptor *AppDescriptorV1V2) GetDescriptorVersion() *versioning.Version {
+	return descriptor.descriptorVersion
 }
 
 func (descriptor *AppDescriptorV1V2) GetActualBaseURL() *url.URL {
@@ -116,6 +119,11 @@ func (descriptor *AppDescriptorV1V2) GetTitle() string {
 }
 
 func (descriptor *AppDescriptorV1V2) Init() (err error) {
+	descriptor.descriptorVersion, err = versioning.ParseVersion(descriptor.DescriptorVersion)
+	if err != nil {
+		return err
+	}
+
 	descriptor.appVersion, err = versioning.ParseVersion(descriptor.Version)
 	if err != nil {
 		return err
@@ -132,7 +140,7 @@ func (descriptor *AppDescriptorV1V2) Init() (err error) {
 
 	descriptor.setCommandLine()
 
-	err = descriptor.setPackageVersions()
+	descriptor.packageVersions, err = parsePackageVersions(descriptor.PackageVersions)
 	if err != nil {
 		return err
 	}
@@ -141,12 +149,7 @@ func (descriptor *AppDescriptorV1V2) Init() (err error) {
 }
 
 func (descriptor *AppDescriptorV1V2) setDeclaredBaseURL() (err error) {
-	if descriptor.BaseURL[len(descriptor.BaseURL)-1] != '/' {
-		descriptor.BaseURL = descriptor.BaseURL + "/"
-	}
-
-	descriptor.declaredBaseURL, err = url.Parse(descriptor.BaseURL)
-
+	descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
 	return err
 }
 
@@ -184,55 +187,7 @@ func (descriptor *AppDescriptorV1V2) setCommandLine() {
 	}
 }
 
-func (descriptor *AppDescriptorV1V2) setPackageVersions() (err error) {
-	if descriptor.PackageVersions == nil {
-		descriptor.PackageVersions = make(map[string]string)
-	}
-
-	descriptor.packageVersions = make(map[string]*versioning.Version)
-	for packageName, packageVersionString := range descriptor.PackageVersions {
-		if packageVersionString != "" {
-			descriptor.packageVersions[packageName], err = versioning.ParseVersion(packageVersionString)
-			if err != nil {
-				return fmt.Errorf("Invalid version string for package '%v': '%v'",
-					packageName,
-					packageVersionString)
-			}
-		} else {
-			descriptor.packageVersions[packageName] = nil
-		}
-	}
-
-	return nil
-}
-
-func (descriptor *AppDescriptorV1V2) CheckMatch(otherDescriptor AppDescriptor) (err error) {
-	if descriptor.GetName() != otherDescriptor.GetName() {
-		return fmt.Errorf("The descriptors have different Name values:\n\t'%v'\n\t'%v",
-			descriptor.GetName(),
-			otherDescriptor.GetName())
-	}
-
-	if descriptor.GetDescriptorFileName() != otherDescriptor.GetDescriptorFileName() {
-		return fmt.Errorf("The descriptors have different DescriptorFileName values:\n\t'%v'\n\t'%v",
-			descriptor.GetDescriptorFileName(),
-			otherDescriptor.GetDescriptorFileName())
-	}
-
-	if descriptor.GetDeclaredBaseURL().String() != otherDescriptor.GetDeclaredBaseURL().String() {
-		return fmt.Errorf("The descriptors have different BaseURL's:\n\t'%v'\n\t'%v'",
-			descriptor.GetDeclaredBaseURL(),
-			otherDescriptor.GetDeclaredBaseURL())
-	}
-
-	return nil
-}
-
 func (descriptor *AppDescriptorV1V2) CheckRequirements() (err error) {
-	if descriptor.commandLine == nil {
-		return fmt.Errorf("The app does does not provide a command line for this operating system: %v", runtime.GOOS)
-	}
-
 	return nil
 }
 

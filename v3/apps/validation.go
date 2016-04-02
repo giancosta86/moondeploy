@@ -69,3 +69,25 @@ func validate(descriptor AppDescriptor) (err error) {
 
 	return nil
 }
+
+func CheckDescriptorMatch(descriptor AppDescriptor, otherDescriptor AppDescriptor) (err error) {
+	if descriptor.GetName() != otherDescriptor.GetName() {
+		return fmt.Errorf("The descriptors have different Name values:\n\t'%v'\n\t'%v",
+			descriptor.GetName(),
+			otherDescriptor.GetName())
+	}
+
+	if descriptor.GetDescriptorFileName() != otherDescriptor.GetDescriptorFileName() {
+		return fmt.Errorf("The descriptors have different DescriptorFileName values:\n\t'%v'\n\t'%v",
+			descriptor.GetDescriptorFileName(),
+			otherDescriptor.GetDescriptorFileName())
+	}
+
+	if descriptor.GetDeclaredBaseURL().String() != otherDescriptor.GetDeclaredBaseURL().String() {
+		return fmt.Errorf("The descriptors have different BaseURL's:\n\t'%v'\n\t'%v'",
+			descriptor.GetDeclaredBaseURL(),
+			otherDescriptor.GetDeclaredBaseURL())
+	}
+
+	return nil
+}

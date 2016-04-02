@@ -24,7 +24,32 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+
+	"github.com/giancosta86/moondeploy/v3/versioning"
 )
+
+func parsePackageVersions(packageVersionsStringMap map[string]string) (result map[string]*versioning.Version, err error) {
+	result = make(map[string]*versioning.Version)
+
+	if packageVersionsStringMap == nil {
+		return result, nil
+	}
+
+	for packageName, packageVersionString := range packageVersionsStringMap {
+		if packageVersionString != "" {
+			result[packageName], err = versioning.ParseVersion(packageVersionString)
+			if err != nil {
+				return nil, fmt.Errorf("Invalid version string for package '%v': '%v'",
+					packageName,
+					packageVersionString)
+			}
+		} else {
+			result[packageName] = nil
+		}
+	}
+
+	return result, nil
+}
 
 func getRelativeFileURL(descriptor AppDescriptor, relativePath string) (*url.URL, error) {
 	if path.IsAbs(relativePath) {
@@ -37,4 +62,12 @@ func getRelativeFileURL(descriptor AppDescriptor, relativePath string) (*url.URL
 	}
 
 	return descriptor.GetActualBaseURL().ResolveReference(relativeURL), nil
+}
+
+func ensureTrailingSlash(path string) string {
+	if path[len(path)-1] != '/' {
+		return path + "/"
+	}
+
+	return path
 }

@@ -27,7 +27,7 @@ import (
 )
 
 type AppDescriptor interface {
-	GetDescriptorVersion() (*versioning.Version, error)
+	GetDescriptorVersion() *versioning.Version
 	GetDeclaredBaseURL() *url.URL
 	GetActualBaseURL() *url.URL
 	GetDescriptorFileName() string
@@ -47,7 +47,6 @@ type AppDescriptor interface {
 	GetTitle() string
 
 	Init() (err error)
-	CheckMatch(otherDescriptor AppDescriptor) (err error)
 	CheckRequirements() (err error)
 
 	GetFileURL(relativePath string) (fileURL *url.URL, err error)

@@ -112,7 +112,7 @@ func Run(bootDescriptor apps.AppDescriptor, settings *custom.Settings, userInter
 
 	if startedWithLocalDescriptor {
 		logging.Info("Checking that local descriptor and boot descriptor actually match...")
-		err = localDescriptor.CheckMatch(bootDescriptor)
+		err = apps.CheckDescriptorMatch(localDescriptor, bootDescriptor)
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,7 @@ func Run(bootDescriptor apps.AppDescriptor, settings *custom.Settings, userInter
 
 		if remoteDescriptor != nil {
 			logging.Info("Checking that remote descriptor and boot descriptor actually match...")
-			err = remoteDescriptor.CheckMatch(bootDescriptor)
+			err = apps.CheckDescriptorMatch(remoteDescriptor, bootDescriptor)
 			if err != nil {
 				return err
 			}
