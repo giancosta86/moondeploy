@@ -20,7 +20,24 @@
 
 package apps
 
-const LockFileName = "App.lock"
-const DefaultDescriptorFileName = "App.moondeploy"
+type OsSettingsV3 struct {
+	RemoteURL         string
+	PackageVersions   map[string]string
+	CommandLine       string
+	SkipPackageLevels int
+	SkipUpdateCheck   bool
+	Description       string
+	IconPath          string
+}
 
-const FilesDirName = "files"
+type AppDescriptorV3 struct {
+	DescriptorVersion string
+
+	Name      string
+	Version   string
+	Publisher string
+
+	OsSettingsV3
+
+	Systems map[string]OsSettingsV3
+}

@@ -28,7 +28,6 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy/apps"
 	"github.com/giancosta86/moondeploy/logging"
 	"github.com/giancosta86/moondeploy/versioning"
 )
@@ -53,15 +52,15 @@ type GitHubRemoteDescriptorInfo struct {
 	DescriptorURL *url.URL
 }
 
-func GetLatestRemoteDescriptorInfo(baseUrl *url.URL) *GitHubRemoteDescriptorInfo {
+func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHubRemoteDescriptorInfo {
 	logging.Info("Checking if the Base URL matches GitHub's /latest release URL pattern...")
 
 	gitHubProjectParams := latestVersionUrlRegex.FindStringSubmatch(baseUrl.String())
 	if gitHubProjectParams == nil {
-		logging.Info("The URL does not match")
+		logging.Info("The URL does not match a GitHub pattern")
 		return nil
 	}
-	logging.Notice("The URL matches")
+	logging.Notice("The URL matches a GitHub 'latest' pattern")
 
 	gitHubUser := gitHubProjectParams[1]
 	gitHubRepo := gitHubProjectParams[2]
@@ -98,7 +97,7 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL) *GitHubRemoteDescriptorInfo
 	result := GitHubRemoteDescriptorInfo{}
 
 	for _, asset := range latestVersionResponse.Assets {
-		if asset.Name == apps.DescriptorFileName {
+		if asset.Name == descriptorFileName {
 			result.DescriptorURL, err = url.Parse(asset.BrowserDownloadURL)
 			if err != nil {
 				logging.Warning(err.Error())

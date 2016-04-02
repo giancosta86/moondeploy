@@ -44,7 +44,7 @@ Type=Application
 Terminal=0
 `
 
-func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor *apps.AppDescriptor) (err error) {
+func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor apps.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -54,12 +54,12 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	shortcutFileName := caravel.FormatFileName(referenceDescriptor.Name) + ".desktop"
+	shortcutFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".desktop"
 	logging.Info("Shortcut name: '%v'", shortcutFileName)
 
 	shortcutFilePath := filepath.Join(desktopDir, shortcutFileName)
 
-	logging.Info("Creating OpenDesktop shortcut: '%v'...", shortcutFilePath)
+	logging.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
 
 	shortcutFile, err := os.OpenFile(shortcutFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
 	if err != nil {
@@ -72,11 +72,11 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		}
 	}()
 
-	actualIconPath := referenceDescriptor.GetActualIconPath(appFilesDir)
+	actualIconPath := getActualIconPath(referenceDescriptor, appFilesDir)
 
 	shortcutContent := fmt.Sprintf(linuxShortcutContent,
-		referenceDescriptor.Name,
-		referenceDescriptor.Description,
+		referenceDescriptor.GetName(),
+		referenceDescriptor.GetDescription(),
 		moondeploy.Executable,
 		localDescriptorPath,
 		actualIconPath)
@@ -86,7 +86,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		return err
 	}
 
-	logging.Notice("OpenDesktop shortcut created")
+	logging.Notice("Desktop shortcut created")
 
 	return nil
 }

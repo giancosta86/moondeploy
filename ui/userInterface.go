@@ -29,15 +29,15 @@ base on any technology, into MoonDeploy's algorithm
 type UserInterface interface {
 	ShowError(message string)
 
-	AskForSecureFirstRun(bootDescriptor *apps.AppDescriptor) (canRun bool)
-	AskForUntrustedFirstRun(bootDescriptor *apps.AppDescriptor) (canRun bool)
+	AskForSecureFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool)
+	AskForUntrustedFirstRun(bootDescriptor apps.AppDescriptor) (canRun bool)
 
 	SetApp(app string)
 	SetHeader(header string)
 	SetStatus(status string)
 	SetProgress(progress float64)
 
-	AskForDesktopShortcut(referenceDescriptor *apps.AppDescriptor) (canCreate bool)
+	AskForDesktopShortcut(referenceDescriptor apps.AppDescriptor) (canCreate bool)
 
 	HideLoader()
 }

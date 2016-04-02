@@ -20,7 +20,21 @@
 
 package apps
 
-const LockFileName = "App.lock"
-const DefaultDescriptorFileName = "App.moondeploy"
+import (
+	"fmt"
+	"net/url"
+	"path"
+)
 
-const FilesDirName = "files"
+func getRelativeFileURL(descriptor AppDescriptor, relativePath string) (*url.URL, error) {
+	if path.IsAbs(relativePath) {
+		return nil, fmt.Errorf("Absolute paths are not allowed: '%v'", relativePath)
+	}
+
+	relativeURL, err := url.Parse(relativePath)
+	if err != nil {
+		return nil, err
+	}
+
+	return descriptor.GetActualBaseURL().ResolveReference(relativeURL), nil
+}

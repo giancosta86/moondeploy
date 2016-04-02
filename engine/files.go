@@ -22,6 +22,7 @@ package engine
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/giancosta86/caravel"
@@ -32,14 +33,14 @@ import (
 )
 
 func checkAppFiles(
-	remoteDescriptor *apps.AppDescriptor,
+	remoteDescriptor apps.AppDescriptor,
 	localDescriptorPath string,
-	localDescriptor *apps.AppDescriptor,
+	localDescriptor apps.AppDescriptor,
 	appFilesDir string,
 	settings *custom.Settings,
 	userInterface ui.UserInterface) (err error) {
 
-	packagesToUpdate := remoteDescriptor.GetPackagesToUpdate(localDescriptor)
+	packagesToUpdate := getPackagesToUpdate(remoteDescriptor, localDescriptor)
 
 	if len(packagesToUpdate) == 0 {
 		logging.Notice("All the packages are up-to-date")
@@ -55,7 +56,7 @@ func checkAppFiles(
 		logging.Notice("Local descriptor deleted")
 	}
 
-	retrieveAllPackages := (len(packagesToUpdate) == len(remoteDescriptor.PackageVersions))
+	retrieveAllPackages := (len(packagesToUpdate) == len(remoteDescriptor.GetPackageVersions()))
 	logging.Notice("Must retrieve all the remote packages? %v", retrieveAllPackages)
 
 	if retrieveAllPackages {
@@ -74,7 +75,8 @@ func checkAppFiles(
 				len(packagesToUpdate),
 				packageName))
 
-		err = remoteDescriptor.InstallPackage(
+		err = installPackage(
+			remoteDescriptor,
 			packageName,
 			appFilesDir,
 			settings,
@@ -86,6 +88,97 @@ func checkAppFiles(
 			return err
 		}
 	}
+
+	return nil
+}
+
+func getPackagesToUpdate(remoteDescriptor apps.AppDescriptor, localDescriptor apps.AppDescriptor) []string {
+	if localDescriptor == nil {
+		packagesToUpdate := []string{}
+
+		for packageName := range remoteDescriptor.GetPackageVersions() {
+			packagesToUpdate = append(packagesToUpdate, packageName)
+		}
+
+		return packagesToUpdate
+	}
+
+	if !remoteDescriptor.GetAppVersion().NewerThan(localDescriptor.GetAppVersion()) {
+		return []string{}
+	}
+
+	packagesToUpdate := []string{}
+
+	for remotePackageName, remotePackageVersion := range remoteDescriptor.GetPackageVersions() {
+		localPackageVersion := localDescriptor.GetPackageVersions()[remotePackageName]
+
+		if remotePackageVersion == nil ||
+			localPackageVersion == nil ||
+			remotePackageVersion.NewerThan(localPackageVersion) {
+			packagesToUpdate = append(packagesToUpdate, remotePackageName)
+		}
+	}
+
+	return packagesToUpdate
+}
+
+func installPackage(
+	remoteDescriptor apps.AppDescriptor,
+	packageName string,
+	appFilesDir string,
+	settings *custom.Settings,
+	progressCallback caravel.RetrievalProgressCallback) (err error) {
+
+	packageURL, err := remoteDescriptor.GetFileURL(packageName)
+	if err != nil {
+		return err
+	}
+
+	logging.Info("Creating package temp file...")
+	packageTempFile, err := ioutil.TempFile(os.TempDir(), packageName)
+	if err != nil {
+		return err
+	}
+	packageTempFilePath := packageTempFile.Name()
+	logging.Info("Package temp file created '%v'", packageTempFilePath)
+
+	defer func() {
+		packageTempFile.Close()
+
+		logging.Info("Deleting package temp file: '%v'", packageTempFilePath)
+		tempFileRemovalErr := os.Remove(packageTempFilePath)
+		if tempFileRemovalErr != nil {
+			logging.Warning("Could not remove the package temp file! '%v'", tempFileRemovalErr)
+		} else {
+			logging.Notice("Package temp file removed")
+		}
+	}()
+
+	logging.Info("Retrieving package: %v", packageURL)
+	err = caravel.RetrieveChunksFromURL(packageURL, packageTempFile, settings.BufferSize, progressCallback)
+	if err != nil {
+		return err
+	}
+	logging.Notice("Package retrieved")
+
+	logging.Info("Closing the package temp file...")
+	packageTempFile.Close()
+	if err != nil {
+		return err
+	}
+	logging.Notice("Package temp file closed")
+
+	err = os.MkdirAll(appFilesDir, 0700)
+	if err != nil {
+		return err
+	}
+
+	logging.Info("Extracting the package. Skipping levels: %v...", remoteDescriptor.GetSkipPackageLevels())
+	err = caravel.ExtractZipSkipLevels(packageTempFilePath, appFilesDir, remoteDescriptor.GetSkipPackageLevels())
+	if err != nil {
+		return err
+	}
+	logging.Notice("Package extracted")
 
 	return nil
 }

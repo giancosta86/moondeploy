@@ -18,9 +18,4 @@
   ===========================================================================
 */
 
-package apps
-
-const LockFileName = "App.lock"
-const DefaultDescriptorFileName = "App.moondeploy"
-
-const FilesDirName = "files"
+package test

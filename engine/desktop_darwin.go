@@ -32,11 +32,11 @@ import (
 	"github.com/giancosta86/moondeploy/logging"
 )
 
-const macScriptContent = `#!/bin/bash
+const macScriptContentFormat = `#!/bin/bash
 "%v" "%v"
 `
 
-func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor *apps.AppDescriptor) (err error) {
+func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor apps.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	scriptFileName := caravel.FormatFileName(referenceDescriptor.Name)
+	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName())
 	logging.Info("BASH shortcut name: '%v'", scriptFileName)
 
 	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
@@ -64,7 +64,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 		}
 	}()
 
-	scriptContent := fmt.Sprintf(macScriptContent,
+	scriptContent := fmt.Sprintf(macScriptContentFormat,
 		moondeploy.Executable,
 		localDescriptorPath)
 

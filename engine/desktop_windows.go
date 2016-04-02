@@ -43,13 +43,13 @@ const windowsShortcutContent = `
 	shellLink.WorkingDirectory = "%v"
 	shellLink.Save`
 
-func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor *apps.AppDescriptor) (err error) {
+func createDesktopShortcut(appFilesDir string, localDescriptorPath string, referenceDescriptor apps.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
 	}
 
-	shortcutName := caravel.FormatFileName(referenceDescriptor.Name) + ".lnk"
+	shortcutName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".lnk"
 	logging.Info("Shortcut name: '%v'", shortcutName)
 
 	shortcutPath := filepath.Join(desktopDir, shortcutName)
@@ -81,7 +81,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 	}()
 
 	logging.Info("Temp script file created: %v", tempFilePath)
-	actualIconPath := referenceDescriptor.GetActualIconPath(appFilesDir)
+	actualIconPath := getActualIconPath(referenceDescriptor, appFilesDir)
 	logging.Info("Actual icon path: '%v'", actualIconPath)
 
 	workingDirectory := filepath.Dir(localDescriptorPath)
@@ -90,7 +90,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 	shortcutScript := fmt.Sprintf(windowsShortcutContent,
 		shortcutPath,
 		localDescriptorPath,
-		referenceDescriptor.Description,
+		referenceDescriptor.GetDescription(),
 		actualIconPath,
 		workingDirectory)
 

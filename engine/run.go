@@ -46,25 +46,14 @@ func (err *ExecutionCanceled) Error() string {
 Run is the entry point you must employ to create a custom installer, for example to
 employ custom settings or a brand-new user interface, based on any technology
 */
-func Run(bootDescriptor *apps.AppDescriptor, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
+func Run(bootDescriptor apps.AppDescriptor, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
 	userInterface.SetHeader("Performing startup operations")
 
 	logging.Info("The boot descriptor is: %#v", bootDescriptor)
 
-	logging.Info("Validating the boot descriptor...")
-	err = bootDescriptor.Validate()
-	if err != nil {
-		return err
-	}
-	logging.Notice("Boot descriptor valid")
-
 	//----------------------------------------------------------------------------
 
-	originalBaseURL := bootDescriptor.BaseURL
-
-	//----------------------------------------------------------------------------
-
-	userInterface.SetApp(bootDescriptor.Name)
+	userInterface.SetApp(bootDescriptor.GetName())
 
 	//----------------------------------------------------------------------------
 
@@ -115,10 +104,13 @@ func Run(bootDescriptor *apps.AppDescriptor, settings *custom.Settings, userInte
 	//----------------------------------------------------------------------------
 
 	logging.Info("Resolving the local descriptor...")
-	localDescriptorPath := filepath.Join(appDir, apps.DescriptorFileName)
+	localDescriptorPath := filepath.Join(appDir, bootDescriptor.GetDescriptorFileName())
 	localDescriptor := getLocalDescriptor(localDescriptorPath)
 
-	if localDescriptor != nil {
+	startedWithLocalDescriptor := localDescriptor != nil
+	logging.Info("Started with local descriptor? %v", startedWithLocalDescriptor)
+
+	if startedWithLocalDescriptor {
 		logging.Info("Checking that local descriptor and boot descriptor actually match...")
 		err = localDescriptor.CheckMatch(bootDescriptor)
 		if err != nil {
@@ -127,12 +119,10 @@ func Run(bootDescriptor *apps.AppDescriptor, settings *custom.Settings, userInte
 		logging.Notice("The descriptors match correctly")
 	}
 
-	startedWithoutLocalDescriptor := localDescriptor == nil
-	logging.Info("Started without local descriptor? %v", startedWithoutLocalDescriptor)
 	//----------------------------------------------------------------------------
 
-	var remoteDescriptor *apps.AppDescriptor
-	if localDescriptor != nil && localDescriptor.SkipUpdateCheck {
+	var remoteDescriptor apps.AppDescriptor
+	if localDescriptor != nil && localDescriptor.IsSkipUpdateCheck() {
 		logging.Notice("Skipping update check, as requested by the local descriptor")
 		remoteDescriptor = nil
 	} else {
@@ -161,15 +151,20 @@ func Run(bootDescriptor *apps.AppDescriptor, settings *custom.Settings, userInte
 
 	//----------------------------------------------------------------------------
 
+	err = referenceDescriptor.CheckRequirements()
+	if err != nil {
+		return err
+	}
+
+	//----------------------------------------------------------------------------
+
 	userInterface.SetApp(referenceDescriptor.GetTitle())
 
 	//----------------------------------------------------------------------------
 
 	logging.Info("Resolving the OS-specific app command line...")
-	commandLine, err := referenceDescriptor.GetCommandLine()
-	if err != nil {
-		return err
-	}
+	commandLine := referenceDescriptor.GetCommandLine()
+
 	if len(commandLine) == 0 {
 		return fmt.Errorf("Empty command line found")
 	}
@@ -199,22 +194,20 @@ func Run(bootDescriptor *apps.AppDescriptor, settings *custom.Settings, userInte
 
 	//----------------------------------------------------------------------------
 
-	if referenceDescriptor != localDescriptor {
-		referenceDescriptorSaved := tryToSaveReferenceDescriptor(*referenceDescriptor, localDescriptorPath, originalBaseURL)
+	referenceDescriptorSaved := tryToSaveReferenceDescriptor(referenceDescriptor, localDescriptorPath)
 
-		if startedWithoutLocalDescriptor && referenceDescriptorSaved {
-			if userInterface.AskForDesktopShortcut(referenceDescriptor) {
-				logging.Info("Creating desktop shortcut...")
+	if !startedWithLocalDescriptor && referenceDescriptorSaved {
+		if userInterface.AskForDesktopShortcut(referenceDescriptor) {
+			logging.Info("Creating desktop shortcut...")
 
-				err = createDesktopShortcut(appFilesDir, localDescriptorPath, referenceDescriptor)
-				if err != nil {
-					logging.Warning("Could not create desktop shortcut: %v", err)
-				} else {
-					logging.Notice("Desktop shortcut created")
-				}
+			err = createDesktopShortcut(appFilesDir, localDescriptorPath, referenceDescriptor)
+			if err != nil {
+				logging.Warning("Could not create desktop shortcut: %v", err)
 			} else {
-				logging.Info("The user refused to create a desktop shortcut")
+				logging.Notice("Desktop shortcut created")
 			}
+		} else {
+			logging.Info("The user refused to create a desktop shortcut")
 		}
 	}
 
