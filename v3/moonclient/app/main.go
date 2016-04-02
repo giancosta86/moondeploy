@@ -24,16 +24,22 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/custom"
-	"github.com/giancosta86/moondeploy/engine"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/logging"
 
-	"github.com/giancosta86/moondeploy/client/verbs"
+	"github.com/giancosta86/moondeploy/v3/moonclient/verbs"
 )
 
+const ExitCodeSuccess = 0
+const ExitCodeError = 1
+const ExitCodeCanceled = 2
+
+const ServeVerb = "serve"
+
 func main() {
-	fmt.Println(moondeploy.Title)
+	fmt.Println(moonclient.Title)
 
 	if len(os.Args) < 2 {
 		exitWithUsage()
@@ -48,7 +54,7 @@ func main() {
 
 	switch err.(type) {
 	case nil:
-		os.Exit(moondeploy.ExitCodeSuccess)
+		os.Exit(ExitCodeSuccess)
 
 	case *engine.ExecutionCanceled:
 		exitWithCancel()
@@ -84,7 +90,7 @@ func setLoggingLevel(settings *custom.Settings) {
 
 func executeCommand(command string, settings *custom.Settings) (err error) {
 	switch command {
-	case moondeploy.ServeVerb:
+	case ServeVerb:
 		return verbs.DoServe()
 
 	default:
@@ -94,12 +100,12 @@ func executeCommand(command string, settings *custom.Settings) (err error) {
 
 func exitWithCancel() {
 	logging.Warning("*** EXECUTION CANCELED ***")
-	os.Exit(moondeploy.ExitCodeCanceled)
+	os.Exit(ExitCodeCanceled)
 }
 
 func exitWithError(err error) {
 	logging.Error(err.Error())
-	os.Exit(moondeploy.ExitCodeError)
+	os.Exit(ExitCodeError)
 }
 
 func exitWithUsage() {
@@ -109,9 +115,9 @@ func exitWithUsage() {
 	fmt.Println()
 	fmt.Println("Available commands")
 	fmt.Println()
-	fmt.Printf("%v <port> <directory>\n", moondeploy.ServeVerb)
+	fmt.Printf("%v <port> <directory>\n", ServeVerb)
 	fmt.Println("\tStarts an HTTP server on <port> serving files from <directory>")
 	fmt.Println()
 
-	os.Exit(moondeploy.ExitCodeError)
+	os.Exit(ExitCodeError)
 }

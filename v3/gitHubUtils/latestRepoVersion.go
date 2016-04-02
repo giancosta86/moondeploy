@@ -28,8 +28,8 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy/logging"
-	"github.com/giancosta86/moondeploy/versioning"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
 var latestVersionUrlRegex = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+)/releases/latest/?`)

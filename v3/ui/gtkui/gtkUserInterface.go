@@ -26,8 +26,8 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/apps"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
 const untrustedWarning = "\n\n\nWARNING: the provided address is insecure, so " +
@@ -56,7 +56,7 @@ func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
 		}
 
 		gladeDescriptorPath := filepath.Join(
-			filepath.Dir(moondeploy.Executable),
+			filepath.Dir(moonclient.Executable),
 			"moondeploy.glade")
 
 		err = builder.AddFromFile(gladeDescriptorPath)
@@ -71,8 +71,8 @@ func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
 		window := windowObject.(*gtk.Window)
 		userInterface.window = window
 
-		window.SetTitle(moondeploy.Title)
-		window.SetIconFromFile(moondeploy.IconPathAsPng)
+		window.SetTitle(moonclient.Title)
+		window.SetIconFromFile(moonclient.IconPathAsPng)
 
 		window.Connect("destroy", func() {
 			window.Destroy()
@@ -120,7 +120,7 @@ func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.Me
 		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
 		defer dialog.Destroy()
 
-		dialog.SetTitle(moondeploy.Title)
+		dialog.SetTitle(moonclient.Title)
 		dialog.Run()
 
 		return nil
@@ -132,7 +132,7 @@ func (userInterface *GtkUserInterface) showYesNoDialog(messageType gtk.MessageTy
 		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
 		defer dialog.Destroy()
 
-		dialog.SetTitle(moondeploy.Title)
+		dialog.SetTitle(moonclient.Title)
 		return (dialog.Run() == int(gtk.RESPONSE_YES))
 	})
 
@@ -179,7 +179,7 @@ func (userInterface *GtkUserInterface) AskForDesktopShortcut(referenceDescriptor
 
 func (userInterface *GtkUserInterface) SetApp(app string) {
 	runOnUIThreadAndWait(func() interface{} {
-		userInterface.window.SetTitle(fmt.Sprintf("%v - %v", moondeploy.Name, app))
+		userInterface.window.SetTitle(fmt.Sprintf("%v - %v", moonclient.Name, app))
 		userInterface.appLabel.SetText(app)
 		return nil
 	})

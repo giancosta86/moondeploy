@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package moondeploy
+package moonclient
 
 import (
 	"net/url"
@@ -26,11 +26,13 @@ import (
 	"runtime"
 
 	"github.com/kardianos/osext"
+
+	"github.com/giancosta86/moondeploy"
 )
 
 const Name = "MoonDeploy"
 
-var Title = Name + " " + Version.String()
+var Title = Name + " " + moondeploy.Version
 
 var WebsiteURL *url.URL
 

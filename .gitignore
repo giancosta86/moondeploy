@@ -1,4 +1,4 @@
 .gradle/**
 build/**
 WinSetup/Output/**
-engineVersion.go
+version.go

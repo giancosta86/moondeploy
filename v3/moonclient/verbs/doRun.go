@@ -25,12 +25,12 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/custom"
-	"github.com/giancosta86/moondeploy/engine"
-	"github.com/giancosta86/moondeploy/logging"
-	"github.com/giancosta86/moondeploy/ui/gtkui"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/ui/gtkui"
 )
 
 type asyncResult struct {
@@ -146,7 +146,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 }
 
 func startUserInterface(userInterface *gtkui.GtkUserInterface) {
-	userInterface.SetApp(moondeploy.Title)
+	userInterface.SetApp(moonclient.Title)
 	userInterface.SetHeader("Loading the boot descriptor")
 
 	logging.Info("Registering user interface for logging...")

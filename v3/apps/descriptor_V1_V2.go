@@ -26,7 +26,7 @@ import (
 	"net/url"
 	"runtime"
 
-	"github.com/giancosta86/moondeploy/versioning"
+	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
 const AnyOS = "*"

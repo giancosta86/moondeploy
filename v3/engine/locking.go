@@ -27,8 +27,8 @@ import (
 	"github.com/giancosta86/LockAPI/lockapi"
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/logging"
 )
 
 func lockAppDir(appDir string) (lockFile *os.File, err error) {

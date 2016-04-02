@@ -30,8 +30,8 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/logging"
 )
 
 const windowsShortcutContent = `

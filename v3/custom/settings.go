@@ -30,7 +30,7 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
 const userSettingsFileName = ".moondeploy.json"
@@ -63,7 +63,7 @@ func GetDefaultSettings() (settings *Settings, err error) {
 }
 
 func getDefaultGalleryDir() (galleryDir string, err error) {
-	galleryDir = filepath.Join(moondeploy.Dir, defaultGalleryDirName)
+	galleryDir = filepath.Join(moonclient.Dir, defaultGalleryDirName)
 
 	return galleryDir, nil
 }

@@ -27,9 +27,9 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/logging"
 )
 
 const macScriptContentFormat = `#!/bin/bash
@@ -65,7 +65,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 	}()
 
 	scriptContent := fmt.Sprintf(macScriptContentFormat,
-		moondeploy.Executable,
+		moonclient.Executable,
 		localDescriptorPath)
 
 	_, err = scriptFile.Write([]byte(scriptContent))

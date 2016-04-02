@@ -23,8 +23,8 @@ package apps
 import (
 	"net/url"
 
-	"github.com/giancosta86/moondeploy/gitHubUtils"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/gitHubUtils"
+	"github.com/giancosta86/moondeploy/v3/logging"
 )
 
 type actualBaseURLSearchStrategy func(AppDescriptor) *url.URL

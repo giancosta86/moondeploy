@@ -27,9 +27,9 @@ import (
 
 	"github.com/giancosta86/caravel"
 
-	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/logging"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/logging"
 )
 
 const linuxShortcutContent = `
@@ -77,7 +77,7 @@ func createDesktopShortcut(appFilesDir string, localDescriptorPath string, refer
 	shortcutContent := fmt.Sprintf(linuxShortcutContent,
 		referenceDescriptor.GetName(),
 		referenceDescriptor.GetDescription(),
-		moondeploy.Executable,
+		moonclient.Executable,
 		localDescriptorPath,
 		actualIconPath)
 

@@ -26,10 +26,10 @@ import (
 	"os"
 
 	"github.com/giancosta86/caravel"
-	"github.com/giancosta86/moondeploy/apps"
-	"github.com/giancosta86/moondeploy/custom"
-	"github.com/giancosta86/moondeploy/logging"
-	"github.com/giancosta86/moondeploy/ui"
+	"github.com/giancosta86/moondeploy/v3/apps"
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
 func checkAppFiles(

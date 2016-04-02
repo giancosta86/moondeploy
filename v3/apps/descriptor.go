@@ -18,10 +18,39 @@
   ===========================================================================
 */
 
-package moondeploy
+package apps
 
-const ExitCodeSuccess = 0
-const ExitCodeError = 1
-const ExitCodeCanceled = 2
+import (
+	"net/url"
 
-const ServeVerb = "serve"
+	"github.com/giancosta86/moondeploy/v3/versioning"
+)
+
+type AppDescriptor interface {
+	GetDescriptorVersion() (*versioning.Version, error)
+	GetDeclaredBaseURL() *url.URL
+	GetActualBaseURL() *url.URL
+	GetDescriptorFileName() string
+
+	GetName() string
+	GetAppVersion() *versioning.Version
+	GetPublisher() string
+	GetDescription() string
+
+	GetPackageVersions() map[string]*versioning.Version
+	GetCommandLine() []string
+	GetSkipPackageLevels() int
+	IsSkipUpdateCheck() bool
+
+	GetIconPath() string
+
+	GetTitle() string
+
+	Validate() (err error)
+	CheckMatch(otherDescriptor AppDescriptor) (err error)
+	CheckRequirements() (err error)
+
+	GetFileURL(relativePath string) (fileURL *url.URL, err error)
+
+	GetBytes() (bytes []byte, err error)
+}

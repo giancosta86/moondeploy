@@ -24,8 +24,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/giancosta86/moondeploy/logging"
-	"github.com/giancosta86/moondeploy/server"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/server"
 )
 
 func DoServe() (err error) {

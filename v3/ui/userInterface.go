@@ -20,7 +20,7 @@
 
 package ui
 
-import "github.com/giancosta86/moondeploy/apps"
+import "github.com/giancosta86/moondeploy/v3/apps"
 
 /*
 UserInterface is the interface that must be implemented to plug a user interface,
