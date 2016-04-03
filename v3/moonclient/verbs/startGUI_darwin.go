@@ -20,14 +20,8 @@
 
 package verbs
 
-import (
-	"os"
+import "github.com/giancosta86/moondeploy/v3/custom"
 
-	"github.com/giancosta86/moondeploy/v3/custom"
-)
-
-func DoRun(settings *custom.Settings) (err error) {
-	bootDescriptorPath := os.Args[1]
-
-	return StartGUI(bootDescriptorPath, settings)
+func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+	return nil
 }

@@ -18,16 +18,40 @@
   ===========================================================================
 */
 
+//TODO: restore these lines and move the lines below to the Darwin implementation
+/*package verbs
+
+import (
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/moonclient/gtkLauncher"
+)
+
+func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+	return gtkLauncher.StartGUI(bootDescriptorPath, settings)
+}
+*/
+
 package verbs
 
 import (
-	"os"
-
 	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/ui"
+
+	goLogging "github.com/op/go-logging"
 )
 
-func DoRun(settings *custom.Settings) (err error) {
-	bootDescriptorPath := os.Args[1]
+func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+	logging.SetLevel(goLogging.CRITICAL)
 
-	return StartGUI(bootDescriptorPath, settings)
+	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
+	if err != nil {
+		return err
+	}
+
+	userInterface := ui.NewBashUserInterface()
+
+	return engine.Run(bootDescriptor, settings, userInterface)
 }
