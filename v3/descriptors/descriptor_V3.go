@@ -32,6 +32,19 @@ import (
 type AppDescriptorV3 struct {
 	DescriptorVersion string
 
+	BaseURL            string
+	DescriptorFileName string
+
+	Name        string
+	Version     string
+	Publisher   string
+	Description string
+
+	SkipPackageLevels int
+	SkipUpdateCheck   bool
+
+	SupportedOS []string
+
 	OsSettings
 
 	OS map[string]OsSettings
@@ -49,30 +62,20 @@ type AppDescriptorV3 struct {
 	publisher   string
 	description string
 
-	packageVersions map[string]*versioning.Version
-	commandLine     []string
-
-	iconPath string
-
 	skipPackageLevels int
 	skipUpdateCheck   bool
+
+	supportedOS []string
+
+	packageVersions map[string]*versioning.Version
+	commandLine     []string
+	iconPath        string
 }
 
 type OsSettings struct {
-	BaseURL            string
-	DescriptorFileName string
-
-	Name        string
-	Version     string
-	Publisher   string
-	Description string
-
 	PackageVersions map[string]string
 	CommandLine     []string
 	IconPath        string
-
-	SkipPackageLevels int
-	SkipUpdateCheck   bool
 }
 
 func (descriptor *AppDescriptorV3) GetDescriptorVersion() *versioning.Version {
@@ -139,52 +142,35 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 
 	osSettings, osSettingsFound := descriptor.OS[runtime.GOOS]
 
-	if osSettingsFound && osSettings.BaseURL != "" {
-		descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(osSettings.BaseURL))
-	} else {
-		descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
-	}
-
+	descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
 	if err != nil {
 		return
 	}
 
-	if osSettingsFound && osSettings.DescriptorFileName != "" {
-		descriptor.descriptorFileName = osSettings.DescriptorFileName
-	} else {
+	if descriptor.DescriptorFileName != "" {
 		descriptor.descriptorFileName = descriptor.DescriptorFileName
-	}
-
-	if osSettingsFound && descriptor.descriptorFileName == "" {
+	} else {
 		descriptor.descriptorFileName = defaultDescriptorFileName
 	}
 
-	if osSettingsFound && osSettings.Name != "" {
-		descriptor.name = osSettings.Name
-	} else {
-		descriptor.name = descriptor.Name
-	}
+	descriptor.name = descriptor.Name
 
-	if osSettingsFound && osSettings.Version != "" {
-		descriptor.appVersion, err = versioning.ParseVersion(osSettings.Version)
-	} else {
-		descriptor.appVersion, err = versioning.ParseVersion(descriptor.Version)
-	}
-
+	descriptor.appVersion, err = versioning.ParseVersion(descriptor.Version)
 	if err != nil {
 		return err
 	}
 
-	if osSettingsFound && osSettings.Publisher != "" {
-		descriptor.publisher = osSettings.Publisher
-	} else {
-		descriptor.publisher = descriptor.Publisher
-	}
+	descriptor.publisher = descriptor.Publisher
 
-	if osSettingsFound && osSettings.Description != "" {
-		descriptor.description = osSettings.Description
+	descriptor.description = descriptor.Description
+
+	descriptor.skipPackageLevels = descriptor.SkipPackageLevels
+	descriptor.skipUpdateCheck = descriptor.SkipUpdateCheck
+
+	if descriptor.SupportedOS != nil {
+		descriptor.supportedOS = descriptor.SupportedOS
 	} else {
-		descriptor.description = descriptor.Description
+		descriptor.supportedOS = []string{}
 	}
 
 	if osSettingsFound && osSettings.PackageVersions != nil {
@@ -209,24 +195,26 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 		descriptor.iconPath = descriptor.IconPath
 	}
 
-	if osSettingsFound {
-		descriptor.skipPackageLevels = osSettings.SkipPackageLevels
-	} else {
-		descriptor.skipPackageLevels = osSettings.SkipPackageLevels
-	}
-
-	if osSettingsFound {
-		descriptor.skipUpdateCheck = osSettings.SkipUpdateCheck
-	} else {
-		descriptor.skipUpdateCheck = osSettings.SkipUpdateCheck
-	}
-
 	descriptor.actualBaseURL = getActualBaseURL(descriptor)
 
 	return nil
 }
 
 func (descriptor *AppDescriptorV3) CheckRequirements() (err error) {
+	if len(descriptor.supportedOS) > 0 {
+		foundOS := false
+
+		for _, supportedOS := range descriptor.supportedOS {
+			if supportedOS == runtime.GOOS {
+				foundOS = true
+				break
+			}
+		}
+
+		if !foundOS {
+			return fmt.Errorf("The current OS (%v) is not supported", runtime.GOOS)
+		}
+	}
 	return nil
 }
 
