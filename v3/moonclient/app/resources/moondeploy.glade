@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.3 -->
 <!--§
   ===========================================================================
   MoonDeploy
@@ -18,9 +19,8 @@
   limitations under the License.
   ===========================================================================
 -->
-
 <interface>
-  <!-- interface-requires gtk+ 3.12 -->
+  <requires lib="gtk+" version="3.12"/>
   <object class="GtkWindow" id="mainWindow">
     <property name="width_request">800</property>
     <property name="height_request">350</property>
@@ -29,61 +29,103 @@
     <property name="window_position">center-always</property>
     <property name="gravity">static</property>
     <child>
-      <object class="GtkBox" id="box1">
+      <object class="GtkOverlay" id="overlay1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="border_width">35</property>
-        <property name="spacing">25</property>
         <child>
-          <object class="GtkSpinner" id="spinner">
-            <property name="width_request">32</property>
-            <property name="height_request">32</property>
+          <object class="GtkImage" id="image1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="active">True</property>
+            <property name="pixbuf">background.png</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
-        <child>
-          <object class="GtkBox" id="box2">
+        <child type="overlay">
+          <object class="GtkBox" id="box1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">15</property>
-            <property name="margin_right">15</property>
-            <property name="margin_bottom">15</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">15</property>
+            <property name="border_width">35</property>
+            <property name="spacing">25</property>
             <child>
-              <object class="GtkLabel" id="appLabel">
+              <object class="GtkSpinner" id="spinner">
+                <property name="width_request">32</property>
+                <property name="height_request">32</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">label</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Enter Value&gt; 24"/>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
+                <property name="active">True</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="headerLabel">
+              <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">label</property>
-                <property name="wrap">True</property>
-                <property name="max_width_chars">60</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
+                <property name="margin_bottom">15</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">15</property>
+                <child>
+                  <object class="GtkLabel" id="appLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">label</property>
+                    <attributes>
+                      <attribute name="font-desc" value="&lt;Enter Value&gt; 24"/>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="headerLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">label</property>
+                    <property name="wrap">True</property>
+                    <property name="max_width_chars">60</property>
+                    <property name="xalign">0</property>
+                    <attributes>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="statusLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">label</property>
+                    <property name="wrap">True</property>
+                    <property name="max_width_chars">70</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkProgressBar" id="progressBar">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -91,39 +133,7 @@
                 <property name="position">1</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkLabel" id="statusLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">label</property>
-                <property name="wrap">True</property>
-                <property name="max_width_chars">70</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkProgressBar" id="progressBar">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_right">62</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
     </child>
