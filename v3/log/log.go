@@ -22,23 +22,24 @@ package log
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/op/go-logging"
 )
 
-type LoggingCallback func(level logging.Level, message string)
+type LogCallback func(level logging.Level, message string)
 
 var logger logging.Logger
 var leveledBackend logging.LeveledBackend
 
-var loggingCallback LoggingCallback = func(level logging.Level, message string) {}
+var logCallback LogCallback = func(level logging.Level, message string) {}
 
-func SetCallback(callback LoggingCallback) {
-	loggingCallback = callback
+func SetCallback(callback LogCallback) {
+	logCallback = callback
 }
 
 func Debug(format string, args ...interface{}) {
@@ -47,7 +48,7 @@ func Debug(format string, args ...interface{}) {
 
 		logger.Debug(message)
 
-		loggingCallback(logging.DEBUG, message)
+		logCallback(logging.DEBUG, message)
 	}
 }
 
@@ -57,7 +58,7 @@ func Info(format string, args ...interface{}) {
 
 		logger.Info(message)
 
-		loggingCallback(logging.INFO, message)
+		logCallback(logging.INFO, message)
 	}
 }
 
@@ -67,7 +68,7 @@ func Notice(format string, args ...interface{}) {
 
 		logger.Notice(message)
 
-		loggingCallback(logging.NOTICE, message)
+		logCallback(logging.NOTICE, message)
 	}
 }
 
@@ -77,7 +78,7 @@ func Warning(format string, args ...interface{}) {
 
 		logger.Warning(message)
 
-		loggingCallback(logging.WARNING, message)
+		logCallback(logging.WARNING, message)
 	}
 }
 
@@ -87,7 +88,7 @@ func Error(format string, args ...interface{}) {
 
 		logger.Error(message)
 
-		loggingCallback(logging.ERROR, message)
+		logCallback(logging.ERROR, message)
 	}
 }
 
@@ -97,7 +98,7 @@ func Critical(format string, args ...interface{}) {
 
 		logger.Critical(message)
 
-		loggingCallback(logging.CRITICAL, message)
+		logCallback(logging.CRITICAL, message)
 	}
 }
 
@@ -105,17 +106,41 @@ func SetLevel(level logging.Level) {
 	leveledBackend.SetLevel(level, "")
 }
 
-func init() {
-	logsDirectory := filepath.Join(moonclient.Directory, "logs")
+func SwitchToFile(logsDirectory string) {
+	tryGarbageLogCollection(logsDirectory)
 
+	ensureLogsDirectory(logsDirectory)
+
+	logFile := openLogFile(logsDirectory)
+
+	setup(logFile)
+}
+
+func tryGarbageLogCollection(logsDirectory string) {
+	files, _ := ioutil.ReadDir(logsDirectory)
+
+	if len(files) > 20 {
+		fmt.Println("Removing older logs...")
+
+		err := os.RemoveAll(logsDirectory)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot remove the logs directory ('%v') for garbage collection. Error: %v", logsDirectory, err)
+		}
+	}
+}
+
+func ensureLogsDirectory(logsDirectory string) {
 	err := os.MkdirAll(logsDirectory, 0700)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot create the logs directory: %v", err.Error())
 		os.Exit(1)
 	}
+}
 
+func openLogFile(logsDirectory string) *os.File {
 	now := time.Now()
-	logsFileName := fmt.Sprintf("MoonDeploy - %d-%d-%d %d-%d-%d %d.log",
+
+	logFileName := fmt.Sprintf("MoonDeploy - %d-%d-%d %d-%d-%d %d.log",
 		now.Year(),
 		now.Month(),
 		now.Day(),
@@ -124,17 +149,21 @@ func init() {
 		now.Second(),
 		now.Nanosecond())
 
-	logFilePath := filepath.Join(logsDirectory, logsFileName)
+	logFilePath := filepath.Join(logsDirectory, logFileName)
 
-	targetOutput, err := os.Create(logFilePath)
+	logFile, err := os.Create(logFilePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot create the log file! %v", err.Error())
+		fmt.Fprintf(os.Stderr, "Cannot create the log file '%v'! %v", logFilePath, err.Error())
 		os.Exit(1)
 	}
 
-	backend := logging.NewLogBackend(targetOutput, "", 0)
+	return logFile
+}
 
-	formatString := "%{time:15:04:05.000} - %{level} %{message}\n\n"
+func setup(logWriter io.Writer) {
+	backend := logging.NewLogBackend(logWriter, "", 0)
+
+	formatString := "%{time:15:04:05.000} %{level} - %{message}\n\n"
 
 	format := logging.MustStringFormatter(formatString)
 
@@ -143,4 +172,8 @@ func init() {
 	leveledBackend = logging.AddModuleLevel(backendFormatter)
 
 	logger.SetBackend(leveledBackend)
+}
+
+func init() {
+	setup(os.Stdout)
 }

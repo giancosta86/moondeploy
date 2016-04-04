@@ -23,6 +23,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/engine"
@@ -44,6 +45,9 @@ func main() {
 	if len(os.Args) < 2 {
 		exitWithUsage()
 	}
+
+	logsDirectory := filepath.Join(moonclient.Directory, "logs")
+	log.SwitchToFile(logsDirectory)
 
 	settings := loadSettings()
 

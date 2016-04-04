@@ -55,7 +55,11 @@ func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) 
 	select {
 	case result := <-resultChannel:
 		err = result.err
-		log.Info("Result retrieved from channel. Err is: '%v'", err)
+		log.Info("Result retrieved from channel")
+
+		if err != nil {
+			log.Warning("Err is: %v", err)
+		}
 
 		if result.userInterface != nil && result.userInterface.IsClosedByUser() {
 			return &engine.ExecutionCanceled{}
