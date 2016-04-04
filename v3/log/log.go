@@ -30,12 +30,10 @@ import (
 	"github.com/op/go-logging"
 )
 
-var targetOutput *os.File
+type LoggingCallback func(level logging.Level, message string)
 
 var logger logging.Logger
 var leveledBackend logging.LeveledBackend
-
-type LoggingCallback func(level logging.Level, message string)
 
 var loggingCallback LoggingCallback = func(level logging.Level, message string) {}
 
@@ -136,7 +134,7 @@ func init() {
 
 	backend := logging.NewLogBackend(targetOutput, "", 0)
 
-	formatString := "%{time:15:04:05.000} - %{level} %{message}\n"
+	formatString := "%{time:15:04:05.000} - %{level} %{message}\n\n"
 
 	format := logging.MustStringFormatter(formatString)
 
