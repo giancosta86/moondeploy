@@ -28,11 +28,8 @@ import (
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/ui"
 )
-
-const untrustedWarning = "\n\n\nWARNING: the provided address is insecure, so " +
-	"the integrity of the application files might be compromised by " +
-	"third parties during the download process."
 
 type GtkUserInterface struct {
 	window *gtk.Window
@@ -151,30 +148,16 @@ func (userInterface *GtkUserInterface) askWarningYesNo(message string) bool {
 	return userInterface.showYesNoDialog(gtk.MESSAGE_WARNING, message)
 }
 
-func formatBasicFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) (basicFirstRunPrompt string) {
-	const basicFirstRunTemplate = "You are running an application for the first time." +
-		"\n\n\nTitle:   %v" +
-		"\n\nPublisher:   %v" +
-		"\n\nAddress:   %v\n\n\nDo you wish to proceed?"
-
-	return fmt.Sprintf(basicFirstRunTemplate,
-
-		bootDescriptor.GetTitle(),
-		bootDescriptor.GetPublisher(),
-		bootDescriptor.GetDeclaredBaseURL())
-}
-
 func (userInterface *GtkUserInterface) AskForSecureFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
-	return userInterface.askYesNo(formatBasicFirstRunPrompt(bootDescriptor))
+	return userInterface.askYesNo(ui.FormatSecureFirstRunPrompt(bootDescriptor))
 }
 
 func (userInterface *GtkUserInterface) AskForUntrustedFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
-	return userInterface.askWarningYesNo(
-		formatBasicFirstRunPrompt(bootDescriptor) + untrustedWarning)
+	return userInterface.askWarningYesNo(ui.FormatUntrustedFirstRunPrompt(bootDescriptor))
 }
 
 func (userInterface *GtkUserInterface) AskForDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (canCreate bool) {
-	return userInterface.askYesNo("Would you like to create a desktop shortcut for the application?")
+	return userInterface.askYesNo(ui.FormatDesktopShortcutPrompt(referenceDescriptor))
 }
 
 func (userInterface *GtkUserInterface) SetApp(app string) {

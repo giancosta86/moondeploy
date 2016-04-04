@@ -220,7 +220,7 @@ func (app *App) PrepareCommand(commandLine []string) (command *exec.Cmd) {
 func (app *App) SaveReferenceDescriptor() (referenceDescriptorSaved bool) {
 	referenceDescriptor, err := app.GetReferenceDescriptor()
 	if err != nil {
-		logging.Warning("Cannot save the reference descriptor:" + err.Error())
+		logging.Warning("Cannot save the reference descriptor: %v", err)
 		return false
 	}
 
@@ -266,7 +266,7 @@ func (app *App) Launch(command *exec.Cmd, settings *custom.Settings, userInterfa
 func (app *App) GetActualIconPath() string {
 	referenceDescriptor, err := app.GetReferenceDescriptor()
 	if err != nil {
-		logging.Warning("Error while retrieving the reference descriptor: " + err.Error())
+		logging.Warning("Error while retrieving the reference descriptor: %v", err)
 		return moonclient.GetIconPath()
 	}
 

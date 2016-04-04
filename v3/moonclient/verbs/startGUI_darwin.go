@@ -20,8 +20,11 @@
 
 package verbs
 
-import "github.com/giancosta86/moondeploy/v3/custom"
+import (
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/moonclient/launcher/bash"
+)
 
 func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
-	return nil
+	return bash.StartGUI(bootDescriptorPath, settings)
 }

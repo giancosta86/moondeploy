@@ -35,6 +35,12 @@ type LoggingCallback func(message string)
 
 var loggingCallback LoggingCallback = func(message string) {}
 
+var outputEnabled = true
+
+func SetOutputEnabled(newValue bool) {
+	outputEnabled = newValue
+}
+
 func SetCallback(callback LoggingCallback) {
 	loggingCallback = callback
 }
@@ -42,7 +48,10 @@ func SetCallback(callback LoggingCallback) {
 func Debug(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.DEBUG) {
 		message := fmt.Sprintf(format, args...)
-		logger.Debug(message)
+
+		if outputEnabled {
+			logger.Debug(message)
+		}
 
 		loggingCallback(message)
 	}
@@ -51,7 +60,10 @@ func Debug(format string, args ...interface{}) {
 func Info(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.INFO) {
 		message := fmt.Sprintf(format, args...)
-		logger.Info(message)
+
+		if outputEnabled {
+			logger.Info(message)
+		}
 
 		loggingCallback(message)
 	}
@@ -60,7 +72,10 @@ func Info(format string, args ...interface{}) {
 func Notice(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.NOTICE) {
 		message := fmt.Sprintf(format, args...)
-		logger.Notice(message)
+
+		if outputEnabled {
+			logger.Notice(message)
+		}
 
 		loggingCallback(message)
 	}
@@ -69,7 +84,10 @@ func Notice(format string, args ...interface{}) {
 func Warning(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.WARNING) {
 		message := fmt.Sprintf(format, args...)
-		logger.Warning(message)
+
+		if outputEnabled {
+			logger.Warning(message)
+		}
 
 		loggingCallback(message)
 	}
@@ -78,7 +96,10 @@ func Warning(format string, args ...interface{}) {
 func Error(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.ERROR) {
 		message := fmt.Sprintf(format, args...)
-		logger.Error(message)
+
+		if outputEnabled {
+			logger.Error(message)
+		}
 
 		loggingCallback(message)
 	}
@@ -87,7 +108,10 @@ func Error(format string, args ...interface{}) {
 func Critical(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.CRITICAL) {
 		message := fmt.Sprintf(format, args...)
-		logger.Critical(message)
+
+		if outputEnabled {
+			logger.Critical(message)
+		}
 
 		loggingCallback(message)
 	}

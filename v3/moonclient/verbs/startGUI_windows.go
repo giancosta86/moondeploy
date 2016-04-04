@@ -22,9 +22,9 @@ package verbs
 
 import (
 	"github.com/giancosta86/moondeploy/v3/custom"
-	"github.com/giancosta86/moondeploy/v3/moonclient/gtkLauncher"
+	"github.com/giancosta86/moondeploy/v3/moonclient/launcher/gtk"
 )
 
 func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
-	return gtkLauncher.StartGUI(bootDescriptorPath, settings)
+	return gtk.StartGUI(bootDescriptorPath, settings)
 }

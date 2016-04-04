@@ -18,27 +18,28 @@
   ===========================================================================
 */
 
-package ui
+package bash
 
-import "github.com/giancosta86/moondeploy/v3/descriptors"
+import (
+	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/ui/bash"
+)
 
-/*
-UserInterface is the interface that must be implemented to plug a user interface,
-base on any technology, into MoonDeploy's algorithm
-*/
-type UserInterface interface {
-	ShowError(message string)
+func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
+	if err != nil {
+		return err
+	}
 
-	AskForSecureFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool)
-	AskForUntrustedFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool)
+	userInterface := bash.NewBashUserInterface()
 
-	SetApp(app string)
-	SetHeader(header string)
-	SetStatus(status string)
-	SetProgress(progress float64)
+	userInterface.ShowLoader()
 
-	AskForDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (canCreate bool)
+	result := engine.Run(bootDescriptor, settings, userInterface)
 
-	ShowLoader()
-	HideLoader()
+	userInterface.HideLoader()
+
+	return result
 }

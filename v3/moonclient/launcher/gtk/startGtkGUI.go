@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package gtkLauncher
+package gtk
 
 import (
 	"github.com/giancosta86/moondeploy/v3/custom"
@@ -108,7 +108,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 	}
 	logging.Notice("User interface created")
 
-	startUserInterface(userInterface)
+	showUserInterface(userInterface)
 
 	//----------------------------------------------------------------------------
 	logging.Info("Opening boot descriptor: %v", bootDescriptorPath)
@@ -140,7 +140,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 	}
 }
 
-func startUserInterface(userInterface *gtkui.GtkUserInterface) {
+func showUserInterface(userInterface *gtkui.GtkUserInterface) {
 	userInterface.SetApp(moonclient.Title)
 	userInterface.SetHeader("Loading the boot descriptor")
 
