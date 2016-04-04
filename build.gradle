@@ -115,11 +115,8 @@ task installGoLibs {
 task copyResources(type: Copy) {
     dependsOn(checkGoPath, setNotices)
 
-    from projectDir
+    from project.file("v${majorVersion}/moonclient/app/resources")
     into compileOutputDir
-    include "moondeploy.ico"
-    include "moondeploy.png"
-    include "moondeploy.glade"
 }
 
 
@@ -147,13 +144,13 @@ task compileGo {
 } << {
   String clientAppPackage = "github.com/giancosta86/moondeploy/v${majorVersion}/moonclient/app"
 
-  exec {
-    commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", clientAppPackage
-  }
-
   if (onWindows) {
     exec {
-      commandLine "go", "build", "-o", "${compileOutputDir}/moondeployw${programExtension}", "-ldflags", "-H windowsgui", clientAppPackage
+      commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", "-ldflags", "-H windowsgui", clientAppPackage
+    }
+  } else {
+    exec {
+      commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", clientAppPackage
     }
   }
 }
