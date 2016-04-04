@@ -25,7 +25,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 )
 
 /*
@@ -38,7 +38,7 @@ func ServeDirectory(sourceDir string, port int) (err error) {
 	http.Handle("/", fileServer)
 
 	http.HandleFunc("/moondeploy.quit", func(http.ResponseWriter, *http.Request) {
-		logging.Notice("Now quitting")
+		log.Notice("Now quitting")
 		os.Exit(0)
 	})
 

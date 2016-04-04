@@ -63,7 +63,7 @@ func GetDefaultSettings() (settings *Settings, err error) {
 }
 
 func getDefaultGalleryDir() (galleryDir string, err error) {
-	galleryDir = filepath.Join(moonclient.Dir, defaultGalleryDirName)
+	galleryDir = filepath.Join(moonclient.Directory, defaultGalleryDirName)
 
 	return galleryDir, nil
 }

@@ -31,7 +31,7 @@ import (
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 )
 
 const windowsShortcutContent = `
@@ -50,12 +50,12 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 	}
 
 	shortcutName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".lnk"
-	logging.Info("Shortcut name: '%v'", shortcutName)
+	log.Info("Shortcut name: '%v'", shortcutName)
 
 	shortcutPath := filepath.Join(desktopDir, shortcutName)
-	logging.Info("Shortcut path: '%v'", shortcutPath)
+	log.Info("Shortcut path: '%v'", shortcutPath)
 
-	logging.Info("Creating temp file for script...")
+	log.Info("Creating temp file for script...")
 
 	salt := rand.Int63()
 	tempFileName := fmt.Sprintf("shortcutScript_%v_%v.vbs", time.Now().Unix(), salt)
@@ -70,9 +70,9 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 
 		tempRemovalErr := os.Remove(tempFilePath)
 		if tempRemovalErr != nil {
-			logging.Warning("Cannot remove the temp script: %v", tempFilePath)
+			log.Warning("Cannot remove the temp script: %v", tempFilePath)
 		} else {
-			logging.Info("Temp script successfully removed")
+			log.Info("Temp script successfully removed")
 		}
 
 		if err != nil {
@@ -80,12 +80,12 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 		}
 	}()
 
-	logging.Info("Temp script file created: %v", tempFilePath)
+	log.Info("Temp script file created: %v", tempFilePath)
 	actualIconPath := app.GetActualIconPath()
-	logging.Info("Actual icon path: '%v'", actualIconPath)
+	log.Info("Actual icon path: '%v'", actualIconPath)
 
 	workingDirectory := filepath.Dir(app.localDescriptorPath)
-	logging.Info("Working directory: '%v'", workingDirectory)
+	log.Info("Working directory: '%v'", workingDirectory)
 
 	shortcutScript := fmt.Sprintf(windowsShortcutContent,
 		shortcutPath,
@@ -94,12 +94,12 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 		actualIconPath,
 		workingDirectory)
 
-	logging.Info("Writing script temp file...")
+	log.Info("Writing script temp file...")
 	tempFile.Write([]byte(shortcutScript))
 	tempFile.Close()
-	logging.Info("Temp script ready")
+	log.Info("Temp script ready")
 
-	logging.Info("Now executing the temp script...")
+	log.Info("Now executing the temp script...")
 
 	command := exec.Command("wscript", "/b", "/nologo", tempFilePath)
 
@@ -112,7 +112,7 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 		return fmt.Errorf("The script did not run successfully")
 	}
 
-	logging.Notice("The script was successful")
+	log.Notice("The script was successful")
 
 	return nil
 }

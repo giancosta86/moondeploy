@@ -24,7 +24,7 @@ import (
 	"net/url"
 
 	"github.com/giancosta86/moondeploy/v3/gitHubUtils"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 )
 
 type actualBaseURLSearchStrategy func(AppDescriptor) *url.URL
@@ -42,45 +42,45 @@ func getActualBaseURL(descriptor AppDescriptor) *url.URL {
 		actualBaseURL = searchStrategy(descriptor)
 
 		if actualBaseURL != nil {
-			logging.Notice("The actual base URL has been found by a search strategy!")
+			log.Notice("The actual base URL has been found by a search strategy!")
 			break
 		}
 	}
 
 	if actualBaseURL == nil {
-		logging.Info("The actual base URL just matches the actual base URL")
+		log.Info("The actual base URL just matches the actual base URL")
 		actualBaseURL = descriptor.GetDeclaredBaseURL()
 	}
 
 	actualBaseURLCache[descriptor.GetDeclaredBaseURL().String()] = actualBaseURL
-	logging.Info("Actual base URL '%v' put into the cache", actualBaseURL)
+	log.Info("Actual base URL '%v' put into the cache", actualBaseURL)
 
 	return actualBaseURL
 }
 
 func lookForActualURLInCache(descriptor AppDescriptor) *url.URL {
-	logging.Info("Checking if the Base URL is a key of the actual Base URL cache...")
+	log.Info("Checking if the Base URL is a key of the actual Base URL cache...")
 
 	cachedActualURL, _ := actualBaseURLCache[descriptor.GetDeclaredBaseURL().String()]
 
 	if cachedActualURL != nil {
-		logging.Notice("Actual URL found in the cache! --> '%v'", cachedActualURL)
+		log.Info("Actual URL found in the cache! --> '%v'", cachedActualURL)
 
 		return cachedActualURL
 	}
 
-	logging.Info("Actual URL not in the cache")
+	log.Info("Actual URL not in the cache")
 	return nil
 }
 
 func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
-	logging.Info("Checking if the Base URL points to the *latest* release of a GitHub repo...")
+	log.Info("Checking if the Base URL points to the *latest* release of a GitHub repo...")
 	gitHubLatestRemoteDescriptorInfo := gitHubUtils.GetLatestRemoteDescriptorInfo(
 		descriptor.GetDeclaredBaseURL(),
 		descriptor.GetDescriptorFileName())
 
 	if gitHubLatestRemoteDescriptorInfo != nil {
-		logging.Notice("The given base URL actually references version '%v', whose descriptor is at URL: '%v'",
+		log.Info("The given base URL actually references version '%v', whose descriptor is at URL: '%v'",
 			gitHubLatestRemoteDescriptorInfo.Version,
 			gitHubLatestRemoteDescriptorInfo.DescriptorURL)
 
@@ -91,7 +91,7 @@ func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
 
 		actualBaseURL := gitHubLatestRemoteDescriptorInfo.DescriptorURL.ResolveReference(parentDirURL)
 
-		logging.Notice("The actual base URL returned by GitHub is: '%v'", actualBaseURL)
+		log.Notice("The actual base URL returned by GitHub is: '%v'", actualBaseURL)
 		return actualBaseURL
 	}
 

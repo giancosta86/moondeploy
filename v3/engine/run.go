@@ -24,7 +24,7 @@ import (
 	"github.com/giancosta86/moondeploy/v3/apps"
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
@@ -45,7 +45,7 @@ employ custom settings or a brand-new user interface, based on any technology
 func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
 	userInterface.SetHeader("Performing startup operations")
 
-	logging.Info("The boot descriptor is: %#v", bootDescriptor)
+	log.Info("The boot descriptor is: %#v", bootDescriptor)
 
 	//----------------------------------------------------------------------------
 
@@ -54,43 +54,45 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 	//----------------------------------------------------------------------------
 
 	appGallery := apps.NewAppGallery(settings.GalleryDir)
-	logging.Notice("The app gallery is: %#v", appGallery)
+	log.Info("The app gallery is: %#v", appGallery)
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Resolving the app...")
+	log.Info("Resolving the app...")
 	app, err := appGallery.GetApp(bootDescriptor)
 	if err != nil {
 		return err
 	}
-	logging.Notice("App is: %#v", app)
+	log.Info("The app directory is: %v", app.Directory)
+
+	log.Info("App is: %#v", app)
 
 	firstRun := !app.DirectoryExists()
-	logging.Notice("Is this a first run for the app? %v", firstRun)
+	log.Notice("Is this a first run for the app? %v", firstRun)
 
 	//----------------------------------------------------------------------------
 
 	if firstRun {
-		logging.Info("Now asking the user if the app can run...")
+		log.Info("Now asking the user if the app can run...")
 
 		canRun := app.CanPerformFirstRun(userInterface)
 		if !canRun {
 			return &ExecutionCanceled{}
 		}
 
-		logging.Notice("The user agreed to proceed")
+		log.Notice("The user agreed to proceed")
 
-		logging.Info("Ensuring the app dir is available...")
+		log.Info("Ensuring the app dir is available...")
 		err = app.EnsureDirectory()
 		if err != nil {
 			return err
 		}
-		logging.Notice("App dir available")
+		log.Notice("App dir available")
 	}
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Locking the app dir...")
+	log.Info("Locking the app dir...")
 	err = app.LockDirectory()
 	if err != nil {
 		return err
@@ -98,52 +100,52 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 	defer func() {
 		unlockErr := app.UnlockDirectory()
 		if unlockErr != nil {
-			logging.Warning(unlockErr.Error())
+			log.Warning(unlockErr.Error())
 		}
 	}()
 
-	logging.Notice("App dir locked")
+	log.Notice("App dir locked")
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Resolving the local descriptor...")
+	log.Info("Resolving the local descriptor...")
 	localDescriptor := app.GetLocalDescriptor()
 
 	startedWithLocalDescriptor := localDescriptor != nil
-	logging.Info("Started with local descriptor? %v", startedWithLocalDescriptor)
+	log.Info("Started with local descriptor? %v", startedWithLocalDescriptor)
 
 	if startedWithLocalDescriptor {
-		logging.Info("Checking that local descriptor and boot descriptor actually match...")
+		log.Info("Checking that local descriptor and boot descriptor actually match...")
 		err = descriptors.CheckDescriptorMatch(localDescriptor, bootDescriptor)
 		if err != nil {
 			return err
 		}
-		logging.Notice("The descriptors match correctly")
+		log.Notice("The descriptors match correctly")
 	}
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Resolving the remote descriptor...")
+	log.Info("Resolving the remote descriptor...")
 	remoteDescriptor := app.GetRemoteDescriptor()
 
 	if remoteDescriptor != nil {
-		logging.Info("Checking that remote descriptor and boot descriptor actually match...")
+		log.Info("Checking that remote descriptor and boot descriptor actually match...")
 		err = descriptors.CheckDescriptorMatch(remoteDescriptor, bootDescriptor)
 		if err != nil {
 			return err
 		}
-		logging.Notice("The descriptors match correctly")
+		log.Notice("The descriptors match correctly")
 	}
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Now choosing the reference descriptor...")
+	log.Info("Now choosing the reference descriptor...")
 	referenceDescriptor, err := app.GetReferenceDescriptor()
 	if err != nil {
 		return err
 	}
 
-	logging.Info("The reference descriptor is: %#v", referenceDescriptor)
+	log.Info("The reference descriptor is: %#v", referenceDescriptor)
 
 	//----------------------------------------------------------------------------
 
@@ -158,9 +160,9 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 
 	//----------------------------------------------------------------------------
 
-	logging.Info("Resolving the OS-specific app command line...")
+	log.Info("Resolving the OS-specific app command line...")
 	commandLine := referenceDescriptor.GetCommandLine()
-	logging.Notice("Command line resolved: %v", commandLine)
+	log.Info("Command line resolved: %v", commandLine)
 
 	//----------------------------------------------------------------------------
 
@@ -174,10 +176,10 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 	userInterface.SetHeader("Preparing the command...")
 
 	command := app.PrepareCommand(commandLine)
-	logging.Notice("Command created")
+	log.Notice("Command created")
 
-	logging.Info("Command path: %v", command.Path)
-	logging.Info("Command arguments: %v", command.Args)
+	log.Info("Command path: %v", command.Path)
+	log.Info("Command arguments: %v", command.Args)
 
 	//----------------------------------------------------------------------------
 
@@ -185,16 +187,16 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, us
 
 	if !startedWithLocalDescriptor && referenceDescriptorSaved {
 		if userInterface.AskForDesktopShortcut(referenceDescriptor) {
-			logging.Info("Creating desktop shortcut...")
+			log.Info("Creating desktop shortcut...")
 
 			err = app.CreateDesktopShortcut(referenceDescriptor)
 			if err != nil {
-				logging.Warning("Could not create desktop shortcut: %v", err)
+				log.Warning("Could not create desktop shortcut: %v", err)
 			} else {
-				logging.Notice("Desktop shortcut created")
+				log.Notice("Desktop shortcut created")
 			}
 		} else {
-			logging.Info("The user refused to create a desktop shortcut")
+			log.Info("The user refused to create a desktop shortcut")
 		}
 	}
 

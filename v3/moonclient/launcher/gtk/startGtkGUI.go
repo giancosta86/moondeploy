@@ -24,10 +24,11 @@ import (
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/ui/gtkui"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/op/go-logging"
 )
 
 type asyncResult struct {
@@ -36,25 +37,25 @@ type asyncResult struct {
 }
 
 func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
-	logging.Info("Initializing GTK...")
+	log.Info("Initializing GTK...")
 	gtkui.InitGTK()
-	logging.Notice("GTK initialized")
+	log.Notice("GTK initialized")
 
 	resultChannel := make(chan asyncResult)
 	defer close(resultChannel)
 
 	go backgroundCollector(bootDescriptorPath, settings, resultChannel)
 
-	logging.Info("Starting GTK main loop...")
+	log.Info("Starting GTK main loop...")
 	gtk.Main()
 
-	logging.SetCallback(func(message string) {})
-	logging.Notice("GTK main loop terminated")
+	log.SetCallback(func(level logging.Level, message string) {})
+	log.Notice("GTK main loop terminated")
 
 	select {
 	case result := <-resultChannel:
 		err = result.err
-		logging.Info("Result retrieved from channel. Err is: '%v'", err)
+		log.Info("Result retrieved from channel. Err is: '%v'", err)
 
 		if result.userInterface != nil && result.userInterface.IsClosedByUser() {
 			return &engine.ExecutionCanceled{}
@@ -64,10 +65,10 @@ func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) 
 			return err
 		}
 
-		logging.Notice("OK")
+		log.Notice("OK")
 		return nil
 	default:
-		logging.Info("The user has manually closed the program")
+		log.Info("The user has manually closed the program")
 		return &engine.ExecutionCanceled{}
 	}
 }
@@ -77,8 +78,8 @@ func backgroundCollector(bootDescriptorPath string, settings *custom.Settings, r
 	userInterface := result.userInterface
 	err := result.err
 
-	logging.SetCallback(func(message string) {})
-	logging.Info("Result returned by the background routine. Is UI available? %v. Err is: '%v'", userInterface != nil, err)
+	log.SetCallback(func(level logging.Level, message string) {})
+	log.Info("Result returned by the background routine. Is UI available? %v. Err is: '%v'", userInterface != nil, err)
 
 	if err != nil && userInterface != nil {
 		switch err.(type) {
@@ -91,14 +92,14 @@ func backgroundCollector(bootDescriptorPath string, settings *custom.Settings, r
 		}
 	}
 
-	logging.Info("Now programmatically quitting GTK")
+	log.Info("Now programmatically quitting GTK")
 	gtk.MainQuit()
 
 	resultChannel <- result
 }
 
 func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) asyncResult {
-	logging.Info("Creating the user interface...")
+	log.Info("Creating the user interface...")
 	userInterface, err := gtkui.NewGtkUserInterface()
 	if err != nil {
 		return asyncResult{
@@ -106,12 +107,12 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 			err:           err,
 		}
 	}
-	logging.Notice("User interface created")
+	log.Notice("User interface created")
 
 	showUserInterface(userInterface)
 
 	//----------------------------------------------------------------------------
-	logging.Info("Opening boot descriptor: %v", bootDescriptorPath)
+	log.Info("Opening boot descriptor: %v", bootDescriptorPath)
 
 	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
 	if err != nil {
@@ -121,10 +122,10 @@ func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) 
 		}
 	}
 
-	logging.Notice("Boot descriptor ready")
+	log.Notice("Boot descriptor ready")
 	//----------------------------------------------------------------------------
 
-	logging.Info("Starting the launch process...")
+	log.Info("Starting the launch process...")
 
 	err = engine.Run(bootDescriptor, settings, userInterface)
 	if err != nil {
@@ -144,13 +145,15 @@ func showUserInterface(userInterface *gtkui.GtkUserInterface) {
 	userInterface.SetApp(moonclient.Title)
 	userInterface.SetHeader("Loading the boot descriptor")
 
-	logging.Info("Registering user interface for logging...")
-	logging.SetCallback(func(message string) {
-		userInterface.SetStatus(message)
+	log.Info("Registering user interface for log...")
+	log.SetCallback(func(level logging.Level, message string) {
+		if level <= logging.NOTICE {
+			userInterface.SetStatus(message)
+		}
 	})
-	logging.Notice("User interface registered")
+	log.Notice("User interface registered")
 
-	logging.Info("Showing the loading dialog...")
+	log.Info("Showing the loading dialog...")
 	userInterface.ShowLoader()
-	logging.Notice("Loading dialog shown")
+	log.Notice("Loading dialog shown")
 }

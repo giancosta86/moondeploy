@@ -18,28 +18,26 @@
   ===========================================================================
 */
 
-package logging
+package log
 
 import (
 	"fmt"
 	"os"
-	"runtime"
+	"path/filepath"
+	"time"
 
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/op/go-logging"
 )
+
+var targetOutput *os.File
 
 var logger logging.Logger
 var leveledBackend logging.LeveledBackend
 
-type LoggingCallback func(message string)
+type LoggingCallback func(level logging.Level, message string)
 
-var loggingCallback LoggingCallback = func(message string) {}
-
-var outputEnabled = true
-
-func SetOutputEnabled(newValue bool) {
-	outputEnabled = newValue
-}
+var loggingCallback LoggingCallback = func(level logging.Level, message string) {}
 
 func SetCallback(callback LoggingCallback) {
 	loggingCallback = callback
@@ -49,11 +47,9 @@ func Debug(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.DEBUG) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Debug(message)
-		}
+		logger.Debug(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.DEBUG, message)
 	}
 }
 
@@ -61,11 +57,9 @@ func Info(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.INFO) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Info(message)
-		}
+		logger.Info(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.INFO, message)
 	}
 }
 
@@ -73,11 +67,9 @@ func Notice(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.NOTICE) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Notice(message)
-		}
+		logger.Notice(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.NOTICE, message)
 	}
 }
 
@@ -85,11 +77,9 @@ func Warning(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.WARNING) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Warning(message)
-		}
+		logger.Warning(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.WARNING, message)
 	}
 }
 
@@ -97,11 +87,9 @@ func Error(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.ERROR) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Error(message)
-		}
+		logger.Error(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.ERROR, message)
 	}
 }
 
@@ -109,11 +97,9 @@ func Critical(format string, args ...interface{}) {
 	if logger.IsEnabledFor(logging.CRITICAL) {
 		message := fmt.Sprintf(format, args...)
 
-		if outputEnabled {
-			logger.Critical(message)
-		}
+		logger.Critical(message)
 
-		loggingCallback(message)
+		loggingCallback(logging.CRITICAL, message)
 	}
 }
 
@@ -122,15 +108,35 @@ func SetLevel(level logging.Level) {
 }
 
 func init() {
-	backend := logging.NewLogBackend(os.Stdout, "", 0)
+	logsDirectory := filepath.Join(moonclient.Directory, "logs")
 
-	var formatString string
-
-	if runtime.GOOS != "windows" {
-		formatString = "%{color}%{time:15:04:05.000} ▶ %{level}%{color:reset} %{message}"
-	} else {
-		formatString = "%{time:15:04:05.000} - %{level} %{message}"
+	err := os.MkdirAll(logsDirectory, 0700)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot create the logs directory: %v", err.Error())
+		os.Exit(1)
 	}
+
+	now := time.Now()
+	logsFileName := fmt.Sprintf("MoonDeploy - %d-%d-%d %d-%d-%d %d.log",
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		now.Hour(),
+		now.Minute(),
+		now.Second(),
+		now.Nanosecond())
+
+	logFilePath := filepath.Join(logsDirectory, logsFileName)
+
+	targetOutput, err := os.Create(logFilePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot create the log file! %v", err.Error())
+		os.Exit(1)
+	}
+
+	backend := logging.NewLogBackend(targetOutput, "", 0)
+
+	formatString := "%{time:15:04:05.000} - %{level} %{message}\n"
 
 	format := logging.MustStringFormatter(formatString)
 

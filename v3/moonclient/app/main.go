@@ -24,10 +24,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/engine"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
+	"github.com/giancosta86/moondeploy/v3/moonclient"
 
 	"github.com/giancosta86/moondeploy/v3/moonclient/verbs"
 )
@@ -68,24 +68,24 @@ func main() {
 }
 
 func loadSettings() (settings *custom.Settings) {
-	logging.Info("Loading settings...")
+	log.Info("Loading settings...")
 
 	settings, err := custom.ComputeUserSettings()
 	if err != nil {
 		exitWithError(err)
 	}
 
-	logging.Notice("Settings loaded: %#v", settings)
+	log.Info("Settings loaded: %#v", settings)
 
 	return settings
 }
 
 func setLoggingLevel(settings *custom.Settings) {
-	logging.Info("Configuring the logging level...")
+	log.Info("Configuring the logging level...")
 	loggingLevel := settings.GetLoggingLevel()
-	logging.Notice("Requested logging level: %v", loggingLevel)
-	logging.SetLevel(loggingLevel)
-	logging.Notice("Logging level set")
+	log.Notice("Requested logging level: %v", loggingLevel)
+	log.SetLevel(loggingLevel)
+	log.Notice("Logging level set")
 }
 
 func executeCommand(command string, settings *custom.Settings) (err error) {
@@ -99,12 +99,12 @@ func executeCommand(command string, settings *custom.Settings) (err error) {
 }
 
 func exitWithCancel() {
-	logging.Warning("*** EXECUTION CANCELED ***")
+	log.Warning("*** EXECUTION CANCELED ***")
 	os.Exit(ExitCodeCanceled)
 }
 
 func exitWithError(err error) {
-	logging.Error(err.Error())
+	log.Error(err.Error())
 	os.Exit(ExitCodeError)
 }
 

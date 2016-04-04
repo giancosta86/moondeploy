@@ -28,7 +28,7 @@ import (
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
@@ -55,11 +55,11 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 	}
 
 	shortcutFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".desktop"
-	logging.Info("Shortcut name: '%v'", shortcutFileName)
+	log.Info("Shortcut name: '%v'", shortcutFileName)
 
 	shortcutFilePath := filepath.Join(desktopDir, shortcutFileName)
 
-	logging.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
+	log.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
 
 	shortcutFile, err := os.OpenFile(shortcutFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
 	if err != nil {
@@ -86,7 +86,7 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 		return err
 	}
 
-	logging.Notice("Desktop shortcut created")
+	log.Notice("Desktop shortcut created")
 
 	return nil
 }

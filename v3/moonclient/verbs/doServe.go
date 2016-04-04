@@ -24,7 +24,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/server"
 )
 
@@ -41,7 +41,7 @@ func DoServe() (err error) {
 		return err
 	}
 
-	logging.Info("Activating server on port %v for dir: '%v'...", port, sourceDir)
+	log.Info("Activating server on port %v for dir: '%v'...", port, sourceDir)
 
 	return server.ServeDirectory(sourceDir, port)
 }

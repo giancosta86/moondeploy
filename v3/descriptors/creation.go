@@ -26,7 +26,7 @@ import (
 	"io/ioutil"
 
 	"github.com/giancosta86/moondeploy"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
@@ -56,12 +56,12 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 
 	switch descriptorVersion.Major {
 	case 3:
-		logging.Notice("V3 descriptor found! Deserializing it")
+		log.Notice("V3 descriptor found! Deserializing it")
 		descriptor, err = createV3Descriptor(descriptorBytes)
 
 	case 2:
 	case 1:
-		logging.Notice("V1/V2 descriptor found! Deserializing it")
+		log.Notice("V1/V2 descriptor found! Deserializing it")
 		descriptor, err = createV1V2Descriptor(descriptorBytes)
 
 	default:

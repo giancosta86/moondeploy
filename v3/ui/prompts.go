@@ -49,4 +49,4 @@ func FormatDesktopShortcutPrompt(referenceDescriptor descriptors.AppDescriptor) 
 
 const untrustedWarning = "\n\n\nWARNING: the provided address is insecure, so " +
 	"the integrity of the application files might be compromised by " +
-	"third parties during the download process."
+	"third parties during the download process. Do you really want to continue?"

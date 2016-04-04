@@ -186,7 +186,7 @@ func (userInterface *GtkUserInterface) SetProgress(progress float64) {
 	runOnUIThreadAndWait(func() interface{} {
 		userInterface.progressBar.SetFraction(progress)
 
-		if progress > 0 {
+		if 0 < progress && progress < 1 {
 			userInterface.progressBar.SetVisible(true)
 		} else {
 			userInterface.progressBar.SetVisible(false)

@@ -21,10 +21,12 @@
 package bash
 
 import (
+	"github.com/giancosta86/caravel/terminals"
+
 	"github.com/giancosta86/moondeploy/v3/custom"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
-	"github.com/giancosta86/moondeploy/v3/ui/bash"
+	"github.com/giancosta86/moondeploy/v3/ui/termui"
 )
 
 func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
@@ -33,7 +35,9 @@ func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) 
 		return err
 	}
 
-	userInterface := bash.NewBashUserInterface()
+	bashTerminal := terminals.NewBashTerminal()
+
+	userInterface := termui.NewTerminalUserInterface(bashTerminal)
 
 	userInterface.ShowLoader()
 

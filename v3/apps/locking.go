@@ -26,27 +26,27 @@ import (
 
 	"github.com/giancosta86/LockAPI/lockapi"
 	"github.com/giancosta86/caravel"
-	"github.com/giancosta86/moondeploy/v3/logging"
+	"github.com/giancosta86/moondeploy/v3/log"
 )
 
 func (app *App) LockDirectory() (err error) {
 	lockFilePath := filepath.Join(app.Directory, lockFileName)
 
-	logging.Info("The lock file is: %v", lockFilePath)
+	log.Info("The lock file is: %v", lockFilePath)
 
-	logging.Info("Opening the lock file...")
+	log.Info("Opening the lock file...")
 	lockFile, err := os.OpenFile(lockFilePath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0600)
 	if err != nil {
 		return err
 	}
 
-	logging.Info("Obtaining the API lock...")
+	log.Info("Obtaining the API lock...")
 	err = lockapi.TryLockFile(lockFile)
 	if err != nil {
 		lockFile.Close()
 		return err
 	}
-	logging.Notice("Lock acquired")
+	log.Notice("Lock acquired")
 
 	app.lockFile = lockFile
 
@@ -55,7 +55,6 @@ func (app *App) LockDirectory() (err error) {
 
 func (app *App) UnlockDirectory() (err error) {
 	if app.lockFile == nil {
-		logging.Warning("Since the app directory was already unlocked, this unlock operation will have no effect")
 		return nil
 	}
 
@@ -63,26 +62,26 @@ func (app *App) UnlockDirectory() (err error) {
 		return nil
 	}
 
-	logging.Info("Releasing the API lock...")
+	log.Info("Releasing the API lock...")
 	err = lockapi.UnlockFile(app.lockFile)
 	if err != nil {
 		return err
 	}
-	logging.Notice("Lock released")
+	log.Notice("Lock released")
 
-	logging.Info("Closing lock file...")
+	log.Info("Closing lock file...")
 	err = app.lockFile.Close()
 	if err != nil {
 		return err
 	}
-	logging.Notice("Lock file closed")
+	log.Notice("Lock file closed")
 
-	logging.Info("Deleting lock file...")
+	log.Info("Deleting lock file...")
 	err = os.Remove(app.lockFile.Name())
 	if err != nil {
 		return err
 	}
-	logging.Notice("Lock file deleted")
+	log.Notice("Lock file deleted")
 
 	app.lockFile = nil
 

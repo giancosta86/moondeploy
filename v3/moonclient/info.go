@@ -37,7 +37,7 @@ var Title = Name + " " + moondeploy.Version
 var WebsiteURL *url.URL
 
 var Executable string
-var Dir string
+var Directory string
 
 var IconPathAsIco string
 var IconPathAsPng string
@@ -63,11 +63,11 @@ func init() {
 		panic(err)
 	}
 
-	Dir, err = osext.ExecutableFolder()
+	Directory, err = osext.ExecutableFolder()
 	if err != nil {
 		panic(err)
 	}
 
-	IconPathAsIco = filepath.Join(Dir, "moondeploy.ico")
-	IconPathAsPng = filepath.Join(Dir, "moondeploy.png")
+	IconPathAsIco = filepath.Join(Directory, "moondeploy.ico")
+	IconPathAsPng = filepath.Join(Directory, "moondeploy.png")
 }
