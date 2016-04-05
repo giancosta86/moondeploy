@@ -21,10 +21,10 @@
 package verbs
 
 import (
-	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/moonclient/launcher/gtk"
 )
 
-func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) {
 	return gtk.StartGUI(bootDescriptorPath, settings)
 }

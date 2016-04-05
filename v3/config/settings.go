@@ -18,16 +18,42 @@
   ===========================================================================
 */
 
-package verbs
+package config
 
 import (
-	"os"
+	"strings"
 
-	"github.com/giancosta86/moondeploy/v3/config"
+	"github.com/op/go-logging"
 )
 
-func DoRun(settings *config.Settings) (err error) {
-	bootDescriptorPath := os.Args[1]
+const DefaultLoggingLevel = "INFO"
+const DefaultLoggingLevelValue = logging.INFO
 
-	return StartGUI(bootDescriptorPath, settings)
+type Settings struct {
+	GalleryDir    string
+	BufferSize    int64
+	LoggingLevel  string
+	SkipAppOutput bool
+}
+
+func (settings *Settings) GetLoggingLevel() (level logging.Level) {
+	lowercaseLevelString := strings.ToLower(settings.LoggingLevel)
+
+	switch lowercaseLevelString {
+	case "debug":
+		return logging.DEBUG
+	case "info":
+		return logging.INFO
+	case "notice":
+		return logging.NOTICE
+	case "warning":
+		return logging.WARNING
+	case "error":
+		return logging.ERROR
+	case "critical":
+		return logging.CRITICAL
+
+	default:
+		return DefaultLoggingLevelValue
+	}
 }

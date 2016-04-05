@@ -29,7 +29,8 @@ import (
 	"path/filepath"
 
 	"github.com/giancosta86/caravel"
-	"github.com/giancosta86/moondeploy/v3/custom"
+
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
@@ -241,7 +242,7 @@ func (app *App) SaveReferenceDescriptor() (referenceDescriptorSaved bool) {
 	return true
 }
 
-func (app *App) Launch(command *exec.Cmd, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
+func (app *App) Launch(command *exec.Cmd, settings *config.Settings, userInterface ui.UserInterface) (err error) {
 	log.Info("Starting the app...")
 
 	log.Info("Hiding the user interface...")

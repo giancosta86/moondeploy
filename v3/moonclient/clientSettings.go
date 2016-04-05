@@ -18,57 +18,39 @@
   ===========================================================================
 */
 
-package custom
+package moonclient
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
-
-	"github.com/op/go-logging"
 
 	"github.com/giancosta86/caravel"
-
-	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/config"
 )
 
 const userSettingsFileName = ".moondeploy.json"
 
 const defaultGalleryDirName = "apps"
 const defaultBufferSize = 512 * 1024
-const defaultLoggingLevel = "INFO"
-const defaultLoggingLevelValue = logging.INFO
 const defaultSkipAppOutput = false
 
-type Settings struct {
-	GalleryDir    string
-	BufferSize    int64
-	LoggingLevel  string
-	SkipAppOutput bool
+func getDefaultGalleryDir() string {
+	return filepath.Join(Directory, defaultGalleryDirName)
 }
 
-func GetDefaultSettings() (settings *Settings, err error) {
-	defaultGalleryDir, err := getDefaultGalleryDir()
-	if err != nil {
-		return nil, err
-	}
+func GetDefaultSettings() (defaultSettings *config.Settings, err error) {
+	defaultGalleryDir := getDefaultGalleryDir()
 
-	return &Settings{
+	return &config.Settings{
 		GalleryDir:    defaultGalleryDir,
 		BufferSize:    defaultBufferSize,
-		LoggingLevel:  defaultLoggingLevel,
+		LoggingLevel:  config.DefaultLoggingLevel,
 		SkipAppOutput: defaultSkipAppOutput,
 	}, nil
 }
 
-func getDefaultGalleryDir() (galleryDir string, err error) {
-	galleryDir = filepath.Join(moonclient.Directory, defaultGalleryDirName)
-
-	return galleryDir, nil
-}
-
-func ComputeUserSettings() (userSettings *Settings, err error) {
+func ComputeUserSettings() (userSettings *config.Settings, err error) {
 	userDir, err := caravel.GetUserDirectory()
 	if err != nil {
 		return GetDefaultSettings()
@@ -87,14 +69,14 @@ func ComputeUserSettings() (userSettings *Settings, err error) {
 	return deserializeAndMergeSettings(userSettingsBytes)
 }
 
-func deserializeAndMergeSettings(settingsBytes []byte) (settings *Settings, err error) {
-	settings = &Settings{}
+func deserializeAndMergeSettings(settingsBytes []byte) (settings *config.Settings, err error) {
+	defaultSettings, err := GetDefaultSettings()
+
+	settings = &config.Settings{}
 
 	if settingsBytes != nil {
 		json.Unmarshal(settingsBytes, settings)
 	}
-
-	defaultSettings, err := GetDefaultSettings()
 
 	if settings.GalleryDir == "" {
 		if err != nil {
@@ -123,26 +105,4 @@ func deserializeAndMergeSettings(settingsBytes []byte) (settings *Settings, err 
 	//No need to keep track of bool values
 
 	return settings, nil
-}
-
-func (settings *Settings) GetLoggingLevel() (level logging.Level) {
-	lowercaseLevelString := strings.ToLower(settings.LoggingLevel)
-
-	switch lowercaseLevelString {
-	case "debug":
-		return logging.DEBUG
-	case "info":
-		return logging.INFO
-	case "notice":
-		return logging.NOTICE
-	case "warning":
-		return logging.WARNING
-	case "error":
-		return logging.ERROR
-	case "critical":
-		return logging.CRITICAL
-
-	default:
-		return defaultLoggingLevelValue
-	}
 }

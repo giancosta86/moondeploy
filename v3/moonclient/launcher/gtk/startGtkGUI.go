@@ -21,7 +21,7 @@
 package gtk
 
 import (
-	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/log"
@@ -36,7 +36,7 @@ type asyncResult struct {
 	err           error
 }
 
-func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) {
+func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) {
 	log.Info("Initializing GTK...")
 	gtkui.InitGTK()
 	log.Notice("GTK initialized")
@@ -77,7 +77,7 @@ func StartGUI(bootDescriptorPath string, settings *custom.Settings) (err error) 
 	}
 }
 
-func backgroundCollector(bootDescriptorPath string, settings *custom.Settings, resultChannel chan asyncResult) {
+func backgroundCollector(bootDescriptorPath string, settings *config.Settings, resultChannel chan asyncResult) {
 	result := backgroundProcessing(bootDescriptorPath, settings)
 	userInterface := result.userInterface
 	err := result.err
@@ -102,7 +102,7 @@ func backgroundCollector(bootDescriptorPath string, settings *custom.Settings, r
 	resultChannel <- result
 }
 
-func backgroundProcessing(bootDescriptorPath string, settings *custom.Settings) asyncResult {
+func backgroundProcessing(bootDescriptorPath string, settings *config.Settings) asyncResult {
 	log.Info("Creating the user interface...")
 	userInterface, err := gtkui.NewGtkUserInterface()
 	if err != nil {

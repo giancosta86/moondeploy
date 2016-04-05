@@ -25,7 +25,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/moonclient"
@@ -71,10 +71,10 @@ func main() {
 	}
 }
 
-func loadSettings() (settings *custom.Settings) {
+func loadSettings() (settings *config.Settings) {
 	log.Info("Loading settings...")
 
-	settings, err := custom.ComputeUserSettings()
+	settings, err := moonclient.ComputeUserSettings()
 	if err != nil {
 		exitWithError(err)
 	}
@@ -84,7 +84,7 @@ func loadSettings() (settings *custom.Settings) {
 	return settings
 }
 
-func setLoggingLevel(settings *custom.Settings) {
+func setLoggingLevel(settings *config.Settings) {
 	log.Info("Configuring the logging level...")
 	loggingLevel := settings.GetLoggingLevel()
 	log.Notice("Requested logging level: %v", loggingLevel)
@@ -92,7 +92,7 @@ func setLoggingLevel(settings *custom.Settings) {
 	log.Notice("Logging level set")
 }
 
-func executeCommand(command string, settings *custom.Settings) (err error) {
+func executeCommand(command string, settings *config.Settings) (err error) {
 	switch command {
 	case ServeVerb:
 		return verbs.DoServe()

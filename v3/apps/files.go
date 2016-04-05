@@ -26,13 +26,14 @@ import (
 	"os"
 
 	"github.com/giancosta86/caravel"
-	"github.com/giancosta86/moondeploy/v3/custom"
+
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
 func (app *App) CheckFiles(
-	settings *custom.Settings,
+	settings *config.Settings,
 	userInterface ui.UserInterface) (err error) {
 
 	localDescriptor := app.GetLocalDescriptor()
@@ -133,7 +134,7 @@ func (app *App) getPackagesToUpdate() []string {
 
 func (app *App) installPackage(
 	packageName string,
-	settings *custom.Settings,
+	settings *config.Settings,
 	progressCallback caravel.RetrievalProgressCallback) (err error) {
 
 	remoteDescriptor := app.GetRemoteDescriptor()

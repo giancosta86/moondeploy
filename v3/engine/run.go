@@ -22,7 +22,7 @@ package engine
 
 import (
 	"github.com/giancosta86/moondeploy/v3/apps"
-	"github.com/giancosta86/moondeploy/v3/custom"
+	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
@@ -42,7 +42,7 @@ func (err *ExecutionCanceled) Error() string {
 Run is the entry point you must employ to create a custom installer, for example to
 employ custom settings or a brand-new user interface, based on any technology
 */
-func Run(bootDescriptor descriptors.AppDescriptor, settings *custom.Settings, userInterface ui.UserInterface) (err error) {
+func Run(bootDescriptor descriptors.AppDescriptor, settings *config.Settings, userInterface ui.UserInterface) (err error) {
 	userInterface.SetHeader("Performing startup operations")
 
 	log.Info("The boot descriptor is: %#v", bootDescriptor)
