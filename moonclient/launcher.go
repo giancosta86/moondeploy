@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package moonclient
+package main
 
 import (
 	"fmt"
@@ -80,7 +80,7 @@ func (launcher *MoonLauncher) GetSettings() config.Settings {
 	return launcher.settings
 }
 
-func GetMoonLauncher() *MoonLauncher {
+func getMoonLauncher() *MoonLauncher {
 	if moonLauncher != nil {
 		return moonLauncher
 	}
@@ -88,9 +88,6 @@ func GetMoonLauncher() *MoonLauncher {
 	moonLauncher = &MoonLauncher{
 		name: "MoonDeploy",
 	}
-
-	log.Info("Loading settings...")
-	moonLauncher.settings = GetMoonSettings()
 
 	moonLauncher.title = fmt.Sprintf("%v %v", moonLauncher.name, moondeploy.Version)
 
@@ -107,6 +104,9 @@ func GetMoonLauncher() *MoonLauncher {
 
 	moonLauncher.iconPathAsIco = filepath.Join(moonLauncher.directory, "moondeploy.ico")
 	moonLauncher.iconPathAsPng = filepath.Join(moonLauncher.directory, "moondeploy.png")
+
+	log.Info("Loading settings...")
+	moonLauncher.settings = getMoonSettings()
 
 	return moonLauncher
 }

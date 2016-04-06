@@ -24,29 +24,26 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/giancosta86/moondeploy/moonclient"
+	"github.com/giancosta86/moondeploy/v3"
 	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 
 	"github.com/giancosta86/moondeploy/moonclient/verbs"
 )
 
-const ExitCodeSuccess = 0
-const ExitCodeError = 1
-const ExitCodeCanceled = 2
-
 const ServeVerb = "serve"
 
 func main() {
-	launcher := moonclient.GetMoonLauncher()
+	launcher := getMoonLauncher()
 	fmt.Println(launcher.GetTitle())
 
 	if len(os.Args) < 2 {
 		exitWithUsage()
 	}
 
-	settings := moonclient.GetMoonSettings()
+	settings := launcher.GetSettings()
 	log.Notice("Settings are: %#v", settings)
 
 	log.SwitchToFile(settings.GetLogsDirectory())
@@ -54,11 +51,11 @@ func main() {
 	setLoggingLevel(settings)
 
 	command := os.Args[1]
-	err := executeCommand(command, settings)
+	err := executeCommand(launcher, command, settings)
 
 	switch err.(type) {
 	case nil:
-		os.Exit(ExitCodeSuccess)
+		os.Exit(v3.ExitCodeSuccess)
 
 	case *engine.ExecutionCanceled:
 		exitWithCancel()
@@ -79,24 +76,24 @@ func setLoggingLevel(settings config.Settings) {
 	log.Notice("Logging level set")
 }
 
-func executeCommand(command string, settings config.Settings) (err error) {
+func executeCommand(launcher launchers.Launcher, command string, settings config.Settings) (err error) {
 	switch command {
 	case ServeVerb:
 		return verbs.DoServe()
 
 	default:
-		return verbs.DoRun(settings)
+		return verbs.DoRun(launcher, settings)
 	}
 }
 
 func exitWithCancel() {
 	log.Warning("*** EXECUTION CANCELED ***")
-	os.Exit(ExitCodeCanceled)
+	os.Exit(v3.ExitCodeCanceled)
 }
 
 func exitWithError(err error) {
 	log.Error(err.Error())
-	os.Exit(ExitCodeError)
+	os.Exit(v3.ExitCodeError)
 }
 
 func exitWithUsage() {
@@ -110,5 +107,5 @@ func exitWithUsage() {
 	fmt.Println("\tStarts an HTTP server on <port> serving files from <directory>")
 	fmt.Println()
 
-	os.Exit(ExitCodeError)
+	os.Exit(v3.ExitCodeError)
 }

@@ -18,17 +18,8 @@
   ===========================================================================
 */
 
-package verbs
+package v3
 
-import (
-	"os"
-
-	"github.com/giancosta86/moondeploy/v3/config"
-	"github.com/giancosta86/moondeploy/v3/launchers"
-)
-
-func DoRun(launcher launchers.Launcher, settings config.Settings) (err error) {
-	bootDescriptorPath := os.Args[1]
-
-	return StartGUI(launcher, bootDescriptorPath)
-}
+const ExitCodeSuccess = 0
+const ExitCodeError = 1
+const ExitCodeCanceled = 2

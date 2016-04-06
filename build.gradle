@@ -77,6 +77,8 @@ if (onWindows) {
   programExtension = ".exe"
 }
 
+String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient"
+
 
 task checkGoPath << {
   def goPath = System.getenv('GOPATH')
@@ -115,7 +117,7 @@ task installGoLibs {
 task copyResources(type: Copy) {
     dependsOn(checkGoPath, setNotices)
 
-    from project.file("/moonclient/app/resources")
+    from project.file("moonclient/resources")
     into compileOutputDir
 }
 
@@ -142,8 +144,6 @@ tasks["setNotices"].dependsOn(createVersionSourceFile)
 task compileGo {
   dependsOn(copyResources, installGoLibs, setNotices)
 } << {
-  String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient/app"
-
   if (onWindows) {
     exec {
       commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", "-ldflags", "-H windowsgui", clientAppPackage

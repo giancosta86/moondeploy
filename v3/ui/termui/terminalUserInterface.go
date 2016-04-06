@@ -29,6 +29,7 @@ import (
 
 	"github.com/giancosta86/caravel/terminals"
 
+	"github.com/giancosta86/moondeploy/v3"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
@@ -80,7 +81,7 @@ func (userInterface *TerminalUserInterface) askYesNo(prompt string) (yesResponse
 
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
-			os.Exit(1)
+			os.Exit(v3.ExitCodeError)
 		}
 
 		userInput = strings.TrimSpace(userInput)

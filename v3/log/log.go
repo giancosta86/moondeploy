@@ -28,6 +28,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/giancosta86/moondeploy/v3"
 	"github.com/op/go-logging"
 )
 
@@ -133,7 +134,7 @@ func ensureLogsDirectory(logsDirectory string) {
 	err := os.MkdirAll(logsDirectory, 0700)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot create the logs directory (''%v').%v\n", logsDirectory, err.Error())
-		os.Exit(1)
+		os.Exit(v3.ExitCodeError)
 	}
 }
 
@@ -154,7 +155,7 @@ func openLogFile(logsDirectory string) *os.File {
 	logFile, err := os.Create(logFilePath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot create the log file '%v'! %v\n", logFilePath, err.Error())
-		os.Exit(1)
+		os.Exit(v3.ExitCodeError)
 	}
 
 	return logFile

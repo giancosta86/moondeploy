@@ -18,7 +18,7 @@
   ===========================================================================
 */
 
-package moonclient
+package main
 
 import (
 	"encoding/json"
@@ -29,6 +29,9 @@ import (
 	"strings"
 
 	"github.com/giancosta86/caravel"
+
+	"github.com/giancosta86/moondeploy/v3"
+	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/op/go-logging"
 )
 
@@ -38,7 +41,7 @@ const defaultLocalDirName = "MoonDeploy"
 const galleryDirName = "apps"
 const logsDirName = "logs"
 
-const defaultBufferSize = 512 * 1024
+const defaultBufferSize = 1024 * 1024
 const defaultSkipAppOutput = false
 
 const defaultLoggingLevel = logging.INFO
@@ -108,10 +111,12 @@ func getRawMoonSettings() (rawMoonSettings *rawMoonSettingsStruct) {
 		return &rawMoonSettingsStruct{}
 	}
 
+	log.Info("Settings file content: %#v", rawMoonSettings)
+
 	return rawMoonSettings
 }
 
-func getLoggingLevel(loggingLevelName string) (level logging.Level) {
+func parseLoggingLevel(loggingLevelName string) (level logging.Level) {
 	lowercaseLevelString := strings.ToLower(loggingLevelName)
 
 	switch lowercaseLevelString {
@@ -133,7 +138,7 @@ func getLoggingLevel(loggingLevelName string) (level logging.Level) {
 	}
 }
 
-func GetMoonSettings() *MoonSettings {
+func getMoonSettings() *MoonSettings {
 	if moonSettings != nil {
 		return moonSettings
 	}
@@ -148,7 +153,7 @@ func GetMoonSettings() *MoonSettings {
 		userDir, err := caravel.GetUserDirectory()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot retrieve the user's directory\n")
-			os.Exit(1)
+			os.Exit(v3.ExitCodeError)
 		}
 
 		moonSettings.localDirectory = filepath.Join(userDir, defaultLocalDirName)
@@ -157,13 +162,13 @@ func GetMoonSettings() *MoonSettings {
 	moonSettings.galleryDirectory = filepath.Join(moonSettings.localDirectory, galleryDirName)
 	moonSettings.logsDirectory = filepath.Join(moonSettings.localDirectory, logsDirName)
 
-	if rawMoonSettings.BufferSize != 0 {
+	if rawMoonSettings.BufferSize > 0 {
 		moonSettings.bufferSize = rawMoonSettings.BufferSize
 	} else {
 		moonSettings.bufferSize = defaultBufferSize
 	}
 
-	moonSettings.loggingLevel = getLoggingLevel(rawMoonSettings.LoggingLevel)
+	moonSettings.loggingLevel = parseLoggingLevel(rawMoonSettings.LoggingLevel)
 
 	moonSettings.skipAppOutput = rawMoonSettings.SkipAppOutput
 
