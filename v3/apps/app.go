@@ -246,7 +246,7 @@ func (app *App) Launch(command *exec.Cmd, settings config.Settings, userInterfac
 	log.Info("Starting the app...")
 
 	log.Info("Hiding the user interface...")
-	userInterface.HideLoader()
+	userInterface.Hide()
 	log.Notice("User interface hidden")
 
 	if settings.IsSkipAppOutput() {
@@ -257,7 +257,7 @@ func (app *App) Launch(command *exec.Cmd, settings config.Settings, userInterfac
 
 	if outputBytes != nil && len(outputBytes) > 0 {
 		fmt.Println("------------------------------")
-		fmt.Printf("%s\n", outputBytes)
+		fmt.Println(outputBytes)
 		fmt.Println("------------------------------")
 	}
 

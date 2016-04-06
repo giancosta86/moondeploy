@@ -48,8 +48,8 @@ type TerminalUserInterface struct {
 }
 
 func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Terminal) *TerminalUserInterface {
-	log.Notice("Terminal rows: %v", terminal.GetRows())
-	log.Notice("Terminal columns: %v", terminal.GetColumns())
+	log.Info("Terminal rows: %v", terminal.GetRows())
+	log.Info("Terminal columns: %v", terminal.GetColumns())
 
 	return &TerminalUserInterface{
 		terminal: terminal,
@@ -57,7 +57,7 @@ func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Te
 }
 
 func (userInterface *TerminalUserInterface) ShowError(message string) {
-	userInterface.HideLoader()
+	userInterface.Hide()
 
 	log.Error(message)
 }
@@ -71,16 +71,16 @@ func (userInterface *TerminalUserInterface) askYesNo(prompt string) (yesResponse
 
 		userInterface.drawTitle()
 
-		terminal.ShowCursor()
-
 		terminal.MoveCursor(8, 1)
 		fmt.Printf("%v [Y/N]: ", prompt)
+
+		terminal.ShowCursor()
 
 		reader := bufio.NewReader(os.Stdin)
 		userInput, err := reader.ReadString('\n')
 
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			userInterface.ShowError(err.Error())
 			os.Exit(v3.ExitCodeError)
 		}
 
@@ -149,7 +149,7 @@ func (userInterface *TerminalUserInterface) AskForDesktopShortcut(referenceDescr
 	return userInterface.askYesNo(prompt)
 }
 
-func (userInterface *TerminalUserInterface) ShowLoader() {
+func (userInterface *TerminalUserInterface) Show() {
 	log.SetCallback(func(level logging.Level, message string) {
 		if level <= logging.NOTICE {
 			userInterface.SetStatus(message)
@@ -157,7 +157,7 @@ func (userInterface *TerminalUserInterface) ShowLoader() {
 	})
 }
 
-func (userInterface *TerminalUserInterface) HideLoader() {
+func (userInterface *TerminalUserInterface) Hide() {
 	terminal := userInterface.terminal
 
 	terminal.ResetStyle()
@@ -188,7 +188,7 @@ func (userInterface *TerminalUserInterface) redraw() {
 	terminal.DisableTextBold()
 
 	terminal.MoveCursor(12, 2)
-	fmt.Printf("%v", userInterface.status)
+	fmt.Print(userInterface.status)
 
 	if 0 < userInterface.progress && userInterface.progress < 1 {
 		terminal.DrawHorizontalProgressBar(16, 2, terminal.GetColumns()-20, userInterface.progress)
@@ -211,12 +211,12 @@ func (userInterface *TerminalUserInterface) drawTitle() {
 	solidLine := strings.Repeat("-", terminal.GetColumns())
 
 	terminal.MoveCursor(1, 1)
-	fmt.Printf(solidLine)
+	fmt.Print(solidLine)
 
 	terminal.EnableTextBold()
 	terminal.PrintCenteredInRow(3, strings.ToUpper(userInterface.app))
 	terminal.DisableTextBold()
 
 	terminal.MoveCursor(5, 1)
-	fmt.Printf(solidLine)
+	fmt.Print(solidLine)
 }

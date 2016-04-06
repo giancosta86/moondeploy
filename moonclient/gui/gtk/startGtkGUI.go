@@ -157,6 +157,6 @@ func showUserInterface(launcher launchers.Launcher, userInterface *gtkui.GtkUser
 	log.Notice("User interface registered")
 
 	log.Info("Showing the loading dialog...")
-	userInterface.ShowLoader()
+	userInterface.Show()
 	log.Notice("Loading dialog shown")
 }

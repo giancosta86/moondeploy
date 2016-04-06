@@ -40,11 +40,11 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 
 	userInterface := termui.NewTerminalUserInterface(launcher, bashTerminal)
 
-	userInterface.ShowLoader()
+	userInterface.Show()
 
 	result := engine.Run(launcher, userInterface, bootDescriptor)
 
-	userInterface.HideLoader()
+	userInterface.Hide()
 
 	log.Notice("OK")
 

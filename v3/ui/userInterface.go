@@ -39,6 +39,6 @@ type UserInterface interface {
 
 	AskForDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (canCreate bool)
 
-	ShowLoader()
-	HideLoader()
+	Show()
+	Hide()
 }

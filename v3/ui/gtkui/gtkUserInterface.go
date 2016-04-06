@@ -202,7 +202,7 @@ func (userInterface *GtkUserInterface) SetProgress(progress float64) {
 	})
 }
 
-func (userInterface *GtkUserInterface) ShowLoader() {
+func (userInterface *GtkUserInterface) Show() {
 	runOnUIThreadAndWait(func() interface{} {
 		userInterface.window.ShowAll()
 		userInterface.progressBar.Hide()
@@ -211,7 +211,7 @@ func (userInterface *GtkUserInterface) ShowLoader() {
 	})
 }
 
-func (userInterface *GtkUserInterface) HideLoader() {
+func (userInterface *GtkUserInterface) Hide() {
 	runOnUIThreadAndWait(func() interface{} {
 		userInterface.window.Hide()
 		return nil

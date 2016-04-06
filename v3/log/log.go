@@ -114,18 +114,20 @@ func SwitchToFile(logsDirectory string) {
 
 	logFile := openLogFile(logsDirectory)
 
+	fmt.Printf("Now switching the log to file: '%v'\n", logFile.Name())
+
 	setup(logFile)
 }
 
 func tryGarbageLogCollection(logsDirectory string) {
-	files, _ := ioutil.ReadDir(logsDirectory)
+	logFiles, _ := ioutil.ReadDir(logsDirectory)
 
-	if len(files) > 20 {
+	if len(logFiles) > 20 {
 		fmt.Println("Removing older logs...")
 
 		err := os.RemoveAll(logsDirectory)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot remove the logs directory ('%v') for garbage collection. Error: %v", logsDirectory, err)
+			fmt.Fprintf(os.Stderr, "Cannot remove the logs directory ('%v') for garbage collection. Error: %v\n", logsDirectory, err)
 		}
 	}
 }
