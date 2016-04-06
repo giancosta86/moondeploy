@@ -28,15 +28,15 @@ import (
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
 const macScriptContentFormat = `#!/bin/bash
 "%v" "%v"
 `
 
-func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(launcher *launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 	}()
 
 	scriptContent := fmt.Sprintf(macScriptContentFormat,
-		moonclient.Executable,
+		launcher.GetExecutable(),
 		app.localDescriptorPath)
 
 	_, err = scriptFile.Write([]byte(scriptContent))

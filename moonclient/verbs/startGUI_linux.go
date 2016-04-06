@@ -18,56 +18,13 @@
   ===========================================================================
 */
 
-package moonclient
+package verbs
 
 import (
-	"net/url"
-	"path/filepath"
-	"runtime"
-
-	"github.com/kardianos/osext"
-
-	"github.com/giancosta86/moondeploy"
+	"github.com/giancosta86/moondeploy/moonclient/gui/gtk"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 )
 
-const Name = "MoonDeploy"
-
-var Title = Name + " " + moondeploy.Version
-
-var WebsiteURL *url.URL
-
-var Executable string
-var Directory string
-
-var IconPathAsIco string
-var IconPathAsPng string
-
-func GetIconPath() string {
-	if runtime.GOOS == "windows" {
-		return IconPathAsIco
-	}
-
-	return IconPathAsPng
-}
-
-func init() {
-	var err error
-
-	WebsiteURL, err = url.Parse("https://github.com/giancosta86/moondeploy")
-	if err != nil {
-		panic(err)
-	}
-
-	Executable, err = osext.Executable()
-	if err != nil {
-		panic(err)
-	}
-
-	Directory, err = osext.ExecutableFolder()
-	if err != nil {
-		panic(err)
-	}
-
-	IconPathAsIco = filepath.Join(Directory, "moondeploy.ico")
-	IconPathAsPng = filepath.Join(Directory, "moondeploy.png")
+func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error) {
+	return gtk.StartGUI(launcher, bootDescriptorPath)
 }

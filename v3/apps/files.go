@@ -33,7 +33,7 @@ import (
 )
 
 func (app *App) CheckFiles(
-	settings *config.Settings,
+	settings config.Settings,
 	userInterface ui.UserInterface) (err error) {
 
 	localDescriptor := app.GetLocalDescriptor()
@@ -134,7 +134,7 @@ func (app *App) getPackagesToUpdate() []string {
 
 func (app *App) installPackage(
 	packageName string,
-	settings *config.Settings,
+	settings config.Settings,
 	progressCallback caravel.RetrievalProgressCallback) (err error) {
 
 	remoteDescriptor := app.GetRemoteDescriptor()
@@ -165,7 +165,7 @@ func (app *App) installPackage(
 	}()
 
 	log.Info("Retrieving package: %v", packageURL)
-	err = caravel.RetrieveChunksFromURL(packageURL, packageTempFile, settings.BufferSize, progressCallback)
+	err = caravel.RetrieveChunksFromURL(packageURL, packageTempFile, settings.GetBufferSize(), progressCallback)
 	if err != nil {
 		return err
 	}

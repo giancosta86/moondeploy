@@ -21,11 +21,10 @@
 package gtk
 
 import (
-	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/ui/gtkui"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/op/go-logging"
@@ -36,7 +35,7 @@ type asyncResult struct {
 	err           error
 }
 
-func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) {
+func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error) {
 	log.Info("Initializing GTK...")
 	gtkui.InitGTK()
 	log.Notice("GTK initialized")
@@ -44,7 +43,7 @@ func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) 
 	resultChannel := make(chan asyncResult)
 	defer close(resultChannel)
 
-	go backgroundCollector(bootDescriptorPath, settings, resultChannel)
+	go backgroundCollector(launcher, bootDescriptorPath, resultChannel)
 
 	log.Info("Starting GTK main loop...")
 	gtk.Main()
@@ -77,8 +76,8 @@ func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) 
 	}
 }
 
-func backgroundCollector(bootDescriptorPath string, settings *config.Settings, resultChannel chan asyncResult) {
-	result := backgroundProcessing(bootDescriptorPath, settings)
+func backgroundCollector(launcher launchers.Launcher, bootDescriptorPath string, resultChannel chan asyncResult) {
+	result := backgroundProcessing(launcher, bootDescriptorPath)
 	userInterface := result.userInterface
 	err := result.err
 
@@ -102,9 +101,9 @@ func backgroundCollector(bootDescriptorPath string, settings *config.Settings, r
 	resultChannel <- result
 }
 
-func backgroundProcessing(bootDescriptorPath string, settings *config.Settings) asyncResult {
+func backgroundProcessing(launcher launchers.Launcher, bootDescriptorPath string) asyncResult {
 	log.Info("Creating the user interface...")
-	userInterface, err := gtkui.NewGtkUserInterface()
+	userInterface, err := gtkui.NewGtkUserInterface(launcher)
 	if err != nil {
 		return asyncResult{
 			userInterface: nil,
@@ -113,7 +112,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *config.Settings) 
 	}
 	log.Notice("User interface created")
 
-	showUserInterface(userInterface)
+	showUserInterface(launcher, userInterface)
 
 	//----------------------------------------------------------------------------
 	log.Info("Opening boot descriptor: %v", bootDescriptorPath)
@@ -131,7 +130,7 @@ func backgroundProcessing(bootDescriptorPath string, settings *config.Settings) 
 
 	log.Info("Starting the launch process...")
 
-	err = engine.Run(bootDescriptor, settings, userInterface)
+	err = engine.Run(launcher, userInterface, bootDescriptor)
 	if err != nil {
 		return asyncResult{
 			userInterface: userInterface,
@@ -145,8 +144,8 @@ func backgroundProcessing(bootDescriptorPath string, settings *config.Settings) 
 	}
 }
 
-func showUserInterface(userInterface *gtkui.GtkUserInterface) {
-	userInterface.SetApp(moonclient.Title)
+func showUserInterface(launcher launchers.Launcher, userInterface *gtkui.GtkUserInterface) {
+	userInterface.SetApp(launcher.GetTitle())
 	userInterface.SetHeader("Loading the boot descriptor")
 
 	log.Info("Registering user interface for log...")

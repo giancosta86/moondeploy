@@ -32,8 +32,8 @@ import (
 
 	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
@@ -242,14 +242,14 @@ func (app *App) SaveReferenceDescriptor() (referenceDescriptorSaved bool) {
 	return true
 }
 
-func (app *App) Launch(command *exec.Cmd, settings *config.Settings, userInterface ui.UserInterface) (err error) {
+func (app *App) Launch(command *exec.Cmd, settings config.Settings, userInterface ui.UserInterface) (err error) {
 	log.Info("Starting the app...")
 
 	log.Info("Hiding the user interface...")
 	userInterface.HideLoader()
 	log.Notice("User interface hidden")
 
-	if settings.SkipAppOutput {
+	if settings.IsSkipAppOutput() {
 		return command.Run()
 	}
 	var outputBytes []byte
@@ -264,11 +264,11 @@ func (app *App) Launch(command *exec.Cmd, settings *config.Settings, userInterfa
 	return err
 }
 
-func (app *App) GetActualIconPath() string {
+func (app *App) GetActualIconPath(launcher launchers.Launcher) string {
 	referenceDescriptor, err := app.GetReferenceDescriptor()
 	if err != nil {
 		log.Warning("Error while retrieving the reference descriptor: %v", err)
-		return moonclient.GetIconPath()
+		return launcher.GetIconPath()
 	}
 
 	providedIconPath := referenceDescriptor.GetIconPath()
@@ -277,5 +277,5 @@ func (app *App) GetActualIconPath() string {
 		return filepath.Join(app.filesDirectory, providedIconPath)
 	}
 
-	return moonclient.GetIconPath()
+	return launcher.GetIconPath()
 }

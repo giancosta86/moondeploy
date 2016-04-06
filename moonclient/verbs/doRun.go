@@ -21,10 +21,15 @@
 package verbs
 
 import (
+	"os"
+
+	"github.com/giancosta86/moondeploy/moonclient"
 	"github.com/giancosta86/moondeploy/v3/config"
-	"github.com/giancosta86/moondeploy/v3/moonclient/launcher/bash"
 )
 
-func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) {
-	return bash.StartGUI(bootDescriptorPath, settings)
+func DoRun(settings config.Settings) (err error) {
+	launcher := moonclient.GetMoonLauncher()
+	bootDescriptorPath := os.Args[1]
+
+	return StartGUI(launcher, bootDescriptorPath)
 }

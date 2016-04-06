@@ -30,6 +30,7 @@ import (
 	"github.com/giancosta86/caravel/terminals"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
 
@@ -45,7 +46,7 @@ type TerminalUserInterface struct {
 	terminal terminals.Terminal
 }
 
-func NewTerminalUserInterface(terminal terminals.Terminal) *TerminalUserInterface {
+func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Terminal) *TerminalUserInterface {
 	log.Notice("Terminal rows: %v", terminal.GetRows())
 	log.Notice("Terminal columns: %v", terminal.GetColumns())
 

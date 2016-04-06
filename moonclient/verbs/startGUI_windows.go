@@ -18,35 +18,13 @@
   ===========================================================================
 */
 
-package bash
+package verbs
 
 import (
-	"github.com/giancosta86/caravel/terminals"
-
-	"github.com/giancosta86/moondeploy/v3/config"
-	"github.com/giancosta86/moondeploy/v3/descriptors"
-	"github.com/giancosta86/moondeploy/v3/engine"
-	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/ui/termui"
+	"github.com/giancosta86/moondeploy/moonclient/gui/gtk"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 )
 
-func StartGUI(bootDescriptorPath string, settings *config.Settings) (err error) {
-	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
-	if err != nil {
-		return err
-	}
-
-	bashTerminal := terminals.NewBashTerminal()
-
-	userInterface := termui.NewTerminalUserInterface(bashTerminal)
-
-	userInterface.ShowLoader()
-
-	result := engine.Run(bootDescriptor, settings, userInterface)
-
-	userInterface.HideLoader()
-
-	log.Notice("OK")
-
-	return result
+func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error) {
+	return gtk.StartGUI(launcher, bootDescriptorPath)
 }

@@ -22,8 +22,8 @@ package engine
 
 import (
 	"github.com/giancosta86/moondeploy/v3/apps"
-	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
@@ -42,7 +42,9 @@ func (err *ExecutionCanceled) Error() string {
 Run is the entry point you must employ to create a custom installer, for example to
 employ custom settings or a brand-new user interface, based on any technology
 */
-func Run(bootDescriptor descriptors.AppDescriptor, settings *config.Settings, userInterface ui.UserInterface) (err error) {
+func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescriptor descriptors.AppDescriptor) (err error) {
+	settings := launcher.GetSettings()
+
 	userInterface.SetHeader("Performing startup operations")
 
 	log.Info("The boot descriptor is: %#v", bootDescriptor)
@@ -53,7 +55,7 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *config.Settings, us
 
 	//----------------------------------------------------------------------------
 
-	appGallery := apps.NewAppGallery(settings.GalleryDir)
+	appGallery := apps.NewAppGallery(settings.GetGalleryDirectory())
 	log.Info("The app gallery is: %#v", appGallery)
 
 	//----------------------------------------------------------------------------
@@ -189,7 +191,7 @@ func Run(bootDescriptor descriptors.AppDescriptor, settings *config.Settings, us
 		if userInterface.AskForDesktopShortcut(referenceDescriptor) {
 			log.Info("Creating desktop shortcut...")
 
-			err = app.CreateDesktopShortcut(referenceDescriptor)
+			err = app.CreateDesktopShortcut(launcher, referenceDescriptor)
 			if err != nil {
 				log.Warning("Could not create desktop shortcut: %v", err)
 			} else {

@@ -23,14 +23,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
+	"github.com/giancosta86/moondeploy/moonclient"
 	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 
-	"github.com/giancosta86/moondeploy/v3/moonclient/verbs"
+	"github.com/giancosta86/moondeploy/moonclient/verbs"
 )
 
 const ExitCodeSuccess = 0
@@ -40,16 +39,17 @@ const ExitCodeCanceled = 2
 const ServeVerb = "serve"
 
 func main() {
-	fmt.Println(moonclient.Title)
+	launcher := moonclient.GetMoonLauncher()
+	fmt.Println(launcher.GetTitle())
 
 	if len(os.Args) < 2 {
 		exitWithUsage()
 	}
 
-	logsDirectory := filepath.Join(moonclient.Directory, "logs")
-	log.SwitchToFile(logsDirectory)
+	settings := moonclient.GetMoonSettings()
+	log.Notice("Settings are: %#v", settings)
 
-	settings := loadSettings()
+	log.SwitchToFile(settings.GetLogsDirectory())
 
 	setLoggingLevel(settings)
 
@@ -71,20 +71,7 @@ func main() {
 	}
 }
 
-func loadSettings() (settings *config.Settings) {
-	log.Info("Loading settings...")
-
-	settings, err := moonclient.ComputeUserSettings()
-	if err != nil {
-		exitWithError(err)
-	}
-
-	log.Info("Settings loaded: %#v", settings)
-
-	return settings
-}
-
-func setLoggingLevel(settings *config.Settings) {
+func setLoggingLevel(settings config.Settings) {
 	log.Info("Configuring the logging level...")
 	loggingLevel := settings.GetLoggingLevel()
 	log.Notice("Requested logging level: %v", loggingLevel)
@@ -92,7 +79,7 @@ func setLoggingLevel(settings *config.Settings) {
 	log.Notice("Logging level set")
 }
 
-func executeCommand(command string, settings *config.Settings) (err error) {
+func executeCommand(command string, settings config.Settings) (err error) {
 	switch command {
 	case ServeVerb:
 		return verbs.DoServe()

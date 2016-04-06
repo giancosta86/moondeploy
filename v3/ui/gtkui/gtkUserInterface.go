@@ -27,11 +27,13 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/ui"
 )
 
 type GtkUserInterface struct {
+	launcher launchers.Launcher
+
 	window *gtk.Window
 
 	appLabel *gtk.Label
@@ -43,8 +45,10 @@ type GtkUserInterface struct {
 	closedByUser bool
 }
 
-func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
-	userInterface = &GtkUserInterface{}
+func NewGtkUserInterface(launcher launchers.Launcher) (userInterface *GtkUserInterface, err error) {
+	userInterface = &GtkUserInterface{
+		launcher: launcher,
+	}
 
 	runOnUIThreadAndWait(func() interface{} {
 		builder, err := gtk.BuilderNew()
@@ -53,7 +57,7 @@ func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
 		}
 
 		gladeDescriptorPath := filepath.Join(
-			filepath.Dir(moonclient.Executable),
+			filepath.Dir(launcher.GetExecutable()),
 			"moondeploy.glade")
 
 		err = builder.AddFromFile(gladeDescriptorPath)
@@ -68,8 +72,10 @@ func NewGtkUserInterface() (userInterface *GtkUserInterface, err error) {
 		window := windowObject.(*gtk.Window)
 		userInterface.window = window
 
-		window.SetTitle(moonclient.Title)
-		window.SetIconFromFile(moonclient.IconPathAsPng)
+		launcher := userInterface.launcher
+
+		window.SetTitle(launcher.GetTitle())
+		window.SetIconFromFile(launcher.GetIconPathAsPng())
 
 		window.Connect("destroy", func() {
 			window.Destroy()
@@ -117,7 +123,7 @@ func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.Me
 		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
 		defer dialog.Destroy()
 
-		dialog.SetTitle(moonclient.Title)
+		dialog.SetTitle(userInterface.launcher.GetTitle())
 		dialog.Run()
 
 		return nil
@@ -129,7 +135,7 @@ func (userInterface *GtkUserInterface) showYesNoDialog(messageType gtk.MessageTy
 		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
 		defer dialog.Destroy()
 
-		dialog.SetTitle(moonclient.Title)
+		dialog.SetTitle(userInterface.launcher.GetTitle())
 		return (dialog.Run() == int(gtk.RESPONSE_YES))
 	})
 
@@ -162,7 +168,7 @@ func (userInterface *GtkUserInterface) AskForDesktopShortcut(referenceDescriptor
 
 func (userInterface *GtkUserInterface) SetApp(app string) {
 	runOnUIThreadAndWait(func() interface{} {
-		userInterface.window.SetTitle(fmt.Sprintf("%v - %v", moonclient.Name, app))
+		userInterface.window.SetTitle(fmt.Sprintf("%v - %v", userInterface.launcher.GetName(), app))
 		userInterface.appLabel.SetText(app)
 		return nil
 	})

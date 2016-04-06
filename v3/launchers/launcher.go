@@ -18,16 +18,17 @@
   ===========================================================================
 */
 
-package verbs
+package launchers
 
-import (
-	"os"
+import "github.com/giancosta86/moondeploy/v3/config"
 
-	"github.com/giancosta86/moondeploy/v3/config"
-)
-
-func DoRun(settings *config.Settings) (err error) {
-	bootDescriptorPath := os.Args[1]
-
-	return StartGUI(bootDescriptorPath, settings)
+type Launcher interface {
+	GetIconPath() string
+	GetIconPathAsIco() string
+	GetIconPathAsPng() string
+	GetExecutable() string
+	GetTitle() string
+	GetName() string
+	GetDirectory() string
+	GetSettings() config.Settings
 }

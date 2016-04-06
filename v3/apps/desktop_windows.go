@@ -31,6 +31,7 @@ import (
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 )
 
@@ -43,7 +44,7 @@ const windowsShortcutContent = `
 	shellLink.WorkingDirectory = "%v"
 	shellLink.Save`
 
-func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(launcher *launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -81,7 +82,7 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 	}()
 
 	log.Info("Temp script file created: %v", tempFilePath)
-	actualIconPath := app.GetActualIconPath()
+	actualIconPath := app.GetActualIconPath(launcher)
 	log.Info("Actual icon path: '%v'", actualIconPath)
 
 	workingDirectory := filepath.Dir(app.localDescriptorPath)

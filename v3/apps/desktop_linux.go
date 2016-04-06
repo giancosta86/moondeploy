@@ -28,8 +28,8 @@ import (
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3/descriptors"
+	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/giancosta86/moondeploy/v3/moonclient"
 )
 
 const linuxShortcutContent = `
@@ -44,7 +44,7 @@ Type=Application
 Terminal=0
 `
 
-func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
@@ -72,12 +72,12 @@ func (app *App) CreateDesktopShortcut(referenceDescriptor descriptors.AppDescrip
 		}
 	}()
 
-	actualIconPath := app.GetActualIconPath()
+	actualIconPath := app.GetActualIconPath(launcher)
 
 	shortcutContent := fmt.Sprintf(linuxShortcutContent,
 		referenceDescriptor.GetName(),
 		referenceDescriptor.GetDescription(),
-		moonclient.Executable,
+		launcher.GetExecutable(),
 		app.localDescriptorPath,
 		actualIconPath)
 

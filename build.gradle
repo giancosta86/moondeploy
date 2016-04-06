@@ -115,7 +115,7 @@ task installGoLibs {
 task copyResources(type: Copy) {
     dependsOn(checkGoPath, setNotices)
 
-    from project.file("v${majorVersion}/moonclient/app/resources")
+    from project.file("/moonclient/app/resources")
     into compileOutputDir
 }
 
@@ -142,7 +142,7 @@ tasks["setNotices"].dependsOn(createVersionSourceFile)
 task compileGo {
   dependsOn(copyResources, installGoLibs, setNotices)
 } << {
-  String clientAppPackage = "github.com/giancosta86/moondeploy/v${majorVersion}/moonclient/app"
+  String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient/app"
 
   if (onWindows) {
     exec {

@@ -20,40 +20,13 @@
 
 package config
 
-import (
-	"strings"
+import "github.com/op/go-logging"
 
-	"github.com/op/go-logging"
-)
-
-const DefaultLoggingLevel = "INFO"
-const DefaultLoggingLevelValue = logging.INFO
-
-type Settings struct {
-	GalleryDir    string
-	BufferSize    int64
-	LoggingLevel  string
-	SkipAppOutput bool
-}
-
-func (settings *Settings) GetLoggingLevel() (level logging.Level) {
-	lowercaseLevelString := strings.ToLower(settings.LoggingLevel)
-
-	switch lowercaseLevelString {
-	case "debug":
-		return logging.DEBUG
-	case "info":
-		return logging.INFO
-	case "notice":
-		return logging.NOTICE
-	case "warning":
-		return logging.WARNING
-	case "error":
-		return logging.ERROR
-	case "critical":
-		return logging.CRITICAL
-
-	default:
-		return DefaultLoggingLevelValue
-	}
+type Settings interface {
+	GetLocalDirectory() string
+	GetGalleryDirectory() string
+	GetLogsDirectory() string
+	GetBufferSize() int64
+	GetLoggingLevel() logging.Level
+	IsSkipAppOutput() bool
 }
