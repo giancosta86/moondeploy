@@ -65,7 +65,7 @@ func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescri
 	if err != nil {
 		return err
 	}
-	log.Info("The app directory is: %v", app.Directory)
+	log.Notice("The app directory is: '%v'", app.Directory)
 
 	log.Info("App is: %#v", app)
 
@@ -209,6 +209,7 @@ func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescri
 	//----------------------------------------------------------------------------
 
 	userInterface.SetHeader("Launching the application")
+	userInterface.SetStatus("")
 
 	return app.Launch(command, settings, userInterface)
 }

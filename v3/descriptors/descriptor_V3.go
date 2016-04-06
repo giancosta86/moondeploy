@@ -74,9 +74,9 @@ type AppDescriptorV3 struct {
 }
 
 type OsSettings struct {
-	PackageVersions map[string]string
-	CommandLine     []string
-	IconPath        string
+	Packages    map[string]string
+	CommandLine []string
+	IconPath    string
 }
 
 func (descriptor *AppDescriptorV3) GetDescriptorVersion() *versioning.Version {
@@ -174,10 +174,10 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 		descriptor.supportedOS = []string{}
 	}
 
-	if osSettingsFound && osSettings.PackageVersions != nil {
-		descriptor.packageVersions, err = parsePackageVersions(osSettings.PackageVersions)
+	if osSettingsFound && osSettings.Packages != nil {
+		descriptor.packageVersions, err = parsePackageVersions(osSettings.Packages)
 	} else {
-		descriptor.packageVersions, err = parsePackageVersions(descriptor.PackageVersions)
+		descriptor.packageVersions, err = parsePackageVersions(descriptor.Packages)
 	}
 
 	if err != nil {
