@@ -19,3 +19,10 @@
 */
 
 package test
+
+/*
+It is not trivial to perform automated tests for MoonDeploy.
+
+Currently, testing is based on its actual execution for existing programs
+such as GraphsJ, Chronos IDE and KnapScal.
+*/

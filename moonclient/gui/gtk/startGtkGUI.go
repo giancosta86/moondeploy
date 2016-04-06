@@ -30,7 +30,7 @@ import (
 	"github.com/op/go-logging"
 )
 
-type asyncResult struct {
+type guiOutcomeStruct struct {
 	userInterface *gtkui.GtkUserInterface
 	err           error
 }
@@ -40,10 +40,10 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 	gtkui.InitGTK()
 	log.Notice("GTK initialized")
 
-	resultChannel := make(chan asyncResult)
-	defer close(resultChannel)
+	guiOutcomeChannel := make(chan guiOutcomeStruct)
+	defer close(guiOutcomeChannel)
 
-	go backgroundCollector(launcher, bootDescriptorPath, resultChannel)
+	go backgroundOrchestrator(launcher, bootDescriptorPath, guiOutcomeChannel)
 
 	log.Info("Starting GTK main loop...")
 	gtk.Main()
@@ -52,19 +52,16 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 	log.Notice("GTK main loop terminated")
 
 	select {
-	case result := <-resultChannel:
-		err = result.err
-		log.Info("Result retrieved from channel")
+	case guiOutcome := <-guiOutcomeChannel:
+		log.Info("Outcome retrieved from the GUI channel")
 
-		if err != nil {
-			log.Warning("Err is: %v", err)
-		}
-
-		if result.userInterface != nil && result.userInterface.IsClosedByUser() {
+		if guiOutcome.userInterface != nil && guiOutcome.userInterface.IsClosedByUser() {
 			return &engine.ExecutionCanceled{}
 		}
 
+		err = guiOutcome.err
 		if err != nil {
+			log.Warning("Err is: %v", err)
 			return err
 		}
 
@@ -76,40 +73,46 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 	}
 }
 
-func backgroundCollector(launcher launchers.Launcher, bootDescriptorPath string, resultChannel chan asyncResult) {
-	result := backgroundProcessing(launcher, bootDescriptorPath)
-	userInterface := result.userInterface
-	err := result.err
+func backgroundOrchestrator(launcher launchers.Launcher, bootDescriptorPath string, guiOutcomeChannel chan guiOutcomeStruct) {
+	outcome := startEngineWithGtk(launcher, bootDescriptorPath)
+	userInterface := outcome.userInterface
+	err := outcome.err
 
 	log.SetCallback(func(level logging.Level, message string) {})
-	log.Info("Result returned by the background routine. Is UI available? %v. Err is: '%v'", userInterface != nil, err)
+	log.Info("Result returned by the background routine. Is UI available? %v", userInterface != nil)
 
-	if err != nil && userInterface != nil {
-		switch err.(type) {
+	if err != nil {
+		log.Warning("Err is: %v", err)
 
-		case *engine.ExecutionCanceled:
-			break
+		if userInterface != nil {
+			switch err.(type) {
 
-		default:
-			userInterface.ShowError(err.Error())
+			case *engine.ExecutionCanceled:
+				break
+
+			default:
+				userInterface.ShowError(err.Error())
+			}
 		}
 	}
 
 	log.Info("Now programmatically quitting GTK")
 	gtk.MainQuit()
 
-	resultChannel <- result
+	guiOutcomeChannel <- outcome
 }
 
-func backgroundProcessing(launcher launchers.Launcher, bootDescriptorPath string) asyncResult {
+func startEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) guiOutcomeStruct {
 	log.Info("Creating the user interface...")
+
 	userInterface, err := gtkui.NewGtkUserInterface(launcher)
 	if err != nil {
-		return asyncResult{
+		return guiOutcomeStruct{
 			userInterface: nil,
 			err:           err,
 		}
 	}
+
 	log.Notice("User interface created")
 
 	showUserInterface(launcher, userInterface)
@@ -119,7 +122,7 @@ func backgroundProcessing(launcher launchers.Launcher, bootDescriptorPath string
 
 	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
 	if err != nil {
-		return asyncResult{
+		return guiOutcomeStruct{
 			userInterface: userInterface,
 			err:           err,
 		}
@@ -132,13 +135,13 @@ func backgroundProcessing(launcher launchers.Launcher, bootDescriptorPath string
 
 	err = engine.Run(launcher, userInterface, bootDescriptor)
 	if err != nil {
-		return asyncResult{
+		return guiOutcomeStruct{
 			userInterface: userInterface,
 			err:           err,
 		}
 	}
 
-	return asyncResult{
+	return guiOutcomeStruct{
 		userInterface: userInterface,
 		err:           nil,
 	}
@@ -148,7 +151,7 @@ func showUserInterface(launcher launchers.Launcher, userInterface *gtkui.GtkUser
 	userInterface.SetApp(launcher.GetTitle())
 	userInterface.SetHeader("Loading the boot descriptor")
 
-	log.Info("Registering user interface for log...")
+	log.Info("Registering the user interface to the logging system...")
 	log.SetCallback(func(level logging.Level, message string) {
 		if level <= logging.NOTICE {
 			userInterface.SetStatus(message)
