@@ -29,7 +29,6 @@ import (
 
 	"github.com/giancosta86/moondeploy"
 	"github.com/giancosta86/moondeploy/v3/config"
-	"github.com/giancosta86/moondeploy/v3/log"
 )
 
 type MoonLauncher struct {
@@ -105,7 +104,6 @@ func getMoonLauncher() *MoonLauncher {
 	moonLauncher.iconPathAsIco = filepath.Join(moonLauncher.directory, "moondeploy.ico")
 	moonLauncher.iconPathAsPng = filepath.Join(moonLauncher.directory, "moondeploy.png")
 
-	log.Info("Loading settings...")
 	moonLauncher.settings = getMoonSettings()
 
 	return moonLauncher

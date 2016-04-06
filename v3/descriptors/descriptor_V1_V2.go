@@ -129,12 +129,10 @@ func (descriptor *AppDescriptorV1V2) Init() (err error) {
 		return err
 	}
 
-	err = descriptor.setDeclaredBaseURL()
+	descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
 	if err != nil {
 		return err
 	}
-
-	descriptor.actualBaseURL = getActualBaseURL(descriptor)
 
 	descriptor.setIconPath()
 
@@ -145,12 +143,9 @@ func (descriptor *AppDescriptorV1V2) Init() (err error) {
 		return err
 	}
 
-	return nil
-}
+	descriptor.actualBaseURL = getActualBaseURL(descriptor)
 
-func (descriptor *AppDescriptorV1V2) setDeclaredBaseURL() (err error) {
-	descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
-	return err
+	return nil
 }
 
 func (descriptor *AppDescriptorV1V2) setIconPath() {

@@ -48,24 +48,25 @@ func getActualBaseURL(descriptor AppDescriptor) *url.URL {
 	}
 
 	if actualBaseURL == nil {
-		log.Info("The actual base URL just matches the actual base URL")
+		log.Info("The actual base URL just matches the declared base URL")
 		actualBaseURL = descriptor.GetDeclaredBaseURL()
 	}
 
 	actualBaseURLCache[descriptor.GetDeclaredBaseURL().String()] = actualBaseURL
-	log.Info("Actual base URL '%v' put into the cache", actualBaseURL)
+	log.Info("Actual base URL '%v' --> '%v' registered into the cache",
+		descriptor.GetDeclaredBaseURL(),
+		actualBaseURL)
 
 	return actualBaseURL
 }
 
 func lookForActualURLInCache(descriptor AppDescriptor) *url.URL {
-	log.Info("Checking if the Base URL is a key of the actual Base URL cache...")
+	log.Info("Checking if the Base URL is a key of the Actual Base URL cache...")
 
 	cachedActualURL, _ := actualBaseURLCache[descriptor.GetDeclaredBaseURL().String()]
 
 	if cachedActualURL != nil {
-		log.Info("Actual URL found in the cache! --> '%v'", cachedActualURL)
-
+		log.Info("Actual URL found in the cache! '%v'", cachedActualURL)
 		return cachedActualURL
 	}
 
@@ -74,7 +75,7 @@ func lookForActualURLInCache(descriptor AppDescriptor) *url.URL {
 }
 
 func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
-	log.Info("Checking if the Base URL points to the *latest* release of a GitHub repo...")
+	log.Info("Checking if the Declared Base URL points to the *latest* release of a GitHub repo...")
 	gitHubDescriptorInfo := gitHubUtils.GetGitHubDescriptorInfo(
 		descriptor.GetDeclaredBaseURL(),
 		descriptor.GetDescriptorFileName())
@@ -91,7 +92,7 @@ func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
 
 		actualBaseURL := gitHubDescriptorInfo.DescriptorURL.ResolveReference(parentDirURL)
 
-		log.Notice("The actual base URL returned by GitHub is: '%v'", actualBaseURL)
+		log.Notice("The actual base URL returned by the GitHub API is: '%v'", actualBaseURL)
 		return actualBaseURL
 	}
 

@@ -51,7 +51,7 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 
 	descriptorVersion, err := versioning.ParseVersion(basicDescriptor.DescriptorVersion)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Invalid Descriptor Version: %v", err.Error())
 	}
 
 	switch descriptorVersion.Major {
@@ -65,7 +65,7 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 		descriptor, err = createV1V2Descriptor(descriptorBytes)
 
 	default:
-		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy, now at version (%v).",
+		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy - your current version is '%v'.",
 			descriptorVersion,
 			moondeploy.Version)
 	}

@@ -52,7 +52,8 @@ type AppDescriptorV3 struct {
 	//
 	//Computed fields
 	//
-	descriptorVersion  *versioning.Version
+	descriptorVersion *versioning.Version
+
 	declaredBaseURL    *url.URL
 	actualBaseURL      *url.URL
 	descriptorFileName string

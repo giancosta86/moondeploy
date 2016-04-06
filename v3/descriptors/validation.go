@@ -20,7 +20,10 @@
 
 package descriptors
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func validate(descriptor AppDescriptor) (err error) {
 	if descriptor.GetDeclaredBaseURL() == nil {
@@ -31,11 +34,11 @@ func validate(descriptor AppDescriptor) (err error) {
 		return fmt.Errorf("Actual Base URL field is missing")
 	}
 
-	if descriptor.GetDescriptorFileName() == "" {
-		return fmt.Errorf("Descriptor file name field is missing")
+	if strings.TrimSpace(descriptor.GetDescriptorFileName()) == "" {
+		return fmt.Errorf("Descriptor File Name field is missing")
 	}
 
-	if descriptor.GetName() == "" {
+	if strings.TrimSpace(descriptor.GetName()) == "" {
 		return fmt.Errorf("Name field is missing")
 	}
 
@@ -43,27 +46,27 @@ func validate(descriptor AppDescriptor) (err error) {
 		return fmt.Errorf("App version field is missing")
 	}
 
-	if descriptor.GetPublisher() == "" {
+	if strings.TrimSpace(descriptor.GetPublisher()) == "" {
 		return fmt.Errorf("Publisher field is missing")
 	}
 
-	if descriptor.GetDescription() == "" {
+	if strings.TrimSpace(descriptor.GetDescription()) == "" {
 		return fmt.Errorf("Description field is missing")
 	}
 
 	if descriptor.GetPackageVersions() == nil {
-		return fmt.Errorf("Package versions field is nil")
+		return fmt.Errorf("Package versions field is missing")
 	}
 
 	if descriptor.GetCommandLine() == nil || len(descriptor.GetCommandLine()) == 0 {
-		return fmt.Errorf("No command line defined in the descriptor")
+		return fmt.Errorf("Command Line field is missing")
 	}
 
 	if descriptor.GetSkipPackageLevels() < 0 {
 		return fmt.Errorf("SkipPackageLevels field must be >= 0")
 	}
 
-	if descriptor.GetTitle() == "" {
+	if strings.TrimSpace(descriptor.GetTitle()) == "" {
 		return fmt.Errorf("The title is missing")
 	}
 
@@ -71,22 +74,22 @@ func validate(descriptor AppDescriptor) (err error) {
 }
 
 func CheckDescriptorMatch(descriptor AppDescriptor, otherDescriptor AppDescriptor) (err error) {
-	if descriptor.GetName() != otherDescriptor.GetName() {
-		return fmt.Errorf("The descriptors have different Name values:\n\t'%v'\n\t'%v",
-			descriptor.GetName(),
-			otherDescriptor.GetName())
-	}
-
-	if descriptor.GetDescriptorFileName() != otherDescriptor.GetDescriptorFileName() {
-		return fmt.Errorf("The descriptors have different DescriptorFileName values:\n\t'%v'\n\t'%v",
-			descriptor.GetDescriptorFileName(),
-			otherDescriptor.GetDescriptorFileName())
-	}
-
 	if descriptor.GetDeclaredBaseURL().String() != otherDescriptor.GetDeclaredBaseURL().String() {
 		return fmt.Errorf("The descriptors have different BaseURL's:\n\t'%v'\n\t'%v'",
 			descriptor.GetDeclaredBaseURL(),
 			otherDescriptor.GetDeclaredBaseURL())
+	}
+
+	if descriptor.GetDescriptorFileName() != otherDescriptor.GetDescriptorFileName() {
+		return fmt.Errorf("The descriptors have different Descriptor File Name values:\n\t'%v'\n\t'%v",
+			descriptor.GetDescriptorFileName(),
+			otherDescriptor.GetDescriptorFileName())
+	}
+
+	if descriptor.GetName() != otherDescriptor.GetName() {
+		return fmt.Errorf("The descriptors have different Name values:\n\t'%v'\n\t'%v",
+			descriptor.GetName(),
+			otherDescriptor.GetName())
 	}
 
 	return nil

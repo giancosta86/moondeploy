@@ -30,6 +30,7 @@ const defaultDescriptorFileName = "App.moondeploy"
 
 type AppDescriptor interface {
 	GetDescriptorVersion() *versioning.Version
+
 	GetDeclaredBaseURL() *url.URL
 	GetActualBaseURL() *url.URL
 	GetDescriptorFileName() string
