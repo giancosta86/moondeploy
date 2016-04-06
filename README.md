@@ -2,7 +2,7 @@
 
 *Lightweight software deployment*
 
-![Logo](v3/moonclient/resources/moondeploy.png)
+![Logo](moonclient/resources/moondeploy.png)
 
 
 ## For software users
