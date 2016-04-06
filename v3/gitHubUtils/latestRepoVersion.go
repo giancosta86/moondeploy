@@ -32,41 +32,42 @@ import (
 	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
-var latestVersionUrlRegex = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+)/releases/latest/?`)
+var latestVersionProjectUrlRegex = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+)/releases/latest/?`)
+
+var apiLatestVersionURLTemplate = "https://api.github.com/repos/%v/%v/releases/latest"
+
 var tagRegex = regexp.MustCompile(`^\D*(\d.*)`)
 
-var apiLatestVersioURLTemplate = "https://api.github.com/repos/%v/%v/releases/latest"
+type latestVersionResponse struct {
+	TagName string      `json:"tag_name"`
+	Assets  []assetInfo `json:"assets"`
+}
 
 type assetInfo struct {
 	Name               string `json:"name"`
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
 
-type apiLatestVersionResponse struct {
-	TagName string      `json:"tag_name"`
-	Assets  []assetInfo `json:"assets"`
-}
-
-type GitHubRemoteDescriptorInfo struct {
-	Version       *versioning.Version
+type GitHubDescriptorInfo struct {
 	DescriptorURL *url.URL
+	Version       *versioning.Version
 }
 
-func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHubRemoteDescriptorInfo {
+func GetGitHubDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHubDescriptorInfo {
 	log.Info("Checking if the Base URL matches GitHub's /latest release URL pattern...")
 
-	gitHubProjectParams := latestVersionUrlRegex.FindStringSubmatch(baseUrl.String())
-	if gitHubProjectParams == nil {
-		log.Info("The URL does not match a GitHub pattern")
+	projectParams := latestVersionProjectUrlRegex.FindStringSubmatch(baseUrl.String())
+	if projectParams == nil {
+		log.Info("The URL is not a latest release on GitHub")
 		return nil
 	}
-	log.Notice("The URL matches a GitHub 'latest' pattern")
+	log.Notice("The URL is a 'latest' release on GitHub")
 
-	gitHubUser := gitHubProjectParams[1]
-	gitHubRepo := gitHubProjectParams[2]
+	gitHubUser := projectParams[1]
+	gitHubRepo := projectParams[2]
 
-	apiLatestVersioURL, err := url.Parse(fmt.Sprintf(
-		apiLatestVersioURLTemplate,
+	apiLatestVersionURL, err := url.Parse(fmt.Sprintf(
+		apiLatestVersionURLTemplate,
 		gitHubUser,
 		gitHubRepo))
 	if err != nil {
@@ -74,9 +75,9 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) 
 		return nil
 	}
 
-	log.Info("Calling GitHub's API, at '%v'...", apiLatestVersioURL)
+	log.Info("Calling GitHub's API, at '%v'...", apiLatestVersionURL)
 
-	responseBytes, err := caravel.RetrieveFromURL(apiLatestVersioURL)
+	apiResponseBytes, err := caravel.RetrieveFromURL(apiLatestVersionURL)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
@@ -84,8 +85,8 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) 
 	log.Notice("API returned OK")
 
 	log.Info("Deserializing the API response...")
-	var latestVersionResponse apiLatestVersionResponse
-	err = json.Unmarshal(responseBytes, &latestVersionResponse)
+	var latestVersionResponse latestVersionResponse
+	err = json.Unmarshal(apiResponseBytes, &latestVersionResponse)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
@@ -94,13 +95,13 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) 
 
 	log.Info("Now processing the response fields...")
 
-	result := GitHubRemoteDescriptorInfo{}
+	result := GitHubDescriptorInfo{}
 
 	for _, asset := range latestVersionResponse.Assets {
 		if asset.Name == descriptorFileName {
 			result.DescriptorURL, err = url.Parse(asset.BrowserDownloadURL)
 			if err != nil {
-				log.Warning(err.Error())
+				log.Warning("Error while parsing the BrowserDownloadURL: %v", err.Error())
 				return nil
 			}
 			break
@@ -108,7 +109,7 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) 
 	}
 
 	if result.DescriptorURL == nil {
-		log.Warning("The app descriptor could not be found as an asset of the latest release")
+		log.Warning("The app descriptor ('%v') could not be found as an asset of the latest release", descriptorFileName)
 		return nil
 	}
 
@@ -120,7 +121,7 @@ func GetLatestRemoteDescriptorInfo(baseUrl *url.URL, descriptorFileName string) 
 
 	result.Version, err = versioning.ParseVersion(tagComponents[1])
 	if err != nil {
-		log.Warning(err.Error())
+		log.Warning("Error while parsing the version: %v", err.Error())
 		return nil
 	}
 

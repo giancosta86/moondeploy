@@ -75,21 +75,21 @@ func lookForActualURLInCache(descriptor AppDescriptor) *url.URL {
 
 func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
 	log.Info("Checking if the Base URL points to the *latest* release of a GitHub repo...")
-	gitHubLatestRemoteDescriptorInfo := gitHubUtils.GetLatestRemoteDescriptorInfo(
+	gitHubDescriptorInfo := gitHubUtils.GetGitHubDescriptorInfo(
 		descriptor.GetDeclaredBaseURL(),
 		descriptor.GetDescriptorFileName())
 
-	if gitHubLatestRemoteDescriptorInfo != nil {
+	if gitHubDescriptorInfo != nil {
 		log.Info("The given base URL actually references version '%v', whose descriptor is at URL: '%v'",
-			gitHubLatestRemoteDescriptorInfo.Version,
-			gitHubLatestRemoteDescriptorInfo.DescriptorURL)
+			gitHubDescriptorInfo.Version,
+			gitHubDescriptorInfo.DescriptorURL)
 
 		parentDirURL, err := url.Parse(".")
 		if err != nil {
 			panic(err)
 		}
 
-		actualBaseURL := gitHubLatestRemoteDescriptorInfo.DescriptorURL.ResolveReference(parentDirURL)
+		actualBaseURL := gitHubDescriptorInfo.DescriptorURL.ResolveReference(parentDirURL)
 
 		log.Notice("The actual base URL returned by GitHub is: '%v'", actualBaseURL)
 		return actualBaseURL
