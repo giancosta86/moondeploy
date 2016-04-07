@@ -37,6 +37,8 @@ version = '3.0'
 
 description = 'Lightweight software deployment'
 
+String crossMacSuffix = "mac"
+
 
 moonLicense {
     license = apache2
@@ -69,6 +71,7 @@ String currentOS = System.properties['os.name'].toLowerCase()
 String osSuffix = currentOS.split(" ")[0]
 
 boolean onWindows = currentOS.contains("windows")
+boolean onLinux = currentOS.contains("linux")
 
 String compileOutputDir = "${buildDir}/${osSuffix}"
 
@@ -78,6 +81,8 @@ if (onWindows) {
 }
 
 String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient"
+
+String crossCompileMacOutputDir = "${buildDir}/${crossMacSuffix}"
 
 
 task checkGoPath << {
@@ -175,15 +180,56 @@ task('createProgramZip', type: Zip, dependsOn: ['check'])  {
 }
 
 
-task('createAdditionalPackages', dependsOn: ['check']) << {
-  exec {
-    commandLine "iscc", "/Q", "/O\"${buildDir}\"", "${projectDir}/WinSetup/MoonDeploy.iss"
+task('createOsSpecificPackages', dependsOn: ['check']) << {
+  if (onWindows) {
+    exec {
+      commandLine "iscc", "/Q", "/O\"${buildDir}\"", "${projectDir}/WinSetup/MoonDeploy.iss"
+    }
+  } else if (onLinux) {
+
   }
 }
-tasks['createAdditionalPackages'].onlyIf { onWindows }
+tasks['createOsSpecificPackages'].onlyIf { onWindows || onLinux }
 
 
-task('packageProgram').dependsOn(['createProgramZip', 'createAdditionalPackages'])
-
+task('packageProgram').dependsOn(['createProgramZip', 'createOsSpecificPackages'])
 
 tasks['build'].dependsOn(['packageProgram'])
+
+
+
+task crossCompileForMac /*{
+  dependsOn(installGoLibs, setNotices)
+  }*/ << {
+    if (!onLinux) {
+      throw new GradleException("Automated cross compiling for MacOS is only supported on Linux")
+    }
+
+    copy {
+      from project.file("moonclient/resources")
+      into crossCompileMacOutputDir
+      include 'moondeploy.png'
+      include 'moondeploy.ico'
+    }
+
+    exec {
+      environment "GOOS": "darwin"
+
+
+      commandLine "go", "build", "-o", "${crossCompileMacOutputDir}/moondeploy", clientAppPackage
+    }
+}
+
+
+task('crossCreateProgramZipForMac', type: Zip, dependsOn: ['crossCompileForMac']) {
+  from crossCompileMacOutputDir
+
+  archiveName "moondeploy-${version}-${crossMacSuffix}.zip"
+
+  destinationDir buildDir
+}
+
+
+task crossBuildForMac {
+  dependsOn(crossCreateProgramZipForMac)
+} << {}

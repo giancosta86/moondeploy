@@ -36,7 +36,7 @@ const macScriptContentFormat = `#!/bin/bash
 "%v" "%v"
 `
 
-func (app *App) CreateDesktopShortcut(launcher *launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err

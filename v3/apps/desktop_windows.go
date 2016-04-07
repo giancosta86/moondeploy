@@ -44,7 +44,7 @@ const windowsShortcutContent = `
 	shellLink.WorkingDirectory = "%v"
 	shellLink.Save`
 
-func (app *App) CreateDesktopShortcut(launcher *launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
+func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
 	if err != nil {
 		return err
