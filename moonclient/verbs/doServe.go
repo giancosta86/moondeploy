@@ -28,6 +28,8 @@ import (
 	"github.com/giancosta86/moondeploy/v3/server"
 )
 
+const Serve = "serve"
+
 func DoServe() (err error) {
 	if len(os.Args) < 4 {
 		return &InvalidCommandLineArguments{}

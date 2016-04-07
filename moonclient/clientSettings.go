@@ -22,17 +22,17 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/op/go-logging"
+
 	"github.com/giancosta86/caravel"
 
 	"github.com/giancosta86/moondeploy/v3"
 	"github.com/giancosta86/moondeploy/v3/log"
-	"github.com/op/go-logging"
 )
 
 const userSettingsFileName = ".moondeploy.json"
@@ -152,7 +152,7 @@ func getMoonSettings() *MoonSettings {
 	} else {
 		userDir, err := caravel.GetUserDirectory()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot retrieve the user's directory\n")
+			log.Error("Cannot retrieve the user's directory")
 			os.Exit(v3.ExitCodeError)
 		}
 

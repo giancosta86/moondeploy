@@ -36,8 +36,7 @@ type GtkUserInterface struct {
 
 	window *gtk.Window
 
-	appLabel *gtk.Label
-
+	appLabel    *gtk.Label
 	headerLabel *gtk.Label
 	statusLabel *gtk.Label
 	progressBar *gtk.ProgressBar
@@ -50,15 +49,15 @@ func NewGtkUserInterface(launcher launchers.Launcher) (userInterface *GtkUserInt
 		launcher: launcher,
 	}
 
+	gladeDescriptorPath := filepath.Join(
+		filepath.Dir(launcher.GetExecutable()),
+		"moondeploy.glade")
+
 	runOnUIThreadAndWait(func() interface{} {
 		builder, err := gtk.BuilderNew()
 		if err != nil {
 			panic(err)
 		}
-
-		gladeDescriptorPath := filepath.Join(
-			filepath.Dir(launcher.GetExecutable()),
-			"moondeploy.glade")
 
 		err = builder.AddFromFile(gladeDescriptorPath)
 		if err != nil {
@@ -118,9 +117,17 @@ func (userInterface *GtkUserInterface) IsClosedByUser() bool {
 	return userInterface.closedByUser
 }
 
+func (userInterface *GtkUserInterface) getVisibleWindow() gtk.IWindow {
+	if userInterface.window.GetVisible() {
+		return userInterface.window
+	} else {
+		return nil
+	}
+}
+
 func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.MessageType, message string) {
 	runOnUIThreadAndWait(func() interface{} {
-		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
+		dialog := gtk.MessageDialogNew(userInterface.getVisibleWindow(), gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_OK, message)
 		defer dialog.Destroy()
 
 		dialog.SetTitle(userInterface.launcher.GetTitle())
@@ -132,7 +139,7 @@ func (userInterface *GtkUserInterface) showBasicMessageDialog(messageType gtk.Me
 
 func (userInterface *GtkUserInterface) showYesNoDialog(messageType gtk.MessageType, message string) bool {
 	result := runOnUIThreadAndWait(func() interface{} {
-		dialog := gtk.MessageDialogNew(userInterface.window, gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
+		dialog := gtk.MessageDialogNew(userInterface.getVisibleWindow(), gtk.DIALOG_MODAL, messageType, gtk.BUTTONS_YES_NO, message)
 		defer dialog.Destroy()
 
 		dialog.SetTitle(userInterface.launcher.GetTitle())

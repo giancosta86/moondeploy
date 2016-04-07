@@ -31,15 +31,15 @@ import (
 
 /*
 ServeDirectory activates a basic static web server on the given port, serving
-from the given source dir.
+from the given source directory.
 A client can stop it by accessing its "/moondeploy.quit" path.
 */
-func ServeDirectory(sourceDir string, port int) (err error) {
-	fileServer := http.FileServer(http.Dir(sourceDir))
+func ServeDirectory(sourceDirectory string, port int) (err error) {
+	fileServer := http.FileServer(http.Dir(sourceDirectory))
 	http.Handle("/", fileServer)
 
 	http.HandleFunc("/moondeploy.quit", func(http.ResponseWriter, *http.Request) {
-		log.Notice("Now quitting")
+		log.Notice("OK")
 		os.Exit(v3.ExitCodeSuccess)
 	})
 

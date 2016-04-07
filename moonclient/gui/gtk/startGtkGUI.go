@@ -21,13 +21,14 @@
 package gtk
 
 import (
+	"github.com/gotk3/gotk3/gtk"
+	"github.com/op/go-logging"
+
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui/gtkui"
-	"github.com/gotk3/gotk3/gtk"
-	"github.com/op/go-logging"
 )
 
 type guiOutcomeStruct struct {

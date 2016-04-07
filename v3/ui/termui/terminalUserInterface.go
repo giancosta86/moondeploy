@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/op/go-logging"
+
 	"github.com/giancosta86/caravel/terminals"
 
 	"github.com/giancosta86/moondeploy/v3"
@@ -34,17 +36,15 @@ import (
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
-
-	"github.com/op/go-logging"
 )
 
 type TerminalUserInterface struct {
+	terminal terminals.Terminal
+
 	app      string
 	header   string
 	status   string
 	progress float64
-
-	terminal terminals.Terminal
 }
 
 func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Terminal) *TerminalUserInterface {
@@ -64,21 +64,21 @@ func (userInterface *TerminalUserInterface) ShowError(message string) {
 
 func (userInterface *TerminalUserInterface) askYesNo(prompt string) (yesResponse bool) {
 	terminal := userInterface.terminal
+
 	for {
 		terminal.ResetStyle()
 		userInterface.setupColors()
 		terminal.Clear()
+		terminal.ShowCursor()
 
 		userInterface.drawTitle()
 
 		terminal.MoveCursor(8, 1)
 		fmt.Printf("%v [Y/N]: ", prompt)
 
-		terminal.ShowCursor()
-
 		reader := bufio.NewReader(os.Stdin)
-		userInput, err := reader.ReadString('\n')
 
+		userInput, err := reader.ReadString('\n')
 		if err != nil {
 			userInterface.ShowError(err.Error())
 			os.Exit(v3.ExitCodeError)
@@ -100,26 +100,24 @@ func (userInterface *TerminalUserInterface) styleFirstRunPrompt(prompt string) s
 		return prompt
 	}
 
-	prompt = strings.Replace(prompt, "\nTitle:", "\n\033[1m   Title:\033[21m", -1)
-	prompt = strings.Replace(prompt, "\nPublisher:", "\n\033[1m   Publisher:\033[21m", -1)
-	prompt = strings.Replace(prompt, "\nAddress:", "\n\033[1m   Address:\033[21m", -1)
-	prompt = strings.Replace(prompt, "\nWARNING:", "\n\033[1mWARNING:\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nTitle:", "\n\n\033[1m   Title:\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nPublisher:", "\n\n\033[1m   Publisher:\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nAddress:", "\n\n\033[1m   Address:\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nWARNING:", "\n\n\033[1mWARNING:\033[21m", -1)
 
 	return prompt
 }
 
 func (userInterface *TerminalUserInterface) AskForSecureFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
-	prompt := ui.FormatSecureFirstRunPrompt(bootDescriptor)
-
-	prompt = userInterface.styleFirstRunPrompt(prompt)
+	prompt := userInterface.styleFirstRunPrompt(
+		ui.FormatSecureFirstRunPrompt(bootDescriptor))
 
 	return userInterface.askYesNo(prompt)
 }
 
 func (userInterface *TerminalUserInterface) AskForUntrustedFirstRun(bootDescriptor descriptors.AppDescriptor) (canRun bool) {
-	prompt := ui.FormatUntrustedFirstRunPrompt(bootDescriptor)
-
-	prompt = userInterface.styleFirstRunPrompt(prompt)
+	prompt := userInterface.styleFirstRunPrompt(
+		ui.FormatUntrustedFirstRunPrompt(bootDescriptor))
 
 	return userInterface.askYesNo(prompt)
 }

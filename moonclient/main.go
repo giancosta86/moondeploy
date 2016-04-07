@@ -25,15 +25,12 @@ import (
 	"os"
 
 	"github.com/giancosta86/moondeploy/v3"
-	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/engine"
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 
 	"github.com/giancosta86/moondeploy/moonclient/verbs"
 )
-
-const ServeVerb = "serve"
 
 func main() {
 	launcher := getMoonLauncher()
@@ -44,14 +41,13 @@ func main() {
 	}
 
 	settings := launcher.GetSettings()
-	log.Notice("Settings are: %#v", settings)
 
-	log.SwitchToFile(settings.GetLogsDirectory())
+	initializeLogging(settings)
 
-	setLoggingLevel(settings)
+	log.Info("Launcher is: %#v", launcher)
 
 	command := os.Args[1]
-	err := executeCommand(launcher, command, settings)
+	err := executeCommand(launcher, command)
 
 	switch err.(type) {
 	case nil:
@@ -68,17 +64,11 @@ func main() {
 	}
 }
 
-func setLoggingLevel(settings config.Settings) {
-	log.Info("Configuring the logging level...")
-	loggingLevel := settings.GetLoggingLevel()
-	log.Notice("Requested logging level: %v", loggingLevel)
-	log.SetLevel(loggingLevel)
-	log.Notice("Logging level set")
-}
+func executeCommand(launcher launchers.Launcher, command string) (err error) {
+	settings := launcher.GetSettings()
 
-func executeCommand(launcher launchers.Launcher, command string, settings config.Settings) (err error) {
 	switch command {
-	case ServeVerb:
+	case verbs.Serve:
 		return verbs.DoServe()
 
 	default:
@@ -103,7 +93,7 @@ func exitWithUsage() {
 	fmt.Println()
 	fmt.Println("Available commands")
 	fmt.Println()
-	fmt.Printf("%v <port> <directory>\n", ServeVerb)
+	fmt.Printf("%v <port> <directory>\n", verbs.Serve)
 	fmt.Println("\tStarts an HTTP server on <port> serving files from <directory>")
 	fmt.Println()
 

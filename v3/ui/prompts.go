@@ -26,7 +26,7 @@ import (
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 )
 
-func FormatSecureFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) (basicFirstRunPrompt string) {
+func FormatSecureFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) string {
 	const basicFirstRunTemplate = "You are running an application for the first time." +
 		"\n\n\nTitle:   %v" +
 		"\n\nPublisher:   %v" +
@@ -39,7 +39,7 @@ func FormatSecureFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) (basic
 		bootDescriptor.GetDeclaredBaseURL())
 }
 
-func FormatUntrustedFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) (basicFirstRunPrompt string) {
+func FormatUntrustedFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) string {
 	return FormatSecureFirstRunPrompt(bootDescriptor) + untrustedWarning
 }
 
@@ -47,6 +47,6 @@ func FormatDesktopShortcutPrompt(referenceDescriptor descriptors.AppDescriptor) 
 	return "Would you like to create a desktop shortcut for the application?"
 }
 
-const untrustedWarning = "\n\n\nWARNING: the provided address is insecure, so " +
+const untrustedWarning = "\n\n\nWARNING: the address is insecure, so " +
 	"the integrity of the application files might be compromised by " +
 	"third parties during the download process. Do you really want to continue?"

@@ -23,12 +23,14 @@ package launchers
 import "github.com/giancosta86/moondeploy/v3/config"
 
 type Launcher interface {
+	GetName() string
+	GetTitle() string
+	GetExecutable() string
+	GetDirectory() string
+
 	GetIconPath() string
 	GetIconPathAsIco() string
 	GetIconPathAsPng() string
-	GetExecutable() string
-	GetTitle() string
-	GetName() string
-	GetDirectory() string
+
 	GetSettings() config.Settings
 }

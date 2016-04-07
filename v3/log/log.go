@@ -23,12 +23,8 @@ package log
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"time"
 
-	"github.com/giancosta86/moondeploy/v3"
 	"github.com/op/go-logging"
 )
 
@@ -107,70 +103,14 @@ func SetLevel(level logging.Level) {
 	leveledBackend.SetLevel(level, "")
 }
 
-func SwitchToFile(logsDirectory string) {
-	tryGarbageLogCollection(logsDirectory)
-
-	ensureLogsDirectory(logsDirectory)
-
-	logFile := openLogFile(logsDirectory)
-
-	fmt.Printf("Now switching the log to file: '%v'\n", logFile.Name())
-
-	setup(logFile)
-}
-
-func tryGarbageLogCollection(logsDirectory string) {
-	logFiles, _ := ioutil.ReadDir(logsDirectory)
-
-	if len(logFiles) > 20 {
-		fmt.Println("Removing older logs...")
-
-		err := os.RemoveAll(logsDirectory)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot remove the logs directory ('%v') for garbage collection. Error: %v\n", logsDirectory, err)
-		}
-	}
-}
-
-func ensureLogsDirectory(logsDirectory string) {
-	err := os.MkdirAll(logsDirectory, 0700)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot create the logs directory (''%v').%v\n", logsDirectory, err.Error())
-		os.Exit(v3.ExitCodeError)
-	}
-}
-
-func openLogFile(logsDirectory string) *os.File {
-	now := time.Now()
-
-	logFileName := fmt.Sprintf("MoonDeploy - %d-%d-%d %d-%d-%d %d.log",
-		now.Year(),
-		now.Month(),
-		now.Day(),
-		now.Hour(),
-		now.Minute(),
-		now.Second(),
-		now.Nanosecond())
-
-	logFilePath := filepath.Join(logsDirectory, logFileName)
-
-	logFile, err := os.Create(logFilePath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Cannot create the log file '%v'! %v\n", logFilePath, err.Error())
-		os.Exit(v3.ExitCodeError)
-	}
-
-	return logFile
-}
-
-func setup(logWriter io.Writer) {
+func Setup(logWriter io.Writer) {
 	backend := logging.NewLogBackend(logWriter, "", 0)
 
 	formatString := "%{time:15:04:05.000} %{level} - %{message}\n\n"
 
-	format := logging.MustStringFormatter(formatString)
+	formatter := logging.MustStringFormatter(formatString)
 
-	backendFormatter := logging.NewBackendFormatter(backend, format)
+	backendFormatter := logging.NewBackendFormatter(backend, formatter)
 
 	leveledBackend = logging.AddModuleLevel(backendFormatter)
 
@@ -178,5 +118,5 @@ func setup(logWriter io.Writer) {
 }
 
 func init() {
-	setup(os.Stdout)
+	Setup(os.Stdout)
 }
