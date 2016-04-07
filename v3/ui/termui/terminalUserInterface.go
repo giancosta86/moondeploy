@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/op/go-logging"
-
 	"github.com/giancosta86/caravel/terminals"
 
 	"github.com/giancosta86/moondeploy/v3"
@@ -148,11 +146,7 @@ func (userInterface *TerminalUserInterface) AskForDesktopShortcut(referenceDescr
 }
 
 func (userInterface *TerminalUserInterface) Show() {
-	log.SetCallback(func(level logging.Level, message string) {
-		if level <= logging.NOTICE {
-			userInterface.SetStatus(message)
-		}
-	})
+
 }
 
 func (userInterface *TerminalUserInterface) Hide() {
@@ -161,8 +155,6 @@ func (userInterface *TerminalUserInterface) Hide() {
 	terminal.ResetStyle()
 	terminal.ShowCursor()
 	terminal.Clear()
-
-	log.SetCallback(func(level logging.Level, message string) {})
 }
 
 func (userInterface *TerminalUserInterface) setupColors() {

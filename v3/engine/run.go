@@ -26,6 +26,7 @@ import (
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
+	"github.com/op/go-logging"
 )
 
 /*
@@ -44,6 +45,13 @@ employ custom settings or a brand-new user interface, based on any technology
 */
 func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescriptor descriptors.AppDescriptor) (err error) {
 	settings := launcher.GetSettings()
+
+	//----------------------------------------------------------------------------
+
+	setupUserInterface(launcher, userInterface)
+	defer dismissUserInterface(userInterface)
+
+	//----------------------------------------------------------------------------
 
 	userInterface.SetHeader("Performing startup operations")
 
@@ -212,4 +220,21 @@ func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescri
 	userInterface.SetStatus("")
 
 	return app.Launch(command, settings, userInterface)
+}
+
+func setupUserInterface(launcher launchers.Launcher, userInterface ui.UserInterface) {
+	userInterface.SetApp(launcher.GetTitle())
+
+	log.SetCallback(func(level logging.Level, message string) {
+		if level <= logging.NOTICE {
+			userInterface.SetStatus(message)
+		}
+	})
+
+	userInterface.Show()
+}
+
+func dismissUserInterface(userInterface ui.UserInterface) {
+	log.SetCallback(func(level logging.Level, message string) {})
+	userInterface.Hide()
 }

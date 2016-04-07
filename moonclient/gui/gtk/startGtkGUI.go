@@ -75,7 +75,7 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 }
 
 func backgroundOrchestrator(launcher launchers.Launcher, bootDescriptorPath string, guiOutcomeChannel chan guiOutcomeStruct) {
-	outcome := startEngineWithGtk(launcher, bootDescriptorPath)
+	outcome := runEngineWithGtk(launcher, bootDescriptorPath)
 	userInterface := outcome.userInterface
 	err := outcome.err
 
@@ -103,8 +103,8 @@ func backgroundOrchestrator(launcher launchers.Launcher, bootDescriptorPath stri
 	guiOutcomeChannel <- outcome
 }
 
-func startEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) guiOutcomeStruct {
-	log.Info("Creating the user interface...")
+func runEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) guiOutcomeStruct {
+	log.Info("Creating the GTK+ user interface...")
 
 	userInterface, err := gtkui.NewGtkUserInterface(launcher)
 	if err != nil {
@@ -115,8 +115,6 @@ func startEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) 
 	}
 
 	log.Notice("User interface created")
-
-	showUserInterface(launcher, userInterface)
 
 	//----------------------------------------------------------------------------
 	log.Info("Opening boot descriptor: %v", bootDescriptorPath)
@@ -135,32 +133,8 @@ func startEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) 
 	log.Info("Starting the launch process...")
 
 	err = engine.Run(launcher, userInterface, bootDescriptor)
-	if err != nil {
-		return guiOutcomeStruct{
-			userInterface: userInterface,
-			err:           err,
-		}
-	}
-
 	return guiOutcomeStruct{
 		userInterface: userInterface,
-		err:           nil,
+		err:           err,
 	}
-}
-
-func showUserInterface(launcher launchers.Launcher, userInterface *gtkui.GtkUserInterface) {
-	userInterface.SetApp(launcher.GetTitle())
-	userInterface.SetHeader("Loading the boot descriptor")
-
-	log.Info("Registering the user interface to the logging system...")
-	log.SetCallback(func(level logging.Level, message string) {
-		if level <= logging.NOTICE {
-			userInterface.SetStatus(message)
-		}
-	})
-	log.Notice("User interface registered")
-
-	log.Info("Showing the loading dialog...")
-	userInterface.Show()
-	log.Notice("Loading dialog shown")
 }

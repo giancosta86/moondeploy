@@ -143,7 +143,17 @@ func (userInterface *GtkUserInterface) showYesNoDialog(messageType gtk.MessageTy
 		defer dialog.Destroy()
 
 		dialog.SetTitle(userInterface.launcher.GetTitle())
-		return (dialog.Run() == int(gtk.RESPONSE_YES))
+
+		var dialogResult int
+
+		for {
+			dialogResult = dialog.Run()
+
+			if dialogResult == int(gtk.RESPONSE_YES) || dialogResult == int(gtk.RESPONSE_NO) {
+				break
+			}
+		}
+		return dialogResult == int(gtk.RESPONSE_YES)
 	})
 
 	return result.(bool)
