@@ -46,8 +46,8 @@ type TerminalUserInterface struct {
 }
 
 func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Terminal) *TerminalUserInterface {
-	log.Info("Terminal rows: %v", terminal.GetRows())
-	log.Info("Terminal columns: %v", terminal.GetColumns())
+	log.Debug("Terminal rows: %v", terminal.GetRows())
+	log.Debug("Terminal columns: %v", terminal.GetColumns())
 
 	return &TerminalUserInterface{
 		terminal: terminal,

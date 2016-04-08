@@ -60,7 +60,7 @@ func Run(
 
 	userInterface.SetHeader("Performing startup operations")
 
-	log.Info("The boot descriptor is: %#v", bootDescriptor)
+	log.Debug("The boot descriptor is: %#v", bootDescriptor)
 
 	//----------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ func Run(
 	//----------------------------------------------------------------------------
 
 	appGallery := apps.NewAppGallery(settings.GetGalleryDirectory())
-	log.Info("The app gallery is: %#v", appGallery)
+	log.Debug("The app gallery is: %#v", appGallery)
 
 	//----------------------------------------------------------------------------
 
@@ -80,10 +80,10 @@ func Run(
 	}
 	log.Notice("The app directory is: '%v'", app.Directory)
 
-	log.Info("App is: %#v", app)
+	log.Debug("App is: %#v", app)
 
 	firstRun := !app.DirectoryExists()
-	log.Notice("Is this a first run for the app? %v", firstRun)
+	log.Debug("Is this a first run for the app? %v", firstRun)
 
 	//----------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ func Run(
 			return &ExecutionCanceled{}
 		}
 
-		log.Notice("The user agreed to proceed")
+		log.Debug("The user agreed to proceed")
 
 		log.Info("Ensuring the app dir is available...")
 		err = app.EnsureDirectory()
@@ -127,7 +127,7 @@ func Run(
 	localDescriptor := app.GetLocalDescriptor()
 
 	startedWithLocalDescriptor := localDescriptor != nil
-	log.Info("Started with local descriptor? %v", startedWithLocalDescriptor)
+	log.Debug("Started with local descriptor? %v", startedWithLocalDescriptor)
 
 	if startedWithLocalDescriptor {
 		log.Info("Checking that local descriptor and boot descriptor actually match...")
@@ -159,8 +159,9 @@ func Run(
 	if err != nil {
 		return err
 	}
+	log.Notice("Reference descriptor chosen")
 
-	log.Info("The reference descriptor is: %#v", referenceDescriptor)
+	log.Debug("The reference descriptor is: %#v", referenceDescriptor)
 
 	//----------------------------------------------------------------------------
 
@@ -177,7 +178,9 @@ func Run(
 
 	log.Info("Resolving the OS-specific app command line...")
 	commandLine := referenceDescriptor.GetCommandLine()
-	log.Info("Command line resolved: %v", commandLine)
+	log.Notice("Command line resolved")
+
+	log.Debug("Command line is: %v", commandLine)
 
 	//----------------------------------------------------------------------------
 
@@ -190,11 +193,12 @@ func Run(
 
 	userInterface.SetHeader("Preparing the command...")
 
+	log.Info("Creating the command...")
 	command := app.PrepareCommand(commandLine)
 	log.Notice("Command created")
 
-	log.Info("Command path: %v", command.Path)
-	log.Info("Command arguments: %v", command.Args)
+	log.Debug("Command path: %v", command.Path)
+	log.Debug("Command arguments: %v", command.Args)
 
 	//----------------------------------------------------------------------------
 

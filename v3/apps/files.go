@@ -144,18 +144,18 @@ func (app *App) installPackage(
 		return err
 	}
 
-	log.Info("Creating package temp file...")
+	log.Debug("Creating package temp file...")
 	packageTempFile, err := ioutil.TempFile(os.TempDir(), packageName)
 	if err != nil {
 		return err
 	}
 	packageTempFilePath := packageTempFile.Name()
-	log.Info("Package temp file created '%v'", packageTempFilePath)
+	log.Debug("Package temp file created '%v'", packageTempFilePath)
 
 	defer func() {
 		packageTempFile.Close()
 
-		log.Info("Deleting package temp file: '%v'", packageTempFilePath)
+		log.Debug("Deleting package temp file: '%v'", packageTempFilePath)
 		tempFileRemovalErr := os.Remove(packageTempFilePath)
 		if tempFileRemovalErr != nil {
 			log.Warning("Could not remove the package temp file! '%v'", tempFileRemovalErr)
@@ -171,7 +171,7 @@ func (app *App) installPackage(
 	}
 	log.Notice("Package retrieved")
 
-	log.Info("Closing the package temp file...")
+	log.Debug("Closing the package temp file...")
 	packageTempFile.Close()
 	if err != nil {
 		return err

@@ -47,7 +47,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	}
 
 	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName())
-	log.Info("Bash shortcut name: '%v'", scriptFileName)
+	log.Debug("Bash shortcut name: '%v'", scriptFileName)
 
 	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
 	log.Info("Creating Bash shortcut: '%v'...", scriptFilePath)

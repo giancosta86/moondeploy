@@ -37,24 +37,24 @@ type guiOutcomeStruct struct {
 }
 
 func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error) {
-	log.Info("Initializing GTK...")
+	log.Debug("Initializing GTK...")
 	gtkui.InitGTK()
-	log.Notice("GTK initialized")
+	log.Debug("GTK initialized")
 
 	guiOutcomeChannel := make(chan guiOutcomeStruct)
 	defer close(guiOutcomeChannel)
 
 	go backgroundOrchestrator(launcher, bootDescriptorPath, guiOutcomeChannel)
 
-	log.Info("Starting GTK main loop...")
+	log.Debug("Starting GTK main loop...")
 	gtk.Main()
 
 	log.SetCallback(func(level logging.Level, message string) {})
-	log.Notice("GTK main loop terminated")
+	log.Debug("GTK main loop terminated")
 
 	select {
 	case guiOutcome := <-guiOutcomeChannel:
-		log.Info("Outcome retrieved from the GUI channel")
+		log.Debug("Outcome retrieved from the GUI channel")
 
 		if guiOutcome.userInterface != nil && guiOutcome.userInterface.IsClosedByUser() {
 			return &engine.ExecutionCanceled{}
@@ -69,7 +69,7 @@ func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error
 		log.Notice("OK")
 		return nil
 	default:
-		log.Info("The user has manually closed the program")
+		log.Debug("The user has manually closed the program")
 		return &engine.ExecutionCanceled{}
 	}
 }
@@ -80,7 +80,7 @@ func backgroundOrchestrator(launcher launchers.Launcher, bootDescriptorPath stri
 	err := outcome.err
 
 	log.SetCallback(func(level logging.Level, message string) {})
-	log.Info("Result returned by the background routine. Is UI available? %v", userInterface != nil)
+	log.Debug("Result returned by the background routine. Is UI available? %v", userInterface != nil)
 
 	if err != nil {
 		log.Warning("Err is: %v", err)
@@ -97,14 +97,14 @@ func backgroundOrchestrator(launcher launchers.Launcher, bootDescriptorPath stri
 		}
 	}
 
-	log.Info("Now programmatically quitting GTK")
+	log.Debug("Now programmatically quitting GTK")
 	gtk.MainQuit()
 
 	guiOutcomeChannel <- outcome
 }
 
 func runEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) guiOutcomeStruct {
-	log.Info("Creating the GTK+ user interface...")
+	log.Debug("Creating the GTK+ user interface...")
 
 	userInterface, err := gtkui.NewGtkUserInterface(launcher)
 	if err != nil {
@@ -114,10 +114,10 @@ func runEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) gu
 		}
 	}
 
-	log.Notice("User interface created")
+	log.Debug("User interface created")
 
 	//----------------------------------------------------------------------------
-	log.Info("Opening boot descriptor: %v", bootDescriptorPath)
+	log.Info("Opening boot descriptor: '%v'...", bootDescriptorPath)
 
 	bootDescriptor, err := descriptors.NewAppDescriptorFromPath(bootDescriptorPath)
 	if err != nil {
@@ -130,7 +130,7 @@ func runEngineWithGtk(launcher launchers.Launcher, bootDescriptorPath string) gu
 	log.Notice("Boot descriptor ready")
 	//----------------------------------------------------------------------------
 
-	log.Info("Starting the launch process...")
+	log.Debug("Starting the launch process...")
 
 	err = engine.Run(launcher, userInterface, bootDescriptor)
 	return guiOutcomeStruct{

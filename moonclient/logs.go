@@ -36,14 +36,14 @@ func initializeLogging(settings config.Settings) {
 	log.SetLevel(settings.GetLoggingLevel())
 
 	logsDirectory := settings.GetLogsDirectory()
-	log.Info("Logs directory is: '%v'", logsDirectory)
+	log.Debug("Logs directory is: '%v'", logsDirectory)
 
 	tryToCollectLogs(logsDirectory)
 	ensureLogsDirectory(logsDirectory)
 
 	logFile := createLogFile(logsDirectory)
 
-	log.Info("Now redirecting log lines to file: '%v'", logFile.Name())
+	log.Debug("Now redirecting log lines to file: '%v'", logFile.Name())
 	log.Setup(logFile)
 }
 

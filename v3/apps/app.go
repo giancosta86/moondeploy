@@ -103,7 +103,7 @@ func (app *App) GetLocalDescriptor() (localDescriptor descriptors.AppDescriptor)
 	}
 	log.Notice("Local descriptor deserialized")
 
-	log.Info("The local descriptor is: %#v", localDescriptor)
+	log.Debug("The local descriptor is: %#v", localDescriptor)
 
 	app.localDescriptor = localDescriptor
 	app.localDescriptorPath = app.localDescriptorPath
@@ -158,7 +158,7 @@ func (app *App) GetRemoteDescriptor() (remoteDescriptor descriptors.AppDescripto
 	}
 	log.Notice("Remote descriptor deserialized")
 
-	log.Info("The remote descriptor is: %#v", remoteDescriptor)
+	log.Debug("The remote descriptor is: %#v", remoteDescriptor)
 
 	app.remoteDescriptor = remoteDescriptor
 
@@ -209,8 +209,6 @@ func (app *App) PrepareCommand(commandLine []string) (command *exec.Cmd) {
 		log.Notice("App directory set as the current directory")
 	}
 
-	log.Info("Creating the command...")
-
 	if len(commandLine) == 1 {
 		return exec.Command(commandLine[0])
 	}
@@ -245,7 +243,7 @@ func (app *App) SaveReferenceDescriptor() (referenceDescriptorSaved bool) {
 func (app *App) Launch(command *exec.Cmd, settings config.Settings, userInterface ui.UserInterface) (err error) {
 	log.Info("Starting the app...")
 
-	log.Info("Hiding the user interface...")
+	log.Debug("Hiding the user interface...")
 	userInterface.Hide()
 	log.Notice("User interface hidden")
 

@@ -44,7 +44,7 @@ func main() {
 
 	initializeLogging(settings)
 
-	log.Info("Launcher is: %#v", launcher)
+	log.Debug("Launcher is: %#v", launcher)
 
 	command := os.Args[1]
 	err := executeCommand(launcher, command)

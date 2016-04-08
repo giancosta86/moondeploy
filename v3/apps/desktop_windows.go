@@ -51,12 +51,14 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	}
 
 	shortcutName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".lnk"
-	log.Info("Shortcut name: '%v'", shortcutName)
+	log.Debug("Shortcut name: '%v'", shortcutName)
 
-	shortcutPath := filepath.Join(desktopDir, shortcutName)
-	log.Info("Shortcut path: '%v'", shortcutPath)
+	shortcutFilePath := filepath.Join(desktopDir, shortcutName)
+	log.Debug("Shortcut path: '%v'", shortcutFilePath)
 
-	log.Info("Creating temp file for script...")
+	log.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
+
+	log.Debug("Creating temp file for script...")
 
 	salt := rand.Int63()
 	tempFileName := fmt.Sprintf("shortcutScript_%v_%v.vbs", time.Now().Unix(), salt)
@@ -73,34 +75,34 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		if tempRemovalErr != nil {
 			log.Warning("Cannot remove the temp script: %v", tempFilePath)
 		} else {
-			log.Info("Temp script successfully removed")
+			log.Debug("Temp script successfully removed")
 		}
 
 		if err != nil {
-			os.Remove(shortcutPath)
+			os.Remove(shortcutFilePath)
 		}
 	}()
 
-	log.Info("Temp script file created: %v", tempFilePath)
+	log.Debug("Temp script file created: %v", tempFilePath)
 	actualIconPath := app.GetActualIconPath(launcher)
-	log.Info("Actual icon path: '%v'", actualIconPath)
+	log.Debug("Actual icon path: '%v'", actualIconPath)
 
 	workingDirectory := filepath.Dir(app.localDescriptorPath)
-	log.Info("Working directory: '%v'", workingDirectory)
+	log.Debug("Working directory: '%v'", workingDirectory)
 
 	shortcutScript := fmt.Sprintf(windowsShortcutContent,
-		shortcutPath,
+		shortcutFilePath,
 		app.localDescriptorPath,
 		referenceDescriptor.GetDescription(),
 		actualIconPath,
 		workingDirectory)
 
-	log.Info("Writing script temp file...")
+	log.Debug("Writing script temp file...")
 	tempFile.Write([]byte(shortcutScript))
 	tempFile.Close()
-	log.Info("Temp script ready")
+	log.Debug("Temp script ready")
 
-	log.Info("Now executing the temp script...")
+	log.Debug("Now executing the temp script...")
 
 	command := exec.Command("wscript", "/b", "/nologo", tempFilePath)
 
@@ -113,7 +115,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		return fmt.Errorf("The script did not run successfully")
 	}
 
-	log.Notice("The script was successful")
+	log.Debug("The script was successful")
 
 	return nil
 }

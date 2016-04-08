@@ -48,7 +48,7 @@ func getActualBaseURL(descriptor AppDescriptor) *url.URL {
 	}
 
 	if actualBaseURL == nil {
-		log.Info("The actual base URL just matches the declared base URL")
+		log.Debug("The actual base URL just matches the declared base URL")
 		actualBaseURL = descriptor.GetDeclaredBaseURL()
 	}
 
@@ -58,27 +58,27 @@ func getActualBaseURL(descriptor AppDescriptor) *url.URL {
 }
 
 func lookForActualURLInCache(descriptor AppDescriptor) *url.URL {
-	log.Info("Checking if the Base URL is a key of the Actual Base URL cache...")
+	log.Debug("Checking if the Base URL is a key of the Actual Base URL cache...")
 
 	cachedActualURL := actualBaseURLCache[descriptor.GetDeclaredBaseURL().String()]
 
 	if cachedActualURL != nil {
-		log.Info("Actual URL found in the cache! '%v'", cachedActualURL)
+		log.Debug("Actual URL found in the cache! '%v'", cachedActualURL)
 		return cachedActualURL
 	}
 
-	log.Info("Actual URL not in the cache")
+	log.Debug("Actual URL not in the cache")
 	return nil
 }
 
 func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
-	log.Info("Checking if the Declared Base URL points to the 'latest' release of a GitHub repo...")
+	log.Debug("Checking if the Declared Base URL points to the 'latest' release of a GitHub repo...")
 	gitHubDescriptorInfo := gitHubUtils.GetGitHubDescriptorInfo(
 		descriptor.GetDeclaredBaseURL(),
 		descriptor.GetDescriptorFileName())
 
 	if gitHubDescriptorInfo != nil {
-		log.Info("The given base URL actually references version '%v', whose descriptor is at URL: '%v'",
+		log.Debug("The given base URL actually references version '%v', whose descriptor is at URL: '%v'",
 			gitHubDescriptorInfo.Version,
 			gitHubDescriptorInfo.DescriptorURL)
 
@@ -89,7 +89,7 @@ func lookForActualURLOnGitHub(descriptor AppDescriptor) *url.URL {
 
 		actualBaseURL := gitHubDescriptorInfo.DescriptorURL.ResolveReference(parentDirURL)
 
-		log.Notice("The actual base URL returned by the GitHub API is: '%v'", actualBaseURL)
+		log.Debug("The actual base URL returned by the GitHub API is: '%v'", actualBaseURL)
 		return actualBaseURL
 	}
 

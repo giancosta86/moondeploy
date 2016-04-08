@@ -56,10 +56,10 @@ type GitHubDescriptorInfo struct {
 func GetGitHubDescriptorInfo(baseURL *url.URL, descriptorFileName string) *GitHubDescriptorInfo {
 	projectParams := latestVersionURLRegex.FindStringSubmatch(baseURL.String())
 	if projectParams == nil {
-		log.Info("The URL does not reference a 'latest' release on GitHub")
+		log.Debug("The URL does not reference a 'latest' release on GitHub")
 		return nil
 	}
-	log.Notice("The URL references a 'latest' release on GitHub")
+	log.Debug("The URL references a 'latest' release on GitHub")
 
 	gitHubUser := projectParams[1]
 	gitHubRepo := projectParams[2]
@@ -73,25 +73,25 @@ func GetGitHubDescriptorInfo(baseURL *url.URL, descriptorFileName string) *GitHu
 		return nil
 	}
 
-	log.Info("Calling GitHub's API, at '%v'...", apiLatestVersionURL)
+	log.Debug("Calling GitHub's API, at '%v'...", apiLatestVersionURL)
 
 	apiResponseBytes, err := caravel.RetrieveFromURL(apiLatestVersionURL)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
 	}
-	log.Notice("API returned OK")
+	log.Debug("API returned OK")
 
-	log.Info("Deserializing the API response...")
+	log.Debug("Deserializing the API response...")
 	var latestVersionResponse latestVersionResponse
 	err = json.Unmarshal(apiResponseBytes, &latestVersionResponse)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
 	}
-	log.Info("Response correctly deserialized: %#v", latestVersionResponse)
+	log.Debug("Response correctly deserialized: %#v", latestVersionResponse)
 
-	log.Info("Now processing the response fields...")
+	log.Debug("Now processing the response fields...")
 
 	result := &GitHubDescriptorInfo{}
 

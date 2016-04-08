@@ -111,7 +111,7 @@ func getRawMoonSettings() (rawMoonSettings *rawMoonSettingsStruct) {
 		return &rawMoonSettingsStruct{}
 	}
 
-	log.Info("Settings file content: %#v", rawMoonSettings)
+	log.Debug("Settings file content: %#v", rawMoonSettings)
 
 	return rawMoonSettings
 }
