@@ -172,7 +172,17 @@ task('testGo', type: Exec, dependsOn: ['assemble']) {
 tasks['check'].dependsOn(['testGo'])
 
 
-task('createProgramZip', type: Zip, dependsOn: ['check'])  {
+task copyOsSpecificFiles {
+  dependsOn(check)
+  } << {
+  copy {
+    from project.file("setup/osFiles/${osSuffix}")
+    into compileOutputDir
+  }
+}
+
+
+task('createProgramZip', type: Zip, dependsOn: ['copyOsSpecificFiles'])  {
   from compileOutputDir
 
   archiveName "moondeploy-${version}-${osSuffix}.zip"
@@ -180,16 +190,16 @@ task('createProgramZip', type: Zip, dependsOn: ['check'])  {
 }
 
 
-task('createOsSpecificPackages', dependsOn: ['check']) << {
+task createOsSpecificPackages {
+  dependsOn(copyOsSpecificFiles)
+} << {
   if (onWindows) {
     exec {
-      commandLine "iscc", "/Q", "/O\"${buildDir}\"", "${projectDir}/WinSetup/MoonDeploy.iss"
+      commandLine "iscc", "/Q", "/O\"${buildDir}\"", "${projectDir}/setup/windows/MoonDeploy.iss"
     }
-  } else if (onLinux) {
-
   }
 }
-tasks['createOsSpecificPackages'].onlyIf { onWindows || onLinux }
+tasks['createOsSpecificPackages'].onlyIf { onWindows }
 
 
 task('packageProgram').dependsOn(['createProgramZip', 'createOsSpecificPackages'])
@@ -197,16 +207,22 @@ task('packageProgram').dependsOn(['createProgramZip', 'createOsSpecificPackages'
 tasks['build'].dependsOn(['packageProgram'])
 
 
-
-task crossCompileForMac /*{
+task crossCompileForMac {
   dependsOn(installGoLibs, setNotices)
-  }*/ << {
+  } << {
     if (!onLinux) {
       throw new GradleException("Automated cross compiling for MacOS is only supported on Linux")
     }
 
     copy {
       from project.file("moonclient/resources")
+      into crossCompileMacOutputDir
+      include 'moondeploy.png'
+      include 'moondeploy.ico'
+    }
+
+    copy {
+      from project.file("setup/osFiles/${crossMacSuffix}")
       into crossCompileMacOutputDir
       include 'moondeploy.png'
       include 'moondeploy.ico'

@@ -44,7 +44,7 @@ const logsDirName = "logs"
 const defaultBufferSize = 1024 * 1024
 const defaultSkipAppOutput = false
 
-const defaultLoggingLevel = logging.INFO
+const defaultLoggingLevel = logging.DEBUG
 
 type rawMoonSettingsStruct struct {
 	LocalDirectory string
