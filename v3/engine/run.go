@@ -21,12 +21,13 @@
 package engine
 
 import (
+	"github.com/op/go-logging"
+
 	"github.com/giancosta86/moondeploy/v3/apps"
 	"github.com/giancosta86/moondeploy/v3/descriptors"
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 	"github.com/giancosta86/moondeploy/v3/ui"
-	"github.com/op/go-logging"
 )
 
 /*
@@ -43,7 +44,11 @@ func (err *ExecutionCanceled) Error() string {
 Run is the entry point you must employ to create a custom installer, for example to
 employ custom settings or a brand-new user interface, based on any technology
 */
-func Run(launcher launchers.Launcher, userInterface ui.UserInterface, bootDescriptor descriptors.AppDescriptor) (err error) {
+func Run(
+	launcher launchers.Launcher,
+	userInterface ui.UserInterface,
+	bootDescriptor descriptors.AppDescriptor) (err error) {
+
 	settings := launcher.GetSettings()
 
 	//----------------------------------------------------------------------------
@@ -226,7 +231,7 @@ func setupUserInterface(launcher launchers.Launcher, userInterface ui.UserInterf
 	userInterface.SetApp(launcher.GetTitle())
 
 	log.SetCallback(func(level logging.Level, message string) {
-		if level <= logging.NOTICE {
+		if level <= logging.INFO {
 			userInterface.SetStatus(message)
 		}
 	})
@@ -236,5 +241,6 @@ func setupUserInterface(launcher launchers.Launcher, userInterface ui.UserInterf
 
 func dismissUserInterface(userInterface ui.UserInterface) {
 	log.SetCallback(func(level logging.Level, message string) {})
+
 	userInterface.Hide()
 }
