@@ -29,7 +29,7 @@ import (
 	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
-type AppDescriptorV3 struct {
+type appDescriptorV3 struct {
 	DescriptorVersion string
 
 	BaseURL            string
@@ -45,9 +45,9 @@ type AppDescriptorV3 struct {
 
 	SupportedOS []string
 
-	OsSettings
+	osSettingsStruct
 
-	OS map[string]OsSettings
+	OS map[string]osSettingsStruct
 
 	//
 	//Computed fields
@@ -66,86 +66,84 @@ type AppDescriptorV3 struct {
 	skipPackageLevels int
 	skipUpdateCheck   bool
 
-	supportedOS []string
+	supportedSystems []string
 
 	packageVersions map[string]*versioning.Version
 	commandLine     []string
 	iconPath        string
 }
 
-type OsSettings struct {
+type osSettingsStruct struct {
 	Packages    map[string]string
 	CommandLine []string
 	IconPath    string
 }
 
-func (descriptor *AppDescriptorV3) GetDescriptorVersion() *versioning.Version {
+func (descriptor *appDescriptorV3) GetDescriptorVersion() *versioning.Version {
 	return descriptor.descriptorVersion
 }
 
-func (descriptor *AppDescriptorV3) GetDeclaredBaseURL() *url.URL {
+func (descriptor *appDescriptorV3) GetDeclaredBaseURL() *url.URL {
 	return descriptor.declaredBaseURL
 }
 
-func (descriptor *AppDescriptorV3) GetActualBaseURL() *url.URL {
+func (descriptor *appDescriptorV3) GetActualBaseURL() *url.URL {
 	return descriptor.actualBaseURL
 }
 
-func (descriptor *AppDescriptorV3) GetDescriptorFileName() string {
+func (descriptor *appDescriptorV3) GetDescriptorFileName() string {
 	return descriptor.descriptorFileName
 }
 
-func (descriptor *AppDescriptorV3) GetName() string {
+func (descriptor *appDescriptorV3) GetName() string {
 	return descriptor.name
 }
 
-func (descriptor *AppDescriptorV3) GetAppVersion() *versioning.Version {
+func (descriptor *appDescriptorV3) GetAppVersion() *versioning.Version {
 	return descriptor.appVersion
 }
 
-func (descriptor *AppDescriptorV3) GetPublisher() string {
+func (descriptor *appDescriptorV3) GetPublisher() string {
 	return descriptor.publisher
 }
 
-func (descriptor *AppDescriptorV3) GetDescription() string {
+func (descriptor *appDescriptorV3) GetDescription() string {
 	return descriptor.description
 }
 
-func (descriptor *AppDescriptorV3) GetPackageVersions() map[string]*versioning.Version {
+func (descriptor *appDescriptorV3) GetPackageVersions() map[string]*versioning.Version {
 	return descriptor.packageVersions
 }
 
-func (descriptor *AppDescriptorV3) GetCommandLine() []string {
+func (descriptor *appDescriptorV3) GetCommandLine() []string {
 	return descriptor.commandLine
 }
 
-func (descriptor *AppDescriptorV3) GetIconPath() string {
+func (descriptor *appDescriptorV3) GetIconPath() string {
 	return descriptor.iconPath
 }
 
-func (descriptor *AppDescriptorV3) GetSkipPackageLevels() int {
+func (descriptor *appDescriptorV3) GetSkipPackageLevels() int {
 	return descriptor.skipPackageLevels
 }
 
-func (descriptor *AppDescriptorV3) IsSkipUpdateCheck() bool {
+func (descriptor *appDescriptorV3) IsSkipUpdateCheck() bool {
 	return descriptor.skipUpdateCheck
 }
 
-func (descriptor *AppDescriptorV3) GetTitle() string {
+func (descriptor *appDescriptorV3) GetTitle() string {
 	return fmt.Sprintf("%v %v", descriptor.GetName(), descriptor.GetAppVersion())
 }
 
-func (descriptor *AppDescriptorV3) Init() (err error) {
+func (descriptor *appDescriptorV3) Init() (err error) {
 	descriptor.descriptorVersion, err = versioning.ParseVersion(descriptor.DescriptorVersion)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error while parsing the Descriptor Version: %v", err.Error())
 	}
-
-	osSettings, osSettingsFound := descriptor.OS[runtime.GOOS]
 
 	descriptor.declaredBaseURL, err = url.Parse(ensureTrailingSlash(descriptor.BaseURL))
 	if err != nil {
-		return
+		return fmt.Errorf("Error while parsing the Base URL: %v", err.Error())
 	}
 
 	if descriptor.DescriptorFileName != "" {
@@ -158,21 +156,22 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 
 	descriptor.appVersion, err = versioning.ParseVersion(descriptor.Version)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error while parsing the app version: %v", err.Error())
 	}
 
 	descriptor.publisher = descriptor.Publisher
-
 	descriptor.description = descriptor.Description
 
 	descriptor.skipPackageLevels = descriptor.SkipPackageLevels
 	descriptor.skipUpdateCheck = descriptor.SkipUpdateCheck
 
 	if descriptor.SupportedOS != nil {
-		descriptor.supportedOS = descriptor.SupportedOS
+		descriptor.supportedSystems = descriptor.SupportedOS
 	} else {
-		descriptor.supportedOS = []string{}
+		descriptor.supportedSystems = []string{}
 	}
+
+	osSettings, osSettingsFound := descriptor.OS[runtime.GOOS]
 
 	if osSettingsFound && osSettings.Packages != nil {
 		descriptor.packageVersions, err = parsePackageVersions(osSettings.Packages)
@@ -181,7 +180,7 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 	}
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Error while parsing the package versions: %v", err.Error())
 	}
 
 	if osSettingsFound && osSettings.CommandLine != nil {
@@ -201,28 +200,28 @@ func (descriptor *AppDescriptorV3) Init() (err error) {
 	return nil
 }
 
-func (descriptor *AppDescriptorV3) CheckRequirements() (err error) {
-	if len(descriptor.supportedOS) > 0 {
+func (descriptor *appDescriptorV3) CheckRequirements() (err error) {
+	if len(descriptor.supportedSystems) > 0 {
 		foundOS := false
 
-		for _, supportedOS := range descriptor.supportedOS {
-			if supportedOS == runtime.GOOS {
+		for _, supportedSystem := range descriptor.supportedSystems {
+			if supportedSystem == runtime.GOOS {
 				foundOS = true
 				break
 			}
 		}
 
 		if !foundOS {
-			return fmt.Errorf("The current OS (%v) is not supported", runtime.GOOS)
+			return fmt.Errorf("The current OS (%v) is not supported by %v.", runtime.GOOS, descriptor.GetTitle())
 		}
 	}
 	return nil
 }
 
-func (descriptor *AppDescriptorV3) GetFileURL(relativePath string) (fileURL *url.URL, err error) {
+func (descriptor *appDescriptorV3) GetFileURL(relativePath string) (fileURL *url.URL, err error) {
 	return getRelativeFileURL(descriptor, relativePath)
 }
 
-func (descriptor *AppDescriptorV3) GetBytes() (bytes []byte, err error) {
+func (descriptor *appDescriptorV3) GetBytes() (bytes []byte, err error) {
 	return json.Marshal(*descriptor)
 }

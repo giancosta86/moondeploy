@@ -26,6 +26,10 @@ import (
 )
 
 func validate(descriptor AppDescriptor) (err error) {
+	if descriptor.GetDescriptorVersion() == nil {
+		return fmt.Errorf("Descriptor Version field is missing")
+	}
+
 	if descriptor.GetDeclaredBaseURL() == nil {
 		return fmt.Errorf("Declared Base URL field is missing")
 	}

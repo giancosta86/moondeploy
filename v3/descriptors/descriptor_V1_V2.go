@@ -31,7 +31,7 @@ import (
 
 const anyOS = "*"
 
-type AppDescriptorV1V2 struct {
+type appDescriptorV1V2 struct {
 	DescriptorVersion string
 	BaseURL           string
 
@@ -62,63 +62,63 @@ type AppDescriptorV1V2 struct {
 	packageVersions map[string]*versioning.Version
 }
 
-func (descriptor *AppDescriptorV1V2) GetDescriptorVersion() *versioning.Version {
+func (descriptor *appDescriptorV1V2) GetDescriptorVersion() *versioning.Version {
 	return descriptor.descriptorVersion
 }
 
-func (descriptor *AppDescriptorV1V2) GetActualBaseURL() *url.URL {
+func (descriptor *appDescriptorV1V2) GetActualBaseURL() *url.URL {
 	return descriptor.actualBaseURL
 }
 
-func (descriptor *AppDescriptorV1V2) GetDeclaredBaseURL() *url.URL {
+func (descriptor *appDescriptorV1V2) GetDeclaredBaseURL() *url.URL {
 	return descriptor.declaredBaseURL
 }
 
-func (descriptor *AppDescriptorV1V2) GetDescriptorFileName() string {
+func (descriptor *appDescriptorV1V2) GetDescriptorFileName() string {
 	return defaultDescriptorFileName
 }
 
-func (descriptor *AppDescriptorV1V2) GetName() string {
+func (descriptor *appDescriptorV1V2) GetName() string {
 	return descriptor.Name
 }
 
-func (descriptor *AppDescriptorV1V2) GetAppVersion() *versioning.Version {
+func (descriptor *appDescriptorV1V2) GetAppVersion() *versioning.Version {
 	return descriptor.appVersion
 }
 
-func (descriptor *AppDescriptorV1V2) GetPublisher() string {
+func (descriptor *appDescriptorV1V2) GetPublisher() string {
 	return descriptor.Publisher
 }
 
-func (descriptor *AppDescriptorV1V2) GetDescription() string {
+func (descriptor *appDescriptorV1V2) GetDescription() string {
 	return descriptor.Description
 }
 
-func (descriptor *AppDescriptorV1V2) GetPackageVersions() map[string]*versioning.Version {
+func (descriptor *appDescriptorV1V2) GetPackageVersions() map[string]*versioning.Version {
 	return descriptor.packageVersions
 }
 
-func (descriptor *AppDescriptorV1V2) GetCommandLine() []string {
+func (descriptor *appDescriptorV1V2) GetCommandLine() []string {
 	return descriptor.commandLine
 }
 
-func (descriptor *AppDescriptorV1V2) GetSkipPackageLevels() int {
+func (descriptor *appDescriptorV1V2) GetSkipPackageLevels() int {
 	return descriptor.SkipPackageLevels
 }
 
-func (descriptor *AppDescriptorV1V2) IsSkipUpdateCheck() bool {
+func (descriptor *appDescriptorV1V2) IsSkipUpdateCheck() bool {
 	return descriptor.SkipUpdateCheck
 }
 
-func (descriptor *AppDescriptorV1V2) GetIconPath() string {
+func (descriptor *appDescriptorV1V2) GetIconPath() string {
 	return descriptor.iconPath
 }
 
-func (descriptor *AppDescriptorV1V2) GetTitle() string {
+func (descriptor *appDescriptorV1V2) GetTitle() string {
 	return fmt.Sprintf("%v %v", descriptor.Name, descriptor.Version)
 }
 
-func (descriptor *AppDescriptorV1V2) Init() (err error) {
+func (descriptor *appDescriptorV1V2) Init() (err error) {
 	descriptor.descriptorVersion, err = versioning.ParseVersion(descriptor.DescriptorVersion)
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func (descriptor *AppDescriptorV1V2) Init() (err error) {
 	return nil
 }
 
-func (descriptor *AppDescriptorV1V2) setIconPath() {
+func (descriptor *appDescriptorV1V2) setIconPath() {
 	if descriptor.IconPath == nil {
 		return
 	}
@@ -165,7 +165,7 @@ func (descriptor *AppDescriptorV1V2) setIconPath() {
 	}
 }
 
-func (descriptor *AppDescriptorV1V2) setCommandLine() {
+func (descriptor *appDescriptorV1V2) setCommandLine() {
 	if descriptor.CommandLine == nil {
 		return
 	}
@@ -182,14 +182,14 @@ func (descriptor *AppDescriptorV1V2) setCommandLine() {
 	}
 }
 
-func (descriptor *AppDescriptorV1V2) CheckRequirements() (err error) {
+func (descriptor *appDescriptorV1V2) CheckRequirements() (err error) {
 	return nil
 }
 
-func (descriptor *AppDescriptorV1V2) GetFileURL(relativePath string) (fileURL *url.URL, err error) {
+func (descriptor *appDescriptorV1V2) GetFileURL(relativePath string) (fileURL *url.URL, err error) {
 	return getRelativeFileURL(descriptor, relativePath)
 }
 
-func (descriptor *AppDescriptorV1V2) GetBytes() (bytes []byte, err error) {
+func (descriptor *appDescriptorV1V2) GetBytes() (bytes []byte, err error) {
 	return json.Marshal(*descriptor)
 }

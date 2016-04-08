@@ -54,8 +54,6 @@ type GitHubDescriptorInfo struct {
 }
 
 func GetGitHubDescriptorInfo(baseURL *url.URL, descriptorFileName string) *GitHubDescriptorInfo {
-	log.Info("Checking if the Base URL matches GitHub's '/latest' release URL pattern...")
-
 	projectParams := latestVersionURLRegex.FindStringSubmatch(baseURL.String())
 	if projectParams == nil {
 		log.Info("The URL does not reference a 'latest' release on GitHub")

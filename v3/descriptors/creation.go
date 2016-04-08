@@ -65,7 +65,7 @@ func NewAppDescriptorFromBytes(descriptorBytes []byte) (descriptor AppDescriptor
 		descriptor, err = createV1V2Descriptor(descriptorBytes)
 
 	default:
-		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy - your current version is '%v'.",
+		return nil, fmt.Errorf("Unsupported descriptor version (%v). Please, consider updating MoonDeploy - your current version is %v.",
 			descriptorVersion,
 			moondeploy.Version)
 	}
@@ -95,7 +95,7 @@ func createBasicDescriptor(descriptorBytes []byte) (descriptor *BasicDescriptor,
 }
 
 func createV3Descriptor(descriptorBytes []byte) (descriptor AppDescriptor, err error) {
-	descriptor = &AppDescriptorV3{}
+	descriptor = &appDescriptorV3{}
 
 	err = json.Unmarshal(descriptorBytes, descriptor)
 	if err != nil {
@@ -106,7 +106,7 @@ func createV3Descriptor(descriptorBytes []byte) (descriptor AppDescriptor, err e
 }
 
 func createV1V2Descriptor(descriptorBytes []byte) (descriptor AppDescriptor, err error) {
-	descriptor = &AppDescriptorV1V2{}
+	descriptor = &appDescriptorV1V2{}
 
 	err = json.Unmarshal(descriptorBytes, descriptor)
 	if err != nil {
