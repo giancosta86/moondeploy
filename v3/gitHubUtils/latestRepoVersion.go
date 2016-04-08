@@ -32,18 +32,18 @@ import (
 	"github.com/giancosta86/moondeploy/v3/versioning"
 )
 
-var latestVersionProjectUrlRegex = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+)/releases/latest/?`)
+var latestVersionURLRegex = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+)/releases/latest/?$`)
 
 var apiLatestVersionURLTemplate = "https://api.github.com/repos/%v/%v/releases/latest"
 
-var tagRegex = regexp.MustCompile(`^\D*(\d.*)`)
+var tagRegex = regexp.MustCompile(`^\D*(\d.*)$`)
 
 type latestVersionResponse struct {
-	TagName string      `json:"tag_name"`
-	Assets  []assetInfo `json:"assets"`
+	TagName string        `json:"tag_name"`
+	Assets  []assetStruct `json:"assets"`
 }
 
-type assetInfo struct {
+type assetStruct struct {
 	Name               string `json:"name"`
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
@@ -53,15 +53,15 @@ type GitHubDescriptorInfo struct {
 	Version       *versioning.Version
 }
 
-func GetGitHubDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHubDescriptorInfo {
-	log.Info("Checking if the Base URL matches GitHub's /latest release URL pattern...")
+func GetGitHubDescriptorInfo(baseURL *url.URL, descriptorFileName string) *GitHubDescriptorInfo {
+	log.Info("Checking if the Base URL matches GitHub's '/latest' release URL pattern...")
 
-	projectParams := latestVersionProjectUrlRegex.FindStringSubmatch(baseUrl.String())
+	projectParams := latestVersionURLRegex.FindStringSubmatch(baseURL.String())
 	if projectParams == nil {
-		log.Info("The URL is not a latest release on GitHub")
+		log.Info("The URL does not reference a 'latest' release on GitHub")
 		return nil
 	}
-	log.Notice("The URL is a 'latest' release on GitHub")
+	log.Notice("The URL references a 'latest' release on GitHub")
 
 	gitHubUser := projectParams[1]
 	gitHubRepo := projectParams[2]
@@ -95,7 +95,7 @@ func GetGitHubDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHu
 
 	log.Info("Now processing the response fields...")
 
-	result := GitHubDescriptorInfo{}
+	result := &GitHubDescriptorInfo{}
 
 	for _, asset := range latestVersionResponse.Assets {
 		if asset.Name == descriptorFileName {
@@ -115,7 +115,7 @@ func GetGitHubDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHu
 
 	tagComponents := tagRegex.FindStringSubmatch(latestVersionResponse.TagName)
 	if tagComponents == nil {
-		log.Warning("GitHub's release tag must be in the format: <string or empty><VERSION>, not '%v'", latestVersionResponse.TagName)
+		log.Warning("GitHub's release tag must be in the format: <any string, even empty><VERSION>, not '%v'", latestVersionResponse.TagName)
 		return nil
 	}
 
@@ -127,5 +127,5 @@ func GetGitHubDescriptorInfo(baseUrl *url.URL, descriptorFileName string) *GitHu
 
 	log.Notice("Response fields correctly processed")
 
-	return &result
+	return result
 }

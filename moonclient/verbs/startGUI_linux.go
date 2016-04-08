@@ -21,8 +21,9 @@
 package verbs
 
 import (
-	"github.com/giancosta86/moondeploy/moonclient/gui/gtk"
 	"github.com/giancosta86/moondeploy/v3/launchers"
+
+	"github.com/giancosta86/moondeploy/moonclient/gui/gtk"
 )
 
 func StartGUI(launcher launchers.Launcher, bootDescriptorPath string) (err error) {

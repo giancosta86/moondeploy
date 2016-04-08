@@ -36,14 +36,14 @@ func DoServe() (err error) {
 	}
 
 	portString := os.Args[2]
-	sourceDir := os.Args[3]
+	sourceDirectory := os.Args[3]
 
 	port, err := strconv.Atoi(portString)
 	if err != nil {
 		return err
 	}
 
-	log.Info("Activating server on port %v for dir: '%v'...", port, sourceDir)
+	log.Info("Activating server on port %v for directory: '%v'...", port, sourceDirectory)
 
-	return server.ServeDirectory(sourceDir, port)
+	return server.ServeDirectory(sourceDirectory, port)
 }
