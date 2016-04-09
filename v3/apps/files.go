@@ -45,6 +45,7 @@ func (app *App) CheckFiles(
 	}
 
 	userInterface.SetHeader("Checking the app files")
+	log.Notice("Computing differences...")
 
 	packagesToUpdate := app.getPackagesToUpdate()
 
@@ -53,9 +54,9 @@ func (app *App) CheckFiles(
 		return nil
 	}
 
-	if localDescriptor != nil && caravel.FileExists(app.localDescriptorPath) {
+	if localDescriptor != nil && caravel.FileExists(app.GetLocalDescriptorPath()) {
 		log.Info("Deleting the local descriptor before starting the update process...")
-		err = os.Remove(app.localDescriptorPath)
+		err = os.Remove(app.GetLocalDescriptorPath())
 		if err != nil {
 			return err
 		}
@@ -87,8 +88,8 @@ func (app *App) CheckFiles(
 			packageName,
 			settings,
 			func(retrievedSize int64, totalSize int64) {
-				userInterface.SetProgress(float64(retrievedSize) / float64(totalSize))
 				log.Notice("Retrieved: %v / %v bytes", retrievedSize, totalSize)
+				userInterface.SetProgress(float64(retrievedSize) / float64(totalSize))
 			})
 		if err != nil {
 			return err
@@ -139,7 +140,7 @@ func (app *App) installPackage(
 
 	remoteDescriptor := app.GetRemoteDescriptor()
 
-	packageURL, err := remoteDescriptor.GetFileURL(packageName)
+	packageURL, err := remoteDescriptor.GetRemoteFileURL(packageName)
 	if err != nil {
 		return err
 	}

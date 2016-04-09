@@ -32,6 +32,10 @@ import (
 )
 
 func (app *App) LockDirectory() (err error) {
+	if app.lockFile != nil {
+		return nil
+	}
+
 	lockFilePath := filepath.Join(app.Directory, lockFileName)
 
 	log.Info("The lock file is: %v", lockFilePath)

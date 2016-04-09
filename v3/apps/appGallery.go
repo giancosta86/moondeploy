@@ -40,19 +40,17 @@ func NewAppGallery(galleryPath string) (appGallery *AppGallery) {
 }
 
 func (appGallery *AppGallery) GetApp(bootDescriptor descriptors.AppDescriptor) (app *App, err error) {
-	appDir, err := appGallery.resolveAppDir(bootDescriptor)
-	if err != nil {
-		return nil, err
-	}
+	appDir := appGallery.resolveAppDir(bootDescriptor)
 
 	return &App{
-		Directory:      appDir,
-		bootDescriptor: bootDescriptor,
-		filesDirectory: filepath.Join(appDir, filesDirName),
+		Directory:           appDir,
+		bootDescriptor:      bootDescriptor,
+		filesDirectory:      filepath.Join(appDir, filesDirName),
+		localDescriptorPath: filepath.Join(appDir, bootDescriptor.GetDescriptorFileName()),
 	}, nil
 }
 
-func (appGallery *AppGallery) resolveAppDir(bootDescriptor descriptors.AppDescriptor) (appDir string, err error) {
+func (appGallery *AppGallery) resolveAppDir(bootDescriptor descriptors.AppDescriptor) (appDir string) {
 	baseURL := bootDescriptor.GetDeclaredBaseURL()
 
 	hostComponent := strings.Replace(baseURL.Host, ":", "_", -1)
@@ -75,5 +73,5 @@ func (appGallery *AppGallery) resolveAppDir(bootDescriptor descriptors.AppDescri
 
 	appDir = filepath.Join(appDirComponents...)
 
-	return appDir, nil
+	return appDir
 }

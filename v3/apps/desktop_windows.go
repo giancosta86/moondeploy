@@ -87,12 +87,12 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	actualIconPath := app.GetActualIconPath(launcher)
 	log.Debug("Actual icon path: '%v'", actualIconPath)
 
-	workingDirectory := filepath.Dir(app.localDescriptorPath)
+	workingDirectory := filepath.Dir(app.GetLocalDescriptorPath())
 	log.Debug("Working directory: '%v'", workingDirectory)
 
 	shortcutScript := fmt.Sprintf(windowsShortcutContent,
 		shortcutFilePath,
-		app.localDescriptorPath,
+		app.GetLocalDescriptorPath(),
 		referenceDescriptor.GetDescription(),
 		actualIconPath,
 		workingDirectory)

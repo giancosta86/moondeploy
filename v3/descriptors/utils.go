@@ -51,7 +51,7 @@ func parsePackageVersions(packageVersionsStringMap map[string]string) (result ma
 	return result, nil
 }
 
-func getRelativeFileURL(descriptor AppDescriptor, relativePath string) (*url.URL, error) {
+func getRemoteFileURL(descriptor AppDescriptor, relativePath string) (*url.URL, error) {
 	if path.IsAbs(relativePath) {
 		return nil, fmt.Errorf("Absolute paths are not allowed: '%v'", relativePath)
 	}

@@ -22,6 +22,8 @@ package descriptors
 
 import (
 	"fmt"
+	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -38,8 +40,13 @@ func validate(descriptor AppDescriptor) (err error) {
 		return fmt.Errorf("Actual Base URL field is missing")
 	}
 
-	if strings.TrimSpace(descriptor.GetDescriptorFileName()) == "" {
+	descriptorFileName := descriptor.GetDescriptorFileName()
+	if strings.TrimSpace(descriptorFileName) == "" {
 		return fmt.Errorf("Descriptor File Name field is missing")
+	}
+
+	if path.Base(descriptorFileName) != descriptorFileName {
+		return fmt.Errorf("Descriptor File Name cannot be a path")
 	}
 
 	if strings.TrimSpace(descriptor.GetName()) == "" {
@@ -62,7 +69,15 @@ func validate(descriptor AppDescriptor) (err error) {
 		return fmt.Errorf("Package versions field is missing")
 	}
 
-	if descriptor.GetCommandLine() == nil || len(descriptor.GetCommandLine()) == 0 {
+	iconPath := descriptor.GetIconPath()
+	if iconPath != "" {
+		if filepath.IsAbs(iconPath) {
+			return fmt.Errorf("The Icon Path must be relative")
+		}
+	}
+
+	commandLine := descriptor.GetCommandLine()
+	if commandLine == nil || len(commandLine) == 0 {
 		return fmt.Errorf("Command Line field is missing")
 	}
 
@@ -71,7 +86,7 @@ func validate(descriptor AppDescriptor) (err error) {
 	}
 
 	if strings.TrimSpace(descriptor.GetTitle()) == "" {
-		return fmt.Errorf("The title is missing")
+		return fmt.Errorf("Title is missing")
 	}
 
 	return nil

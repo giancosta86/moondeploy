@@ -218,8 +218,8 @@ func (descriptor *appDescriptorV3) CheckRequirements() (err error) {
 	return nil
 }
 
-func (descriptor *appDescriptorV3) GetFileURL(relativePath string) (fileURL *url.URL, err error) {
-	return getRelativeFileURL(descriptor, relativePath)
+func (descriptor *appDescriptorV3) GetRemoteFileURL(relativePath string) (remoteFileURL *url.URL, err error) {
+	return getRemoteFileURL(descriptor, relativePath)
 }
 
 func (descriptor *appDescriptorV3) GetBytes() (bytes []byte, err error) {

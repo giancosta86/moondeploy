@@ -22,7 +22,7 @@ package apps
 
 import (
 	"fmt"
-	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/giancosta86/caravel"
@@ -31,10 +31,6 @@ import (
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 )
-
-const macScriptContentFormat = `#!/bin/bash
-"%v" "%v"
-`
 
 func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
@@ -46,34 +42,29 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName())
-	log.Debug("Bash shortcut name: '%v'", scriptFileName)
+	scriptFileName := fmt.Sprintf("%v.scpt", caravel.FormatFileName(referenceDescriptor.GetName()))
+	log.Debug("Script file name: '%v'", scriptFileName)
 
 	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
-	log.Info("Creating Bash shortcut: '%v'...", scriptFilePath)
+	log.Debug("Script file to create: '%v'...", scriptFilePath)
 
-	scriptFile, err := os.OpenFile(scriptFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		scriptFile.Close()
+	scriptGenerationCommand := exec.Command(
+		"osacompile",
+		"-e",
+		fmt.Sprintf(`do shell script ""%v" "%v""`,
+			launcher.GetExecutable(),
+			app.GetLocalDescriptorPath()),
+		"-o",
+		scriptFilePath)
 
-		if err != nil {
-			os.Remove(scriptFilePath)
-		}
-	}()
+	log.Debug("Script command is: %v", scriptGenerationCommand)
 
-	scriptContent := fmt.Sprintf(macScriptContentFormat,
-		launcher.GetExecutable(),
-		app.localDescriptorPath)
-
-	_, err = scriptFile.Write([]byte(scriptContent))
+	err = scriptGenerationCommand.Run()
 	if err != nil {
 		return err
 	}
 
-	log.Notice("Bash shortcut script created")
+	log.Notice("Shortcut script created")
 
 	return nil
 }

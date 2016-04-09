@@ -67,9 +67,9 @@ func (app *App) DirectoryExists() bool {
 func (app *App) CanPerformFirstRun(userInterface ui.UserInterface) bool {
 	if caravel.IsSecureURL(app.bootDescriptor.GetDeclaredBaseURL()) {
 		return userInterface.AskForSecureFirstRun(app.bootDescriptor)
-	} else {
-		return userInterface.AskForUntrustedFirstRun(app.bootDescriptor)
 	}
+
+	return userInterface.AskForUntrustedFirstRun(app.bootDescriptor)
 }
 
 func (app *App) EnsureDirectory() (err error) {
@@ -88,27 +88,28 @@ func (app *App) GetLocalDescriptor() (localDescriptor descriptors.AppDescriptor)
 
 	app.localDescriptorCached = true
 
-	app.localDescriptorPath = filepath.Join(app.Directory, app.bootDescriptor.GetDescriptorFileName())
-
 	if !caravel.FileExists(app.localDescriptorPath) {
 		log.Notice("The local descriptor is missing")
 		return nil
 	}
 
-	log.Notice("The local descriptor has been found! Deserializing...")
+	log.Notice("The local descriptor has been found! Opening it...")
 	localDescriptor, err := descriptors.NewAppDescriptorFromPath(app.localDescriptorPath)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
 	}
-	log.Notice("Local descriptor deserialized")
+	log.Notice("Local descriptor ready")
 
 	log.Debug("The local descriptor is: %#v", localDescriptor)
 
 	app.localDescriptor = localDescriptor
-	app.localDescriptorPath = app.localDescriptorPath
 
 	return localDescriptor
+}
+
+func (app *App) GetLocalDescriptorPath() string {
+	return app.localDescriptorPath
 }
 
 func (app *App) GetRemoteDescriptor() (remoteDescriptor descriptors.AppDescriptor) {
@@ -128,11 +129,11 @@ func (app *App) GetRemoteDescriptor() (remoteDescriptor descriptors.AppDescripto
 		if localDescriptor.IsSkipUpdateCheck() {
 			log.Notice("Skipping update check, as requested by the local descriptor")
 			return nil
-		} else {
-			remoteDescriptorURL, err = localDescriptor.GetFileURL(localDescriptor.GetDescriptorFileName())
 		}
+
+		remoteDescriptorURL, err = localDescriptor.GetRemoteFileURL(localDescriptor.GetDescriptorFileName())
 	} else {
-		remoteDescriptorURL, err = bootDescriptor.GetFileURL(bootDescriptor.GetDescriptorFileName())
+		remoteDescriptorURL, err = bootDescriptor.GetRemoteFileURL(bootDescriptor.GetDescriptorFileName())
 	}
 
 	if err != nil {
@@ -150,13 +151,13 @@ func (app *App) GetRemoteDescriptor() (remoteDescriptor descriptors.AppDescripto
 	}
 	log.Notice("Remote descriptor retrieved")
 
-	log.Info("Deserializing the remote descriptor...")
+	log.Info("Opening the remote descriptor...")
 	remoteDescriptor, err = descriptors.NewAppDescriptorFromBytes(remoteDescriptorBytes)
 	if err != nil {
 		log.Warning(err.Error())
 		return nil
 	}
-	log.Notice("Remote descriptor deserialized")
+	log.Notice("Remote descriptor ready")
 
 	log.Debug("The remote descriptor is: %#v", remoteDescriptor)
 
@@ -269,10 +270,10 @@ func (app *App) GetActualIconPath(launcher launchers.Launcher) string {
 		return launcher.GetIconPath()
 	}
 
-	providedIconPath := referenceDescriptor.GetIconPath()
+	referenceIconPath := referenceDescriptor.GetIconPath()
 
-	if providedIconPath != "" {
-		return filepath.Join(app.filesDirectory, providedIconPath)
+	if referenceIconPath != "" {
+		return filepath.Join(app.filesDirectory, referenceIconPath)
 	}
 
 	return launcher.GetIconPath()

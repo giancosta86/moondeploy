@@ -78,7 +78,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		referenceDescriptor.GetName(),
 		referenceDescriptor.GetDescription(),
 		launcher.GetExecutable(),
-		app.localDescriptorPath,
+		app.GetLocalDescriptorPath(),
 		actualIconPath)
 
 	_, err = shortcutFile.Write([]byte(shortcutContent))

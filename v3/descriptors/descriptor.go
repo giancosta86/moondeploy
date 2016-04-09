@@ -52,7 +52,7 @@ type AppDescriptor interface {
 	Init() (err error)
 	CheckRequirements() (err error)
 
-	GetFileURL(relativePath string) (fileURL *url.URL, err error)
+	GetRemoteFileURL(relativePath string) (remoteFileURL *url.URL, err error)
 
 	GetBytes() (bytes []byte, err error)
 }

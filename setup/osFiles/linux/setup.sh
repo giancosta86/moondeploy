@@ -115,6 +115,14 @@ EOM
 update-desktop-database ~/.local/share/applications
 update-mime-database    ~/.local/share/mime
 
+
+#
+# Conclusion
+#
+
 echo
 echo "Installation successful. You might want to add '${TARGET_DIRECTORY}' to your PATH to run MoonDeploy from within the terminal."
+echo
+read -p "Press [Enter] key to end..."
+echo
 echo
