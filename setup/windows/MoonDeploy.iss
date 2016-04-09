@@ -9,13 +9,13 @@ AppId={{2EF654FA-68EC-4AEE-AA11-5BBF2395098D}
 AppName=MoonDeploy
 AppVersion=3.0
 AppPublisher=Gianluca Costa
-AppPublisherURL=https://github.com/giancosta86/moondeploy
+AppPublisherURL=http://gianlucacosta.info/
 AppSupportURL=https://github.com/giancosta86/moondeploy
-AppUpdatesURL=https://github.com/giancosta86/moondeploy
+AppUpdatesURL=https://github.com/giancosta86/moondeploy/releases/latest
 DefaultDirName=C:\MoonDeploy
 DefaultGroupName=MoonDeploy
 DisableProgramGroupPage=yes
-LicenseFile=..\LICENSE
+LicenseFile=..\..\LICENSE
 OutputBaseFilename=MoonDeploy-setup
 Compression=lzma
 SolidCompression=yes
@@ -30,14 +30,14 @@ ArchitecturesInstallIn64BitMode=x64 ia64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\build\windows\moondeployw.exe"; DestDir: "{app}"; Flags: 64bit
-Source: "..\build\windows\moondeploy.exe"; DestDir: "{app}"; Flags: 64bit
-Source: "..\build\windows\moondeploy.ico"; DestDir: "{app}"
-Source: "..\build\windows\moondeploy.png"; DestDir: "{app}"
-Source: "..\moondeploy.glade"; DestDir: "{app}"
+Source: "..\..\build\windows\moondeploy.exe"; DestDir: "{app}"; Flags: 64bit
+Source: "..\..\build\windows\moondeploy.ico"; DestDir: "{app}"
+Source: "..\..\build\windows\moondeploy.png"; DestDir: "{app}"
+Source: "..\..\build\windows\moondeploy.glade"; DestDir: "{app}"
+Source: "..\..\build\windows\background.png"; DestDir: "{app}"
 
 [Registry]
 Root: HKCR; SubKey: ".moondeploy"; ValueType: string; ValueData: "MoonDeploy Application"; Flags: uninsdeletekey
 Root: HKCR; SubKey: "MoonDeploy Application"; ValueType: string; ValueData: "MoonDeploy application"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "MoonDeploy Application\Shell\Open\Command"; ValueType: string; ValueData: """{app}\moondeployw.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKCR; SubKey: "MoonDeploy Application\Shell\Open\Command"; ValueType: string; ValueData: """{app}\moondeploy.exe"" ""%1"""; Flags: uninsdeletekey
 Root: HKCR; Subkey: "MoonDeploy Application\DefaultIcon"; ValueType: string; ValueData: "{app}\moondeploy.ico,0"; Flags: uninsdeletevalue

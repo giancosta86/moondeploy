@@ -1,4 +1,4 @@
 /.gradle/**
 /build/**
-/WinSetup/Output/**
+/setup/windows/Output/**
 /version.go

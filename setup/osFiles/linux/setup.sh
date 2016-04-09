@@ -80,7 +80,7 @@ cat > "$HOME/.local/share/mime/packages/application-moondeploy.xml" <<- EOM
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
     <mime-type type="application/moondeploy">
-        <comment>Moondeploy App Descriptor</comment>
+        <comment>MoonDeploy Application</comment>
         <icon name="application-moondeploy"/>
         <glob-deleteall/>
         <glob pattern="*.moondeploy"/>
@@ -104,7 +104,7 @@ Icon=${TARGET_DIRECTORY}/moondeploy.png
 Terminal=false
 Type=Application
 Categories=
-Comment=
+Comment=Lightweight software deployment
 EOM
 
 
@@ -112,8 +112,8 @@ EOM
 # Updating caches
 #
 
-update-desktop-database ~/.local/share/applications
-update-mime-database    ~/.local/share/mime
+update-desktop-database $HOME/.local/share/applications
+update-mime-database $HOME/.local/share/mime
 
 
 #
