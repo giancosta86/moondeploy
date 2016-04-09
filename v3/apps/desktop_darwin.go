@@ -42,7 +42,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	scriptFileName := fmt.Sprintf("%v.scpt", caravel.FormatFileName(referenceDescriptor.GetName()))
+	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".scpt"
 	log.Debug("Script file name: '%v'", scriptFileName)
 
 	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
@@ -51,7 +51,10 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	scriptGenerationCommand := exec.Command(
 		"osacompile",
 		"-e",
-		fmt.Sprintf(`do shell script ""%v" "%v""`,
+		"do",
+		"shell",
+		"script",
+		fmt.Sprintf(`""%v" "%v""`,
 			launcher.GetExecutable(),
 			app.GetLocalDescriptorPath()),
 		"-o",
@@ -62,6 +65,10 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	err = scriptGenerationCommand.Run()
 	if err != nil {
 		return err
+	}
+
+	if !scriptGenerationCommand.ProcessState.Success() {
+		return fmt.Errorf("The script did not run successfully")
 	}
 
 	log.Notice("Shortcut script created")

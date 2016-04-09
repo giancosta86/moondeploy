@@ -51,7 +51,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	}
 
 	shortcutName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".lnk"
-	log.Debug("Shortcut name: '%v'", shortcutName)
+	log.Debug("Shortcut file name: '%v'", shortcutName)
 
 	shortcutFilePath := filepath.Join(desktopDir, shortcutName)
 	log.Debug("Shortcut path: '%v'", shortcutFilePath)
@@ -104,14 +104,14 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 
 	log.Debug("Now executing the temp script...")
 
-	command := exec.Command("wscript", "/b", "/nologo", tempFilePath)
+	shortcutCreationCommand := exec.Command("wscript", "/b", "/nologo", tempFilePath)
 
-	err = command.Run()
+	err = shortcutCreationCommand.Run()
 	if err != nil {
 		return err
 	}
 
-	if !command.ProcessState.Success() {
+	if !shortcutCreationCommand.ProcessState.Success() {
 		return fmt.Errorf("The script did not run successfully")
 	}
 

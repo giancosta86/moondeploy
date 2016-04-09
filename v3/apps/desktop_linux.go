@@ -55,7 +55,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 	}
 
 	shortcutFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".desktop"
-	log.Debug("Shortcut name: '%v'", shortcutFileName)
+	log.Debug("Shortcut file name: '%v'", shortcutFileName)
 
 	shortcutFilePath := filepath.Join(desktopDir, shortcutFileName)
 
