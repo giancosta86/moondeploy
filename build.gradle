@@ -37,8 +37,6 @@ version = '3.0'
 
 description = 'Lightweight software deployment'
 
-String crossMacSuffix = "mac"
-
 
 moonLicense {
     license = apache2
@@ -82,7 +80,10 @@ if (onWindows) {
 
 String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient"
 
+String crossMacSuffix = "mac"
 String crossCompileMacOutputDir = "${buildDir}/${crossMacSuffix}"
+
+File resourcesDir = project.file("moonclient/resources")
 
 
 task checkGoPath << {
@@ -91,11 +92,12 @@ task checkGoPath << {
     throw new GradleException("The GOPATH environment variable must be set! See https://golang.org/doc/code.html for further information")
   }
 
-  def absoluteProjectDir = project.projectDir.getAbsolutePath()
-
   def expectedAbsoluteProjectDir = new File(
-    goPath + "/src/github.com/giancosta86/moondeploy"
+          goPath + "/src/github.com/giancosta86/moondeploy"
   ).getAbsolutePath()
+
+
+  def absoluteProjectDir = project.projectDir.getAbsolutePath()
 
   if (absoluteProjectDir != expectedAbsoluteProjectDir) {
     throw new GradleException("The project dir should be: '${expectedAbsoluteProjectDir}' but it is '${absoluteProjectDir}'. Please, move the content of the current project dir to the expected directory")
@@ -122,19 +124,19 @@ task installGoLibs {
 task copyResources(type: Copy) {
     dependsOn(checkGoPath, setNotices)
 
-    from project.file("moonclient/resources")
+    from resourcesDir
     into compileOutputDir
 }
 
 
 task createVersionSourceFile << {
-  def versionFile = project.file('version.go')
-
   def lines = [
     "package moondeploy",
     "",
     "var Version = \"${project.version}\""
   ]
+
+  def versionFile = project.file('version.go')
 
   versionFile.withWriter('utf-8') { writer ->
     lines.each {line ->
@@ -147,7 +149,7 @@ task createVersionSourceFile << {
 tasks["setNotices"].dependsOn(createVersionSourceFile)
 
 task compileGo {
-  dependsOn(copyResources, installGoLibs, setNotices)
+  dependsOn(copyResources, installGoLibs)
 } << {
   if (onWindows) {
     exec {
@@ -210,19 +212,8 @@ tasks['build'].dependsOn(['packageProgram'])
 task crossCompileForMac {
   dependsOn(installGoLibs, setNotices)
   } << {
-    if (!onLinux) {
-      throw new GradleException("Automated cross compiling for MacOS is only supported on Linux")
-    }
-
     copy {
-      from project.file("moonclient/resources")
-      into crossCompileMacOutputDir
-      include 'moondeploy.png'
-      include 'moondeploy.ico'
-    }
-
-    copy {
-      from project.file("setup/osFiles/${crossMacSuffix}")
+      from resourcesDir
       into crossCompileMacOutputDir
       include 'moondeploy.png'
       include 'moondeploy.ico'
