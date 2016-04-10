@@ -22,7 +22,7 @@ package apps
 
 import (
 	"fmt"
-	"os/exec"
+	"os"
 	"path/filepath"
 
 	"github.com/giancosta86/caravel"
@@ -31,6 +31,10 @@ import (
 	"github.com/giancosta86/moondeploy/v3/launchers"
 	"github.com/giancosta86/moondeploy/v3/log"
 )
+
+const macScriptContentFormat = `#!/bin/bash
+"%v" "%v"
+`
 
 func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDescriptor descriptors.AppDescriptor) (err error) {
 	desktopDir, err := caravel.GetUserDesktop()
@@ -42,36 +46,34 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 		return fmt.Errorf("Expected desktop dir '%v' not found", desktopDir)
 	}
 
-	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName()) + ".scpt"
-	log.Debug("Script file name: '%v'", scriptFileName)
+	scriptFileName := caravel.FormatFileName(referenceDescriptor.GetName())
+	log.Debug("Bash shortcut name: '%v'", scriptFileName)
 
 	scriptFilePath := filepath.Join(desktopDir, scriptFileName)
-	log.Debug("Script file to create: '%v'...", scriptFilePath)
+	log.Info("Creating Bash shortcut: '%v'...", scriptFilePath)
 
-	scriptGenerationCommand := exec.Command(
-		"osacompile",
-		"-e",
-		"do",
-		"shell",
-		"script",
-		fmt.Sprintf(`""%v" "%v""`,
-			launcher.GetExecutable(),
-			app.GetLocalDescriptorPath()),
-		"-o",
-		scriptFilePath)
+	scriptFile, err := os.OpenFile(scriptFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		scriptFile.Close()
 
-	log.Debug("Script command is: %v", scriptGenerationCommand)
+		if err != nil {
+			os.Remove(scriptFilePath)
+		}
+	}()
 
-	err = scriptGenerationCommand.Run()
+	scriptContent := fmt.Sprintf(macScriptContentFormat,
+		launcher.GetExecutable(),
+		app.localDescriptorPath)
+
+	_, err = scriptFile.Write([]byte(scriptContent))
 	if err != nil {
 		return err
 	}
 
-	if !scriptGenerationCommand.ProcessState.Success() {
-		return fmt.Errorf("The script did not run successfully")
-	}
-
-	log.Notice("Shortcut script created")
+	log.Notice("Bash shortcut script created")
 
 	return nil
 }
