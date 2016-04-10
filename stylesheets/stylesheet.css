@@ -157,7 +157,7 @@ a.button span {
 
 
 #download-program span {
-  background: transparent url(../images/moondeploy.png) 12px 50% no-repeat;
+  background: transparent url(../images/download.png) 12px 50% no-repeat;
 }
 
 #view-on-github span {
@@ -340,6 +340,11 @@ footer a:hover {
 .clearfix {display: inline-block;}
 * html .clearfix {height: 1%;}
 .clearfix {display: block;}
+
+
+header {
+	text-align: center;
+}
 
 /* #Media Queries
 ================================================== */
