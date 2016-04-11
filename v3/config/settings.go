@@ -29,4 +29,6 @@ type Settings interface {
 	GetBufferSize() int64
 	GetLoggingLevel() logging.Level
 	IsSkipAppOutput() bool
+	GetBackgroundColor() int
+	GetForegroundColor() int
 }

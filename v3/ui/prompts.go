@@ -28,9 +28,9 @@ import (
 
 func FormatSecureFirstRunPrompt(bootDescriptor descriptors.AppDescriptor) string {
 	const basicFirstRunTemplate = "You are running an application for the first time." +
-		"\n\n\nTitle:   %v" +
-		"\n\nPublisher:   %v" +
-		"\n\nAddress:   %v\n\n\nDo you wish to proceed?"
+		"\n\n\nTitle:\t%v" +
+		"\n\nPublisher:\t%v" +
+		"\n\nAddress:\t%v\n\n\nDo you wish to proceed?"
 
 	return fmt.Sprintf(basicFirstRunTemplate,
 

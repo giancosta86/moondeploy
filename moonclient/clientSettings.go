@@ -46,11 +46,16 @@ const defaultSkipAppOutput = false
 
 const defaultLoggingLevel = logging.DEBUG
 
+const defaultBackgroundColor = 195
+const defaultForegroundColor = 22
+
 type rawMoonSettingsStruct struct {
-	LocalDirectory string
-	BufferSize     int64
-	LoggingLevel   string
-	SkipAppOutput  bool
+	LocalDirectory  string
+	BufferSize      int64
+	LoggingLevel    string
+	SkipAppOutput   bool
+	BackgroundColor int
+	ForegroundColor int
 }
 
 type MoonSettings struct {
@@ -60,6 +65,8 @@ type MoonSettings struct {
 	bufferSize       int64
 	loggingLevel     logging.Level
 	skipAppOutput    bool
+	backgroundColor  int
+	foregroundColor  int
 }
 
 var moonSettings *MoonSettings
@@ -88,8 +95,19 @@ func (settings *MoonSettings) IsSkipAppOutput() bool {
 	return settings.skipAppOutput
 }
 
+func (settings *MoonSettings) GetBackgroundColor() int {
+	return settings.backgroundColor
+}
+
+func (settings *MoonSettings) GetForegroundColor() int {
+	return settings.foregroundColor
+}
+
 func getRawMoonSettings() (rawMoonSettings *rawMoonSettingsStruct) {
-	rawMoonSettings = &rawMoonSettingsStruct{}
+	rawMoonSettings = &rawMoonSettingsStruct{
+		BackgroundColor: -1,
+		ForegroundColor: -1,
+	}
 
 	userDir, err := caravel.GetUserDirectory()
 	if err != nil {
@@ -171,6 +189,18 @@ func getMoonSettings() *MoonSettings {
 	moonSettings.loggingLevel = parseLoggingLevel(rawMoonSettings.LoggingLevel)
 
 	moonSettings.skipAppOutput = rawMoonSettings.SkipAppOutput
+
+	if 0 <= rawMoonSettings.BackgroundColor && rawMoonSettings.BackgroundColor <= 255 {
+		moonSettings.backgroundColor = rawMoonSettings.BackgroundColor
+	} else {
+		moonSettings.backgroundColor = defaultBackgroundColor
+	}
+
+	if 0 <= rawMoonSettings.ForegroundColor && rawMoonSettings.ForegroundColor <= 255 {
+		moonSettings.foregroundColor = rawMoonSettings.ForegroundColor
+	} else {
+		moonSettings.foregroundColor = defaultForegroundColor
+	}
 
 	return moonSettings
 }

@@ -37,6 +37,7 @@ import (
 )
 
 type TerminalUserInterface struct {
+	launcher launchers.Launcher
 	terminal terminals.Terminal
 
 	app      string
@@ -50,6 +51,7 @@ func NewTerminalUserInterface(launcher launchers.Launcher, terminal terminals.Te
 	log.Debug("Terminal columns: %v", terminal.GetColumns())
 
 	return &TerminalUserInterface{
+		launcher: launcher,
 		terminal: terminal,
 	}
 }
@@ -159,9 +161,10 @@ func (userInterface *TerminalUserInterface) Hide() {
 
 func (userInterface *TerminalUserInterface) setupColors() {
 	terminal := userInterface.terminal
+	settings := userInterface.launcher.GetSettings()
 
-	terminal.SetBackgroundColor(195)
-	terminal.SetForegroundColor(22)
+	terminal.SetBackgroundColor(settings.GetBackgroundColor())
+	terminal.SetForegroundColor(settings.GetForegroundColor())
 }
 
 func (userInterface *TerminalUserInterface) redraw() {
