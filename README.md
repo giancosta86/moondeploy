@@ -7,6 +7,10 @@
 
 ## For software users
 
+![First-run prompt](screenshots/firstRun.png)
+
+![Downloading](screenshots/downloading.png)
+
 
 ### Introduction
 
@@ -27,16 +31,19 @@ There are already similar solutions (for example Java Web Start, Getdown or Zero
 
 MoonDeploy requires a **64-bit** system. In particular, to correctly start applications from your web browser, it is recommended that you use the **64-bit version of your favorite browser**, which should be free to download from the browser's website.
 
+Furthermore, on Windows and Linux, MoonDeploy requires the GTK runtime libraries: the quickest way to get them is installing [GIMP](https://www.gimp.org) - but separated installation packages are available.
+
 
 ### Installation
 
 MoonDeploy can be easily installed:
 
-* on Windows, download *MoonDeploy-windows.exe* from the [download area](https://github.com/giancosta86/moondeploy/releases/latest) and run it
+* **Windows** - Download *MoonDeploy-windows.exe* from the [download area](https://github.com/giancosta86/moondeploy/releases/latest) and run it: it will install MoonDeploy *for every user in the system*.
 
-* on Linux, download *MoonDeploy-linux.zip* from the [download area](https://github.com/giancosta86/moondeploy/releases/latest), extract it and run the **setup.sh** script
+* **Linux** - Download *MoonDeploy-linux.zip* from the [download area](https://github.com/giancosta86/moondeploy/releases/latest), extract it and run the *setup.sh* script: it will install MoonDeploy *for the current user*
 
-* Mac OS X is now supported - but the launcher is based on the Bash shell, not on GTK+. Furthermore, you should associate the *moondeploy* program with files having *.moondeploy* extension. If you are an experienced user, you can try to add the GTK+ user interface to your Mac OS version, too: please, consult [the build wiki page](https://github.com/giancosta86/moondeploy/wiki/Building-MoonDeploy).
+* **Mac OS X** - it is now supported, but the GUI is command-line only: you should download MoonDeploy's zip file from the [download area](https://github.com/giancosta86/moondeploy/releases/latest), extract it and manually associate MoonDeploy with *.moondeploy* files in your file manager.
+If you are an experienced user, you can try to add the GTK+ user interface to your Mac OS version, too: please, consult [the build wiki page](https://github.com/giancosta86/moondeploy/wiki/Building-MoonDeploy).
 
 
 ### Usage
@@ -47,7 +54,7 @@ MoonDeploy can be easily installed:
 
 * Whenever an application is run, MoonDeploy stores a dedicated log within the logs directory. By default, it is **USER_DIRECTORY/MoonDeploy/logs**
 
-* To uninstall an application, just delete its directory
+* To uninstall an application, just remove its directory from the app gallery using your file manager
 
 
 ## For software developers
