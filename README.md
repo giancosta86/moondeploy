@@ -84,13 +84,22 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 ### Packaging
 
-* To deploy an application, you don't even need MoonDeploy - just open a text editor to create an [app descriptor](https://github.com/giancosta86/moondeploy/wiki/App-descriptor:-Version-3) in JSON format
+* To deploy an application, you don't even need MoonDeploy - just open a text editor to create an [app descriptor](https://github.com/giancosta86/moondeploy/wiki/App-descriptor:-Version-3) in JSON format.
+
+* A few satellite projects deal with automating this process - in particular:
+
+  * [MoonDeploy-Gradle](https://github.com/giancosta86/MoonDeploy-Gradle): a Gradle plugin that makes even simpler the creation of application descriptors
+
+  * [MoonDeploy-Ant](https://github.com/giancosta86/MoonDeploy-Ant): a set of Ant tasks mainly dedicated to developing a custom solution based on MoonDeploy and Ant
+
 
 * To install the Go library for *very* customized installers, run:
  ```
  go get github.com/giancosta86/moondeploy
  go install github.com/giancosta86/moondeploy
  ```
+
+ then refer to the GoDoc page cited below.
 
 
 ### Documentation
@@ -104,9 +113,11 @@ Existing solutions such as [Java Web Start](http://www.oracle.com/technetwork/ja
 
 ## Special thanks
 
-The author would like to thank:
+The author would like to thank (ordered by surname):
 
-* *Gionata Ercolani*: for his valid and extensive testing of MoonDeploy 3 on Mac OS X as well as for his valuable suggestions about Mac OS
+* *Gionata Ercolani*: for his thorough and extensive testing of MoonDeploy 3 on Mac OS X as well as for his valuable suggestions about Mac OS
+
+* *Marco Mengoli*: for his valid feedback and suggestions on Mac OS X
 
 
 ## See also
