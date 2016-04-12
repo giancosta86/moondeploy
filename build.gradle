@@ -85,6 +85,10 @@ String crossCompileMacOutputDir = "${buildDir}/${crossMacSuffix}"
 
 File resourcesDir = project.file("moonclient/resources")
 
+if (onWindows) {
+  apply from: 'win32dlls.gradle'
+}
+
 
 task checkGoPath << {
   def goPath = System.getenv('GOPATH')
@@ -177,10 +181,42 @@ tasks['check'].dependsOn(['testGo'])
 task copyOsSpecificFiles {
   dependsOn(check)
   } << {
-  copy {
-    from project.file("setup/osFiles/${osSuffix}")
-    into compileOutputDir
-  }
+    if (onWindows) {
+      def win32dllsDirForSetup = project.file("build/win32dlls")
+
+      if (!win32dllsDirForSetup.isDirectory() || win32dllsDirForSetup.list().length == 0) {
+        def msys2_64_Dir = new File("C:/msys64")
+
+        if (!msys2_64_Dir.isDirectory()) {
+          throw new GradleException("Cannot find the MSYS2 - 64bits directory ('${msys2_64_Dir}'). Please, refer to: https://msys2.github.io/ or change the build script")
+        }
+
+        println("Now copying DLLs from MSYS2 64...")
+
+        copy {
+          from new File(msys2_64_Dir, "mingw64/bin")
+          into win32dllsDirForSetup
+
+          include '*.dll'
+          exclude {
+            details -> !win32dlls.contains(details.file.name)
+          }
+        }
+      }
+
+      win32dlls.forEach{ dllFileName ->
+        def dllFile = new File(win32dllsDirForSetup, dllFileName)
+
+        if (!dllFile.isFile()) {
+          throw new GradleException("Could not find DLL '${dllFileName}'. Please, delete the 'win32dlls' build dir and be sure to install all the libraries via MSYS2.")
+        }
+      }
+    }
+
+    copy {
+      from project.file("setup/osFiles/${osSuffix}")
+      into compileOutputDir
+    }
 }
 
 
@@ -221,7 +257,6 @@ task crossCompileForMac {
 
     exec {
       environment "GOOS": "darwin"
-
 
       commandLine "go", "build", "-o", "${crossCompileMacOutputDir}/moondeploy", clientAppPackage
     }

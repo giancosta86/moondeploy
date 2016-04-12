@@ -30,11 +30,8 @@ ArchitecturesInstallIn64BitMode=x64 ia64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\..\build\windows\moondeploy.exe"; DestDir: "{app}"; Flags: 64bit
-Source: "..\..\build\windows\moondeploy.ico"; DestDir: "{app}"
-Source: "..\..\build\windows\moondeploy.png"; DestDir: "{app}"
-Source: "..\..\build\windows\moondeploy.glade"; DestDir: "{app}"
-Source: "..\..\build\windows\background.png"; DestDir: "{app}"
+Source: "..\..\build\windows\*"; DestDir: "{app}"; Flags: 64bit
+Source: "..\..\build\win32dlls\*"; DestDir: "{app}"; Flags: 64bit
 
 [Registry]
 Root: HKCR; SubKey: ".moondeploy"; ValueType: string; ValueData: "MoonDeploy Application"; Flags: uninsdeletekey
