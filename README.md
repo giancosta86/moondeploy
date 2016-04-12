@@ -7,8 +7,6 @@
 
 ## For software users
 
-![First-run prompt](screenshots/firstRun.png)
-
 ![Downloading](screenshots/downloading.png)
 
 
@@ -55,6 +53,15 @@ If you are an experienced user, you can try to add the GTK+ user interface to yo
 * Whenever an application is run, MoonDeploy stores a dedicated log within the logs directory. By default, it is **USER_DIRECTORY/MoonDeploy/logs**
 
 * To uninstall an application, just remove its directory from the app gallery using your file manager
+
+
+### Screenshots
+
+![First-run prompt](screenshots/firstRun.png)
+
+![Downloading](screenshots/downloading.png)
+
+![Desktop shortcut](screenshots/desktopShortcut.png)
 
 
 ## For software developers
