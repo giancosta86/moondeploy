@@ -50,7 +50,7 @@ func initializeLogging(settings config.Settings) {
 func tryToCollectLogs(logsDirectory string) {
 	logFiles, _ := ioutil.ReadDir(logsDirectory)
 
-	if len(logFiles) > 20 {
+	if len(logFiles) > 30 {
 		log.Info("Deleting logs directory...")
 
 		err := os.RemoveAll(logsDirectory)
