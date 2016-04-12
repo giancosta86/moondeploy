@@ -36,7 +36,7 @@ MoonDeploy can be easily installed:
 
 * on Linux, download *MoonDeploy-linux.zip* from the [download area](https://github.com/giancosta86/moondeploy/releases/latest), extract it and run the **setup.sh** script
 
-* Mac OS X is now supported - but the launcher is based on the Bash shell, not on GTK+. Furthermore, you should associate the *moondeploy* program with files having *.moondeploy* extension. If you are an experienced user, you can try to add the GTK+ user interface to your Mac OS version, too: please, consult [the build wiki page](https://github.com/giancosta86/moondeploy/wiki/App-descriptor:-Version-3).
+* Mac OS X is now supported - but the launcher is based on the Bash shell, not on GTK+. Furthermore, you should associate the *moondeploy* program with files having *.moondeploy* extension. If you are an experienced user, you can try to add the GTK+ user interface to your Mac OS version, too: please, consult [the build wiki page](https://github.com/giancosta86/moondeploy/wiki/Building-MoonDeploy).
 
 
 ### Usage
