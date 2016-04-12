@@ -31,7 +31,7 @@ There are already similar solutions (for example Java Web Start, Getdown or Zero
 
 MoonDeploy requires a **64-bit** system. In particular, to correctly start applications from your web browser, it is recommended that you use the **64-bit version of your favorite browser**, which should be free to download from the browser's website.
 
-Furthermore, on Windows and Linux, MoonDeploy requires the GTK runtime libraries: the quickest way to get them is installing [GIMP](https://www.gimp.org) - but separated installation packages are available.
+Furthermore, on Windows and Linux, MoonDeploy might require the GTK runtime libraries: the quickest way to get them is installing [GIMP](https://www.gimp.org) - but separated installation packages are available.
 
 
 ### Installation
