@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/giancosta86/caravel/terminals"
 
@@ -100,9 +99,9 @@ func (userInterface *TerminalUserInterface) styleFirstRunPrompt(prompt string) s
 		return prompt
 	}
 
-	prompt = strings.Replace(prompt, "\n\nTitle:", "\n\n\033[1m   Title:\033[21m", -1)
-	prompt = strings.Replace(prompt, "\n\nPublisher:", "\n\n\033[1m   Publisher:\033[21m", -1)
-	prompt = strings.Replace(prompt, "\n\nAddress:", "\n\n\033[1m   Address:\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nTitle:   ", "\n\n\033[1m   Title:\t\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nPublisher:   ", "\n\n\033[1m   Publisher:\t\033[21m", -1)
+	prompt = strings.Replace(prompt, "\n\nAddress:   ", "\n\n\033[1m   Address:\t\033[21m", -1)
 	prompt = strings.Replace(prompt, "\n\nWARNING:", "\n\n\033[1mWARNING:\033[21m", -1)
 
 	return prompt
@@ -189,9 +188,6 @@ func (userInterface *TerminalUserInterface) redraw() {
 
 	terminal.HideCursor()
 	terminal.EnableTextHidden()
-
-	//TODO: DEL THIS
-	time.Sleep(500 * time.Millisecond)
 }
 
 func (userInterface *TerminalUserInterface) drawTitle() {
