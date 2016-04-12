@@ -155,17 +155,19 @@ a.button span {
 }
 
 
-
-#download-program span {
+#downloadProgram span {
   background: transparent url(../images/download.png) 12px 50% no-repeat;
 }
 
-#view-on-github span {
-  background: transparent url(../images/octocat-icon.png) 12px 50% no-repeat;
-}
-#view-on-github {
+
+#viewOnGithub {
   margin-right: 0;
 }
+
+#viewOnGithub span {
+  background: transparent url(../images/octocat-icon.png) 12px 50% no-repeat;
+}
+
 
 code, pre {
   margin-bottom: 30px;
@@ -346,6 +348,8 @@ header {
 	text-align: center;
 }
 
+
+
 /* #Media Queries
 ================================================== */
 
@@ -364,9 +368,9 @@ header {
   #downloads {
     margin-bottom: 25px;
   }
-  #download-program {
-    display: none;
-  }
+	#downloadProgram {
+		display: none;
+	}
   .inner {
     width: 94%;
     margin: 0 auto;
