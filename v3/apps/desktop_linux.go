@@ -61,7 +61,7 @@ func (app *App) CreateDesktopShortcut(launcher launchers.Launcher, referenceDesc
 
 	log.Info("Creating desktop shortcut: '%v'...", shortcutFilePath)
 
-	shortcutFile, err := os.OpenFile(shortcutFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
+	shortcutFile, err := os.OpenFile(shortcutFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
 	if err != nil {
 		return err
 	}
