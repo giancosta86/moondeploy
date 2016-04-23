@@ -28,6 +28,15 @@ Please, consult [MoonDeploy for developers](https://github.com/giancosta86/moond
 * MoonDeploy's Go API has a [dedicated GoDoc page](https://godoc.org/github.com/giancosta86/moondeploy), if you wish to employ its engine for a custom installer
 
 
+## First applications using MoonDeploy
+
+* [Chronos IDE](http://gianlucacosta.info/Chronos-IDE), the visual development environment of a programming language dedicated to Discrete-Event simulation - created by MoonDeploy's author! :ghost:
+
+* [GraphsJ](http://gianlucacosta.info/GraphsJ), a didactic ScalaFX application and framework for running graph algorithms
+
+* [KnapScal](http://gianlucacosta.info/KnapScal), a ScalaFX didactic application for the Knapsack problem
+
+
 
 ## Special thanks
 
