@@ -41,6 +41,10 @@ The author would like to thank (ordered by surname):
 
 ## Further references
 
+* [Official website](http://gianlucacosta.info/moondeploy)
+
+* [MaanBloem](http://gianlucacosta.info/MaanBloem) - App manager for MoonDeploy
+
 * [Facebook page](https://www.facebook.com/MoonDeploy/)
 
 
