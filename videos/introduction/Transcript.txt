@@ -1,0 +1,63 @@
+Greetings, and welcome to MoonDeploy!
+
+I'm Gianluca Costa, and I'll briefly introduce this tool for easily installing and updating applications.
+
+This video regards the Windows operating system, but the core concepts are equally applicable to Linux and Mac OS X.
+
+First of all, let's point our web browser – for example, Firefox – to the displayed address.
+
+This is the official website - very minimalist: if you wish to consult the user's manual or the technical specifications, please visit its GitHub page, especially its wiki.
+
+To download MoonDeploy, let's click the "Get MoonDeploy" button: it will download the installation bundle crafted for your operating system - in this case, a traditional Windows setup wizard!
+
+Let's download and execute it: the wizard should be run by a system administrator, as it will install MoonDeploy for every user in the system.
+
+Let's choose "Yes" to start the installation...
+
+Apart from this detail, the setup procedure is straightforward and can be completed by always clicking "Next". Let's wait for the files to be copied... and let's click "Finish".
+
+Voilà! Our system is now ready to run new applications using MoonDeploy.
+
+But... how can we actually install applications? As a starting point, we need to open files having ".moondeploy" extension, that are called "app descriptors". Usually, you'll find them on web pages, but they can also be shared via e-mail, social networks, instant messaging - because they are small text files.
+
+Let's run our very first application - as an example, we'll choose GraphsJ, which is a ScalaFX didactic application dedicated to graph problems.
+
+To install GraphsJ, we need its app descriptor - which, in this case, can be downloded from its website!
+
+Let's browse to this other address.
+
+In the upper part of the page, there are 2 buttons:
+
+* "Get binary zip" is for users not having MoonDeploy - they can run the app by downloading and extracting the zip file, as usual: the problem is that they will have to manually organize their downloaded applications and keep them up-to-date – tasks which would be automatically performed by MoonDeploy.
+
+* "Run with MoonDeploy" is just what we need: let's click on it to download the app descriptor for GraphsJ
+
+Firefox shows this dialog box - let's choose "Open with: MoonDeploy Application", and MoonDeploy will start executing the app!
+
+When you run any app for the first time, MoonDeploy will show you a few details about it - its title, its publisher and, most important, the website which will provide the application files. It is up to you to check that you trust such address; equally important, the address should employ HTTPS, for enhanced security - otherwise, MoonDeploy will issue a warning.
+
+Let's accept, and MoonDeploy starts downloading the app files, because it's the first run; the next executions will employ the downloaded packages - unless a new version of the specific app is available.
+
+In the end - MoonDeploy will ask you to create a shortcut for the application on your Desktop - which is usually a good idea, so let's accept.
+
+Finally, our program runs. And here we are! We have installed an app and run it, without manually downloading and extracting its zip files, and without locating its binary files.
+
+But there is more! Let's close the application; how can we run it again? And what happens?
+
+To start GraphsJ again, we can double click its desktop shortcut - otherwise, we'd need to double click its local descriptor on your PC, or use an app manager, which we'll mention in a while.
+
+When we start an installed app via MoonDeploy, it will usually check for updates - connecting to its own website: if a new version is available, MoonDeploy will install and run it; otherwise, the current version is started: this is one more advantage of MoonDeploy over manual downloading of zip files.
+
+There's little else to say about installing and running applications – so, let's end the video with an interesting app that completes MoonDeploy: it's called MaanBloem and it enables you to intuitively run, inspect and uninstall all the applications which you have installed via MoonDeploy.
+
+Let's point our browser to this final address and let's click on "Run with MoonDeploy": we'll see the very same setup process as for GraphsJ.
+
+Let's download the app files...
+
+Now that MaanBloem is installed, let's start it... and here we are: all the applications installed via MoonDeploy - in this example, GraphsJ and MaanBloem itself - are listed in the window. If we want to run GraphsJ, we just select it and click "Run app" - and MoonDeploy will start it.
+
+This concludes our brief introduction on MoonDeploy - I hope you have found this tecnology interesting! ^__^!
+
+For further information, please visit its GitHub page.
+
+Thank you for watching! Goodbye! ^__^
