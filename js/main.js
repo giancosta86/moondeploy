@@ -9,6 +9,9 @@ $(document).ready(function() {
     var os = "linux"
   } else if (lowerCasePlatform.indexOf("mac") > -1) {
     var os = "mac"
+
+    downloadButton.attr("href", "https://github.com/giancosta86/moondeploy/wiki/Building-MoonDeploy")
+    return
   }
 
   println("OS = " + os)
