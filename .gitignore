@@ -2,3 +2,4 @@
 /build/**
 /setup/windows/Output/**
 /version.go
+/_site
