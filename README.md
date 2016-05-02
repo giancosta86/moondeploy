@@ -9,7 +9,11 @@
 
 If you are a software user, you are probably wondering why you should install MoonDeploy and how you can actually employ it.
 
-Please, have a look at [MoonDeploy for users](https://github.com/giancosta86/moondeploy/wiki/MoonDeploy-for-users) in the wiki! ^\_\_^!
+Please, have a look at [MoonDeploy for users](https://github.com/giancosta86/moondeploy/wiki/MoonDeploy-for-users) in the wiki.
+
+Finally, you might also want to watch a YouTube video:
+
+[![Youtube](videos/introduction/Thumbnail.png)](https://youtu.be/BvpJiD6SZnI)
 
 
 
