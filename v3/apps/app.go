@@ -273,9 +273,9 @@ func (app *App) Launch(command *exec.Cmd, settings config.Settings, userInterfac
 	outputBytes, err = command.CombinedOutput()
 
 	if outputBytes != nil && len(outputBytes) > 0 {
-		fmt.Println("------------------------------")
-		fmt.Println(outputBytes)
-		fmt.Println("------------------------------")
+		log.Info("------------------------------")
+		log.Info(string(outputBytes))
+		log.Info("------------------------------")
 	}
 
 	return err
