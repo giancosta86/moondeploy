@@ -123,6 +123,15 @@ func Run(
 
 	//----------------------------------------------------------------------------
 
+	log.Info("Checking for conflicting local descriptors...")
+	err = app.CheckForConflictingLocalDescriptors()
+	if err != nil {
+		return err
+	}
+	log.Notice("No conflicting local descriptors found")
+
+	//----------------------------------------------------------------------------
+
 	log.Info("Resolving the local descriptor...")
 	localDescriptor := app.GetLocalDescriptor()
 

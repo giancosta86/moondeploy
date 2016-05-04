@@ -27,6 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/giancosta86/caravel"
 
@@ -62,6 +63,23 @@ type App struct {
 
 func (app *App) DirectoryExists() bool {
 	return caravel.DirectoryExists(app.Directory)
+}
+
+func (app *App) CheckForConflictingLocalDescriptors() (err error) {
+	bootDescriptor := app.bootDescriptor
+
+	appRootFiles, err := ioutil.ReadDir(app.Directory)
+	if err != nil {
+		return err
+	}
+
+	for _, appRootFile := range appRootFiles {
+		if !appRootFile.IsDir() && strings.HasSuffix(strings.ToLower(appRootFile.Name()), ".moondeploy") && appRootFile.Name() != bootDescriptor.GetDescriptorFileName() {
+			return fmt.Errorf("Conflicting app descriptors: only one app descriptor can be deployed to a given path.\n\nPlease, contact the publisher of '%v'.", bootDescriptor.GetName())
+		}
+	}
+
+	return nil
 }
 
 func (app *App) CanPerformFirstRun(userInterface ui.UserInterface) bool {
