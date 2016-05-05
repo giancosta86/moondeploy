@@ -45,6 +45,10 @@ func validate(descriptor AppDescriptor) (err error) {
 		return fmt.Errorf("Descriptor File Name field is missing")
 	}
 
+	if !strings.HasSuffix(descriptorFileName, ".moondeploy") {
+		return fmt.Errorf("The descriptor filename must end with .moondeploy")
+	}
+
 	if path.Base(descriptorFileName) != descriptorFileName {
 		return fmt.Errorf("Descriptor File Name cannot be a path")
 	}
