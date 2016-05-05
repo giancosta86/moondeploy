@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/giancosta86/caravel"
 	"github.com/giancosta86/moondeploy/v3"
 	"github.com/giancosta86/moondeploy/v3/config"
 	"github.com/giancosta86/moondeploy/v3/log"
@@ -38,7 +39,7 @@ func initializeLogging(settings config.Settings) {
 	logsDirectory := settings.GetLogsDirectory()
 	log.Debug("Logs directory is: '%v'", logsDirectory)
 
-	tryToCollectLogs(logsDirectory)
+	tryToRemoveLogs(logsDirectory, settings)
 	ensureLogsDirectory(logsDirectory)
 
 	logFile := createLogFile(logsDirectory)
@@ -47,15 +48,28 @@ func initializeLogging(settings config.Settings) {
 	log.Setup(logFile)
 }
 
-func tryToCollectLogs(logsDirectory string) {
-	logFiles, _ := ioutil.ReadDir(logsDirectory)
+func tryToRemoveLogs(logsDirectory string, settings config.Settings) {
+	if !caravel.DirectoryExists(logsDirectory) {
+		return
+	}
 
-	if len(logFiles) > 30 {
-		log.Info("Deleting logs directory...")
+	logFiles, err := ioutil.ReadDir(logsDirectory)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot list the logs directory: %v\n", err)
+		return
+	}
 
-		err := os.RemoveAll(logsDirectory)
-		if err != nil {
-			log.Error("Cannot remove the logs directory ('%v') for garbage collection. Error: %v", logsDirectory, err)
+	now := time.Now()
+
+	for _, logFile := range logFiles {
+		logFileAge := now.Sub(logFile.ModTime())
+
+		if logFileAge.Hours() > float64(settings.GetLogMaxAgeInHours()) {
+			logFilePath := filepath.Join(logsDirectory, logFile.Name())
+			err = os.Remove(logFilePath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Cannot delete log file: '%v'\n", logFile.Name())
+			}
 		}
 	}
 }
@@ -63,7 +77,7 @@ func tryToCollectLogs(logsDirectory string) {
 func ensureLogsDirectory(logsDirectory string) {
 	err := os.MkdirAll(logsDirectory, 0700)
 	if err != nil {
-		log.Error("Cannot create the logs directory ('%v'). %v", logsDirectory, err.Error())
+		log.Error("Cannot create the logs directory ('%v'). %v", logsDirectory, err)
 		os.Exit(v3.ExitCodeError)
 	}
 }

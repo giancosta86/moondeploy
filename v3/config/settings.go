@@ -31,4 +31,5 @@ type Settings interface {
 	IsSkipAppOutput() bool
 	GetBackgroundColor() int
 	GetForegroundColor() int
+	GetLogMaxAgeInHours() int
 }

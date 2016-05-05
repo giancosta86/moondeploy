@@ -49,13 +49,16 @@ const defaultLoggingLevel = logging.DEBUG
 const defaultBackgroundColor = 195
 const defaultForegroundColor = 22
 
+const defaultLogMaxAgeInHours = 120
+
 type rawMoonSettingsStruct struct {
-	LocalDirectory  string
-	BufferSize      int64
-	LoggingLevel    string
-	SkipAppOutput   bool
-	BackgroundColor int
-	ForegroundColor int
+	LocalDirectory   string
+	BufferSize       int64
+	LoggingLevel     string
+	SkipAppOutput    bool
+	BackgroundColor  int
+	ForegroundColor  int
+	LogMaxAgeInHours int
 }
 
 type MoonSettings struct {
@@ -67,6 +70,7 @@ type MoonSettings struct {
 	skipAppOutput    bool
 	backgroundColor  int
 	foregroundColor  int
+	logMaxAgeInHours int
 }
 
 var moonSettings *MoonSettings
@@ -103,10 +107,15 @@ func (settings *MoonSettings) GetForegroundColor() int {
 	return settings.foregroundColor
 }
 
+func (settings *MoonSettings) GetLogMaxAgeInHours() int {
+	return settings.logMaxAgeInHours
+}
+
 func getRawMoonSettings() (rawMoonSettings *rawMoonSettingsStruct) {
 	rawMoonSettings = &rawMoonSettingsStruct{
-		BackgroundColor: -1,
-		ForegroundColor: -1,
+		BackgroundColor:  -1,
+		ForegroundColor:  -1,
+		LogMaxAgeInHours: defaultLogMaxAgeInHours,
 	}
 
 	userDir, err := caravel.GetUserDirectory()
