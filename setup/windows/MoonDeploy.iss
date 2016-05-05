@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{2EF654FA-68EC-4AEE-AA11-5BBF2395098D}
 AppName=MoonDeploy
-AppVersion=3.0
+AppVersion=3.2
 AppPublisher=Gianluca Costa
 AppPublisherURL=http://gianlucacosta.info/
 AppSupportURL=http://gianlucacosta.info/moondeploy/
@@ -36,5 +36,5 @@ Source: "..\..\build\win32dlls\*"; DestDir: "{app}"; Flags: 64bit
 [Registry]
 Root: HKCR; SubKey: ".moondeploy"; ValueType: string; ValueData: "MoonDeploy Application"; Flags: uninsdeletekey
 Root: HKCR; SubKey: "MoonDeploy Application"; ValueType: string; ValueData: "MoonDeploy application"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "MoonDeploy Application\Shell\Open\Command"; ValueType: string; ValueData: """{app}\moondeploy.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKCR; SubKey: "MoonDeploy Application\Shell\Open\Command"; ValueType: string; ValueData: """{app}\moondeployw.exe"" ""%1"""; Flags: uninsdeletekey
 Root: HKCR; Subkey: "MoonDeploy Application\DefaultIcon"; ValueType: string; ValueData: "{app}\moondeploy.ico,0"; Flags: uninsdeletevalue
