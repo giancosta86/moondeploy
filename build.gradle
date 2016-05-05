@@ -26,7 +26,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "info.gianlucacosta.moonlicense:moonlicense-gradle:4.0"
+        classpath "info.gianlucacosta.moonlicense:moonlicense-gradle:4.1"
     }
 }
 
@@ -80,9 +80,6 @@ if (onWindows) {
 
 String clientAppPackage = "github.com/giancosta86/moondeploy/moonclient"
 
-String crossMacSuffix = "mac"
-String crossCompileMacOutputDir = "${buildDir}/${crossMacSuffix}"
-
 File resourcesDir = project.file("moonclient/resources")
 
 if (onWindows) {
@@ -107,6 +104,7 @@ task checkGoPath << {
     throw new GradleException("The project dir should be: '${expectedAbsoluteProjectDir}' but it is '${absoluteProjectDir}'. Please, move the content of the current project dir to the expected directory")
   }
 }
+
 
 task installGoLibs {
     dependsOn(checkGoPath)
@@ -152,12 +150,17 @@ task createVersionSourceFile << {
 
 tasks["setNotices"].dependsOn(createVersionSourceFile)
 
+
 task compileGo {
   dependsOn(copyResources, installGoLibs)
 } << {
   if (onWindows) {
     exec {
-      commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", "-ldflags", "-H windowsgui", clientAppPackage
+      commandLine "go", "build", "-o", "${compileOutputDir}/moondeploy${programExtension}", clientAppPackage
+    }
+
+    exec {
+      commandLine "go", "build", "-o", "${compileOutputDir}/moondeployw${programExtension}", "-ldflags", "-H windowsgui", clientAppPackage
     }
   } else {
     exec {
@@ -243,35 +246,3 @@ tasks['createOsSpecificPackages'].onlyIf { onWindows }
 task('packageProgram').dependsOn(['createProgramZip', 'createOsSpecificPackages'])
 
 tasks['build'].dependsOn(['packageProgram'])
-
-
-task crossCompileForMac {
-  dependsOn(installGoLibs, setNotices)
-  } << {
-    copy {
-      from resourcesDir
-      into crossCompileMacOutputDir
-      include 'moondeploy.png'
-      include 'moondeploy.ico'
-    }
-
-    exec {
-      environment "GOOS": "darwin"
-
-      commandLine "go", "build", "-o", "${crossCompileMacOutputDir}/moondeploy", clientAppPackage
-    }
-}
-
-
-task('crossCreateProgramZipForMac', type: Zip, dependsOn: ['crossCompileForMac']) {
-  from crossCompileMacOutputDir
-
-  archiveName "moondeploy-${version}-${crossMacSuffix}.zip"
-
-  destinationDir buildDir
-}
-
-
-task crossBuildForMac {
-  dependsOn(crossCreateProgramZipForMac)
-} << {}
